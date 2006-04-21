@@ -9,63 +9,6 @@
 #include <avr/delay.h>
 
 
-const unsigned char easyavrDevice[] =
-{ 0x12,	      // 18 length of device descriptor
-  0x01,       // descriptor type = device descriptor 
-  0x10,0x01,  // version of usb spec. ( e.g. 1.1) 
-  0x00,	      // device class
-  0x00,	      // device subclass
-  0x00,       // protocol code
-  0x08,       // deep of ep0 fifo in byte (e.g. 8)
-  0x00,0x04,  // vendor id
-  0x12,0x34,  // product id
-  0x03,0x01,  // revision id (e.g 1.02)
-  0x00,       // index of manuf. string
-  0x00,	      // index of product string
-  0x00,	      // index of ser. number
-  0x01        // number of configs
-};
-
-// ********************************************************************
-// configuration descriptor          
-// ********************************************************************
-
-const unsigned char easyavrConf[] =
-{ 0x09,	      // 9 length of this descriptor
-  0x02,       // descriptor type = configuration descriptor 
-  0x20,0x00,  // total length with first interface ... 
-  0x01,	      // number of interfaces
-  0x01,	      // number if this config. ( arg for setconfig)
-  0x00,       // string index for config
-  0xA0,       // attrib for this configuration ( bus powerded, remote wakup support)
-  0x1A,        // power for this configuration in mA (e.g. 50mA)
-//InterfaceDescriptor
-  0x09,	      // 9 length of this descriptor
-  0x04,       // descriptor type = interface descriptor 
-  0x00,	      // interface number 
-  0x00,	      // alternate setting for this interface 
-  0x02,	      // number endpoints without 0
-  0x00,       // class code 
-  0x00,       // sub-class code 
-  0x00,       // protocoll code
-  0x00,       // string index for interface
-//EP1 Descriptor
-  0x07,	      // length of ep descriptor
-  0x05,	      // descriptor type= endpoint
-  0x81,	      // endpoint address (e.g. in ep1)
-  0x02,	      // transfer art ( bulk )
-  0x80,0x00,  // fifo size
-  0x00,	      // polling intervall in ms
-//EP2 Descriptor
-  0x07,	      // length of ep descriptor
-  0x05,	      // descriptor type= endpoint
-  0x02,	      // endpoint address (e.g. out ep2)
-  0x02,	      // transfer art ( bulk )
-  0x00,0x08,  // fifo size
-  0x00	      // polling intervall in ms
-};
-
-
 
 
 #include "uart.h"
@@ -86,10 +29,15 @@ SIGNAL(SIG_INTERRUPT0)
 }
 
 
+// start programm from application sector
+void (*jump_to_app)(void) = 0x0000;
 void BootLoaderRunApplication()
 {
-
+  MCUCR = (1<<IVCE);       // move interruptvectors to the Application sector
+  MCUCR = (0<<IVSEL);      // device specific !
+  jump_to_app();	  // Jump to application sector
 }
+
 
 void BootLoaderWriteMemory(char page,char *data)
 {
@@ -108,7 +56,64 @@ void BootLoader(char *buf)
 
 int main(void)
 {
-  int conf, interf;
+
+  const unsigned char easyavrDevice[] =
+  { 0x12,	      // 18 length of device descriptor
+    0x01,       // descriptor type = device descriptor 
+    0x10,0x01,  // version of usb spec. ( e.g. 1.1) 
+    0x00,	      // device class
+    0x00,	      // device subclass
+    0x00,       // protocol code
+    0x08,       // deep of ep0 fifo in byte (e.g. 8)
+    0x00,0x04,  // vendor id
+    0x12,0x34,  // product id
+    0x03,0x01,  // revision id (e.g 1.02)
+    0x00,       // index of manuf. string
+    0x00,	      // index of product string
+    0x00,	      // index of ser. number
+    0x01        // number of configs
+  };
+
+  // ********************************************************************
+  // configuration descriptor          
+  // ********************************************************************
+
+  const unsigned char easyavrConf[] =
+  { 0x09,	      // 9 length of this descriptor
+    0x02,       // descriptor type = configuration descriptor 
+    0x20,0x00,  // total length with first interface ... 
+    0x01,	      // number of interfaces
+    0x01,	      // number if this config. ( arg for setconfig)
+    0x00,       // string index for config
+    0xA0,       // attrib for this configuration ( bus powerded, remote wakup support)
+    0x1A,        // power for this configuration in mA (e.g. 50mA)
+    //InterfaceDescriptor
+    0x09,	      // 9 length of this descriptor
+    0x04,       // descriptor type = interface descriptor 
+    0x00,	      // interface number 
+    0x00,	      // alternate setting for this interface 
+    0x02,	      // number endpoints without 0
+    0x00,       // class code 
+    0x00,       // sub-class code 
+    0x00,       // protocoll code
+    0x00,       // string index for interface
+    //EP1 Descriptor
+    0x07,	      // length of ep descriptor
+    0x05,	      // descriptor type= endpoint
+    0x81,	      // endpoint address (e.g. in ep1)
+    0x02,	      // transfer art ( bulk )
+    0x80,0x00,  // fifo size
+    0x00,	      // polling intervall in ms
+    //EP2 Descriptor
+    0x07,	      // length of ep descriptor
+    0x05,	      // descriptor type= endpoint
+    0x02,	      // endpoint address (e.g. out ep2)
+    0x02,	      // transfer art ( bulk )
+    0x00,0x08,  // fifo size
+    0x00	      // polling intervall in ms
+  };
+
+
   UARTInit();
   USBNInit(easyavrDevice,easyavrConf);   
 
@@ -123,6 +128,7 @@ int main(void)
 
   // start usb chip
   USBNStart();
+  USBNDebug("bootloader ready\r\n");
 
   while(1);
 }

@@ -6,6 +6,7 @@
 #include <inttypes.h>
 
 #include "uart.h"
+#include "../../firmware/usbn960x/usbnapi.h"
 #include "usbn2mc.h"
 
 

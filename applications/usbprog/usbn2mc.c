@@ -23,7 +23,7 @@
 //*******************************************************************
 // add own vendor requests          
 // ********************************************************************
-
+/*
 // decode your own vendor requests
 
 void USBNDecodeVendorRequest(DeviceRequest *req)
@@ -48,7 +48,7 @@ void USBNDecodeClassRequest(DeviceRequest *req)
   USBNRead(RXD0);
   USBNRead(RXD0);
 }
-
+*/
 
 
 // ********************************************************************

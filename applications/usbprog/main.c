@@ -9,6 +9,7 @@
 #include <avr/delay.h>
 
 #include "uart.h"
+#include "../../firmware/usbn960x/usbnapi.h"
 #include "usbn2mc.h"
 
 void Terminal(char cmd);
@@ -186,3 +187,34 @@ int main(void)
   while(1);
 }
 
+
+/*
+
+//*******************************************************************
+// add own vendor requests
+// ********************************************************************
+// decode your own vendor requests
+
+void USBNDecodeVendorRequest(DeviceRequest *req)
+{
+  //SendHex(req->bRequest);       // decode request code
+  SendHex(req->wLength);       // decode request code
+  USBNWrite(RXC0,RX_EN);
+  USBNRead(RXD0);
+  USBNRead(RXD0);
+
+  //USBNWrite(TXC0,FLUSH);
+  //USBNWrite(TXD0,0x24);
+  //USBNWrite(TXD0,0x25);
+}
+
+
+void USBNDecodeClassRequest(DeviceRequest *req)
+{
+  //SendHex(req->bRequest);       // decode request code
+  SendHex(req->wLength);       // decode request code
+  USBNWrite(RXC0,RX_EN);
+  USBNRead(RXD0);
+  USBNRead(RXD0);
+}
+*/

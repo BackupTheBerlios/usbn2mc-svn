@@ -19,7 +19,7 @@
 #ifndef _USBN960X_H
 #define _USBN960X_H
 
-#define DEBUG 1 
+#define DEBUG 0 
 
 #include "usbn960xreg.h"
 #include "usb11spec.h"
@@ -63,8 +63,6 @@ struct epinfo {
 }; 
 
 unsigned char EP0RXBuf[8];
-
-
 
 
 // system functions

@@ -103,8 +103,8 @@ int main(void)
   //USBNInterfaceName(conf,interf,"usbstorage");
   
 
-  USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,&SetGetPort);
-  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64);
+  USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&SetGetPort);
+  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0);
 
 /*
   conf = USBNAddConfiguration();

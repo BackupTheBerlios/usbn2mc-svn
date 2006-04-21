@@ -18,8 +18,7 @@
 #ifndef _MCIFACE_H_
 #define _MCIFACE_H_
 
-
-#include "../../firmware/usbn960x/usbnapi.h"
+//#include "../../firmware/usbn960x/usbnapi.h"
 
 unsigned char USBNRead(unsigned char Adr);
 unsigned char USBNBurstRead(void);
@@ -30,9 +29,6 @@ void USBNInitMC(void);
 
 // print debug messages
 void USBNDebug(char *msg);
-
-void USBNDecodeVendorRequest(DeviceRequest *req);
-void USBNDecodeClassRequest(DeviceRequest *req);
 
 
 /// The Atmega register used to send data/address to the USBN9604

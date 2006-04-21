@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <usb.h>
-#include <time.h>
 
-clock_t start, end;
-double cpu_time_used;
 
 int main(int argc, char **argv)
 {
