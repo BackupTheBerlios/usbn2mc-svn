@@ -22,7 +22,8 @@ void Terminal(char cmd)
   switch(cmd)
   {   
     case 'i':
-      USBNStart();   
+      BootLoaderRunApplication();
+      //USBNStart();   
     break;
     // write to usb register
     case 'w':

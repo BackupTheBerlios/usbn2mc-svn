@@ -29,6 +29,9 @@ SIGNAL(SIG_INTERRUPT0)
 
 uint8_t state;
 uint8_t page_addr;
+uint8_t page_addr_w;
+uint8_t pageblock[128];
+uint8_t collect128;
 
 
 #define NONE	    0x00
@@ -39,15 +42,20 @@ uint8_t page_addr;
 
 // pointer to the beginning of application code
 void (*jump_to_app)( void ) = 0x0000;
+void wait_ms(int ms)
+{
+  int i;
+  for(i=0;i<ms;i++)
+    _delay_ms(1);
+}
 
-
-void BootProgramPage (uint32_t page, uint8_t *buf)
+void BootProgramPage (uint32_t page)
 {
   uint16_t i;
   uint8_t sreg;
 
-  // Disable interrupts.
-
+  //SendHex(page);
+  page = page*128;
   sreg = SREG;
   cli();
     
@@ -55,14 +63,13 @@ void BootProgramPage (uint32_t page, uint8_t *buf)
 
   boot_page_erase (page);
   boot_spm_busy_wait ();      // Wait until the memory is erased.
+  uint8_t wbufaddr = 0;
 
   for (i=0; i<SPM_PAGESIZE; i+=2)
   {
     // Set up little-endian word.
-
-    uint16_t w = *buf++;
-    w += (*buf++) << 8;
-        
+    uint16_t w = pageblock[wbufaddr++];
+    w += pageblock[wbufaddr++] << 8;
     boot_page_fill (page + i, w);
   }
 
@@ -84,37 +91,85 @@ void BootProgramPage (uint32_t page, uint8_t *buf)
 // start programm from application sector
 void BootLoaderRunApplication()
 {
+  //UARTWrite("start\r\n");
+  if(collect128){
+    //SendHex(page_addr);
+    page_addr = page_addr/2;
+    BootProgramPage (page_addr);
+    UARTWrite("programm rest\r\n"); 
+  }
+
   USBNWrite(RXC1,FLUSH);
   USBNWrite(RXC1,RX_EN);
 
   USBNWrite(MCNTRL,SRST);  // clear all usb registers
 
-  MCUCR = (1<<IVCE);       // move interruptvectors to the Application sector
-  MCUCR = (0<<IVSEL);      // device specific !
+  GICR = _BV(IVCE);  // enable wechsel der Interrupt Vectoren
+  GICR = 0x00; // Interrupts auf Application Section umschalten
+
   jump_to_app();	  // Jump to application sector
 }
 
 
 void BootLoader(char *buf)
 {
+  int i;
   // check state first ist 
   switch(state)
   {
     case WRITEPAGE:
       //UARTWrite("write\r\n");
       //SendHex(page_addr);
-      BootProgramPage (page_addr,buf);
-      state = NONE;
+      
+      // if page sizte= 128 collect two 64 packages to a 128
+      if(SPM_PAGESIZE==0x80)
+      {
+	//UARTWrite("128\r\n");
+	//SendHex(page_addr);
+	if(page_addr%2)
+	{
+	  collect128=0;
+	  //UARTWrite("odd\r\n");
+	  // get sescond package
+	  if(page_addr==1)
+	    page_addr_w = 0;
+	  else 
+	    page_addr_w = (page_addr-1)/2;
+	  
+	  for(i=0;i<64;i++)
+	  {
+	    pageblock[i+64]=buf[i];
+	  }
+ 
+	  // write page
+	  BootProgramPage (page_addr_w);
+	  state = NONE;
+	}else
+	{
+	  collect128=1;
+	  //UARTWrite("even\r\n");
+	  // get first package 
+	  for(i=0;i<64;i++)
+	    pageblock[i]=buf[i];
+
+	  state = NONE;
+	}	
+      } else
+      {
+	UARTWrite("64\r\n");
+	BootProgramPage (page_addr);
+	state = NONE;
+      }
     break;
     default:
       //UARTWrite("default\r\n");
       state = buf[0];
-      page_addr = buf[1];
+      if(state==WRITEPAGE)
+	page_addr = buf[1];
 
       if(state==STARTAPP)
       {
-	cli();
-	UARTWrite("start\r\n");
+	//cli();
 	BootLoaderRunApplication();
 	state = NONE;
       }
@@ -126,7 +181,6 @@ void BootLoader(char *buf)
 
 int main(void)
 {
-
   // spm (bootloader mode from avr needs this, to use an own isr table)	
   cli();
   GICR = _BV(IVCE);  // enable wechsel der Interrupt Vectoren
@@ -208,6 +262,13 @@ int main(void)
   
   UARTWrite("\r\nbootloader is now active\r\n");
 
+  collect128=0;
+  // wait 2 seconds then start application
+
+  wait_ms(2000);
+
+  BootLoaderRunApplication();
+ 
   while(1);
 }
 

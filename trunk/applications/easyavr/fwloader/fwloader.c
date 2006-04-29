@@ -39,10 +39,12 @@ void easyAVR_FlashBin(struct usb_dev_handle* usb_handle,char *file)
 
   while(!feof(fd))
   {
-    buf[offset++]=fgetc(fd);
+    buf[offset]=fgetc(fd);
 
-    if(offset >=63)
+    offset++;
+    if(offset == 64)
     {
+      //printf("send package\n");
       // command message
       cmd[0]=WRITEPAGE;
       cmd[1]=(char)page; // page number
@@ -56,6 +58,7 @@ void easyAVR_FlashBin(struct usb_dev_handle* usb_handle,char *file)
   }
   if(offset > 0)
   {
+    //printf("rest\n");
     // command message
     cmd[0]=WRITEPAGE;
     cmd[1]=(char)page; // page number
