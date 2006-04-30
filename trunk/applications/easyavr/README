@@ -1,5 +1,0 @@
-easyavr is a chip like the easyusb from cypress.
-The firmware of the avr is load at the usb connect,
-into the flash.
-
-Benedikt Sauter sauter@ixbat.de
