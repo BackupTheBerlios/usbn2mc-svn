@@ -1,0 +1,49 @@
+usbn2mc - An universal USB Interface
+1. What's usbn2mc? 
+
+usbn2mc is an universal USB Interface for a Microcontroller which has 12 I/O Pins, a SPI Interface or a DMA Controller. The 
+project is based on the USB Bridge from National Semiconductor USBN9602/03/04. The Advantages of this USB-Controller are the 
+price, the configuration and the availability in many electronic shops.
+
+The main part of the project, is the common usb layer of the controller, which manages the communication with usbn960x. It is 
+written in ANSI C, this means it compiles with every ANSI C Compiler.
+
+With usbn2mc you can build and copy every usb device. It is also possible to implement class and vendor requests.
+
+The connection between your device and your application is quite easy to realize. You can finde many examples in our example 
+section. 
+
+The firmware needs about 6K code memory, and circa 500 Byte RAM.
+
+Example:
+
+It is easy to develop your own device with the usbn API. 
+
+Define your vendor, product and  device number:
+
+USBNDeviceVendorID(0x1234);
+USBNDeviceProductID(0x9876);
+
+Give your device a name: 
+
+USBNDeviceManufacture("My little firm");
+USBNDeviceProduct("My device");
+USBNSerialNumber("rev 1.0");
+
+Add Configurations:
+
+conf = USBNAddConfiguration();
+USBNConfigurationName("xyz");
+USBNConfigurationPower(50); // Power in mA
+
+Add Interfaces:
+
+interf = USBNAddInterface(conf,0);
+USBNInterfaceName(conf,interf,"usblp");
+
+Add Endpoints for the communication:
+
+USBNAddInEndpoint(conf,interf,1,1,BULK,64);
+USBNAddOutEndpoint(conf,interf,1,2,BULK,64,&PrintOnLCD);
+
+The last parameter is the function which is  called when the device receives some data on the endpoint.
