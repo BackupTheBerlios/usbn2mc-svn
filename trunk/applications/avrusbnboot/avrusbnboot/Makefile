@@ -1,5 +1,5 @@
 all:
-	gcc -o fwloader fwloader.c -lusb
+	gcc -o avrusbnboot avrusbnboot.c -lusb
 
 install:
 	cp vlabc /usr/bin
