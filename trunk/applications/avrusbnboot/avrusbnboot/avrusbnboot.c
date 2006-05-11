@@ -129,11 +129,15 @@ void easyAVR_Close(struct usb_dev_handle* usb_handle)
 
 int main(int argc, char **argv)
 {
+
+  // start with the destination of your bin file
+	
   struct usb_dev_handle* usb_handle;
   usb_handle = easyAVR_Open();
  
   if(argc==2)
     easyAVR_FlashBin(usb_handle,argv[1]);
+
 
   easyAVR_StartApp(usb_handle);
   easyAVR_Close(usb_handle);
