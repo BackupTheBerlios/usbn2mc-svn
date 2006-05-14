@@ -2,11 +2,10 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
-#include <avr/signal.h>
 #include <inttypes.h>
 
 #include "uart.h"
-#include "../../firmware/usbn960x/usbnapi.h"
+#include "../../../firmware/usbn960x/usbnapi.h"
 #include "usbn2mc.h"
 
 
