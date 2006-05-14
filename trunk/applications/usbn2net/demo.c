@@ -32,6 +32,10 @@ void wait_ms(int ms)
    _delay_ms(1);
 }
 
+void RX(char* data)
+{
+
+}
 
 
 int main(void)
@@ -41,8 +45,10 @@ int main(void)
   USBNInit();   
   // setup your usbn device
 
-  USBNDeviceVendorID(0x0400);
-  USBNDeviceProductID(0x9876);
+  USBNDeviceVendorID(0x0525);
+  //USBNDeviceVendorID(0x0400);
+  USBNDeviceProductID(0x2888);
+  //USBNDeviceProductID(0x9876);
   USBNDeviceBCDDevice(0x0201);
 
 
@@ -54,9 +60,13 @@ int main(void)
   USBNDeviceProduct	("usbn2net");
   USBNDeviceSerialNumber("2006-04-12");
 
+
+  USBNDeviceClass(0x02); // ethernet
+  USBNDeviceSubClass(0x00);
+  USBNDeviceProtocol(0x00);
+  
   conf = USBNAddConfiguration();
 
-  //USBNConfigurationName(conf,"StandardKonfiguration");
   USBNConfigurationPower(conf,50);
 
   interf = USBNAddInterface(conf,0);
@@ -65,8 +75,8 @@ int main(void)
   //USBNInterfaceName(conf,interf,"usbstorage");
   
 
-  //USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&At89Flash);
-  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0);
+  USBNAddOutEndpoint(conf,interf,1,0x03,BULK,64,0,&RX);
+  USBNAddInEndpoint(conf,interf,1,0x04,BULK,64,0);
 
   
   MCUCR |=  (1 << ISC01); // fallende flanke
