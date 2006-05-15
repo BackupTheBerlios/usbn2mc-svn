@@ -1,0 +1,100 @@
+
+USB Netzwerkgeraete unter Windows und Linux.
+
+Fuer USB Netzwerkgeraete ist es leider nicht so eindeutig Treiber
+und Schnittstellen zu schreiben wie z.B. bei der HID-, oder Audio-Class.
+
+
+CDC Ethernet und RNDIS:
+
+Es gibt eigentlich zwei Lösungen. 
+
+Die erste ist die vom USB Forum. Hier handelt es sich um die 
+Communication Device Class. Diese wird von Linux und Mac OS
+unterstuetzt.
+
+Die zweite Loesung Remote Network Driver Interface Secification
+(RNDIS) kommt von Microsoft.  Leider hat Microsoft nur
+diese Lösung in Windows implementiert.
+
+Wenn man ein Gerät entwickeln möchte das unter Windows und Linux
+läuft muss man entweder beide Lösungen in dem Gerät implementieren,
+oder auf propriotäre Treiber zurückgreifen.
+
+Diese gibt es z.B.  von http://www.belcarra.com oder http://www.jungo.com
+
+
+CDC Subset:
+
+Da die Klasse CDC Ethernet vom USB Chip mehr verlangt (verschiedene
+Konfigurationen laden, 2 Bulk Endpoints, 1 Interrupt Endpoint...)
+wurde das Treibermodell cdc_subset in das Leben gerufen. Mit
+dieser klasse kann man mit jedem Gerät kommunizieren das zwei Bulk Endpoints
+anbietet. Das ist auch schon die Anforderung an das Gerät.
+
+Ich habe bis jetzt keine Lösung für Windows für diese einfache Art und Weise gefunden.
+Im Kernel 2.6 ist alles dabei was man dazu braucht.
+
+
+CDC Subset mit eigener Hardware unter Linux betreiben.
+
+
+
+
+CDC Subset is a mininal solution for network connections over
+USB. Only two bulk enpoints are necessary for an easy connection.
+
+One endpoint is for incomming data and the other one for outgoing.
+
+You have to told your usbsystem (in the linux kernel)  that it
+talk with your device over cde_subset.
+These informations are in the file cdc_subset.c in drivers/usb/net.
+
+The other method, wich i prefered for developing was that i give
+my device the vendor and product id from the EPSON USB client.
+
+There is also a definition for the endpoints. 
+
+About Rows 155 in cdc_subset.c
+static const struct driver_info epson2888_info = {
+        .description =  "Epson USB Device",
+        .check_connect = always_connected,
+
+        .in = 4, .out = 3,
+};
+
+Here you can find the vendor and product id (first is vendor)
+Row 256:
+
+#ifdef  CONFIG_USB_EPSON2888
+{
+  USB_DEVICE (0x0525, 0x2888),    // EPSON USB client
+     .driver_info    = (unsigned long) &epson2888_info,
+},
+#endif
+
+
+with modprobe cdc_subset the driver are loaded.
+
+Now you have to activate the network device with
+
+ifconfig usb0 up ( or usb1,usb2,...)
+
+cdc_subset generates a random MAC Address.
+
+You can get the actual MAC Address with the following code:
+
+/*Get source MAC*/
+memset(&ifr, 0x00, sizeof(ifr));
+strncpy(ifr.ifr_name, "eth0", sizeof(ifr.ifr_name));
+if(ioctl(s, SIOCGIFHWADDR, &ifr) < 0){
+     printf("Fail to get hw addr\n");
+     exit(0);
+ } 
+
+
+
+
+
+
+modprobe cdc_subset
