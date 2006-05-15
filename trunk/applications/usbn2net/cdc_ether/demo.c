@@ -45,11 +45,8 @@ int main(void)
   USBNInit();   
   // setup your usbn device
 
-  USBNDeviceVendorID(0x0525);
-  //USBNDeviceVendorID(0x0400);
-  USBNDeviceProductID(0x2888);
-  //USBNDeviceProductID(0x9876);
-  USBNDeviceBCDDevice(0x0201);
+  USBNDeviceVendorID(0x0400);
+  USBNDeviceProductID(0x9876);
 
 
   char lang[]={0x09,0x04};
@@ -74,6 +71,8 @@ int main(void)
 
   //USBNInterfaceName(conf,interf,"usbstorage");
   
+  interf = USBNAddInterface(conf,0);
+  USBNAlternateSetting(conf,interf,1);
 
   USBNAddOutEndpoint(conf,interf,1,0x03,BULK,64,0,&RX);
   USBNAddInEndpoint(conf,interf,1,0x04,BULK,64,0);
