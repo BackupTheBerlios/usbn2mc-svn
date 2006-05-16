@@ -32,10 +32,25 @@ void wait_ms(int ms)
    _delay_ms(1);
 }
 
+
+// this function is called by the usb core when
+// the host sends data
+
 void RX(char* data)
 {
+  //call uip receive engine
+  
+}
+
+
+// this function is for the uip stack to send data to the host
+
+void TX(char* data)
+{
+
 
 }
+
 
 
 int main(void)
@@ -44,6 +59,10 @@ int main(void)
   UARTInit();
   USBNInit();   
   // setup your usbn device
+
+  /********************************************
+   * setup USB System 
+   *******************************************/
 
   USBNDeviceVendorID(0x0525);
   //USBNDeviceVendorID(0x0400);
@@ -59,7 +78,6 @@ int main(void)
   USBNDeviceManufacture ("B.Sauter");
   USBNDeviceProduct	("usbn2net");
   USBNDeviceSerialNumber("2006-04-12");
-
 
   USBNDeviceClass(0x02); // ethernet
   USBNDeviceSubClass(0x00);
@@ -78,11 +96,16 @@ int main(void)
   USBNAddOutEndpoint(conf,interf,1,0x03,BULK,64,0,&RX);
   USBNAddInEndpoint(conf,interf,1,0x04,BULK,64,0);
 
-  
-  MCUCR |=  (1 << ISC01); // fallende flanke
+ 
+  /********************************************
+   * setup uIP Stack 
+   *******************************************/ 
 
-  GICR |= (1 << INT0);
-  sei();
+
+
+ /********************************************
+   * start engine 
+   *******************************************/ 
   
   USBNInitMC();
 

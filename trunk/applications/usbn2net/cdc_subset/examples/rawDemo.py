@@ -16,7 +16,8 @@ ifName,ifProto,pktType,hwType,hwAddr = s.getsockname()
 srcAddr = hwAddr
 dstAddr ="\xEA\x3D\x22\x1A\x00\x20"
 #dstAddr = "\x01\x02\x03\x04\x05\x06"
-ethData = "here is some data for an ethernet packet"
+#ethData = "here is some data for an ethernet packet"
+ethData = "abc abc here is some data for an ethernet packet sjkjskhd sdlskdjslkdj slkdjslkdjsl dslkjdslkjdslkdj slkj"
 
 txFrame = struct.pack("!6s6sh",dstAddr,srcAddr,proto) + ethData
 
