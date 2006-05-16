@@ -23,12 +23,12 @@ txFrame = struct.pack("!6s6sh",dstAddr,srcAddr,proto) + ethData
 print "Tx[%d]: "%len(ethData) + string.join(["%02x"%ord(b) for b in ethData]," ")
 		      
 s.send(txFrame)
-
+'''
 rxFrame = s.recv(2048)
 
 dstAddr,srcAddr,proto = struct.unpack("!6s6sh",rxFrame[:14])
 ethData = rxFrame[14:]
 
 print "Rx[%d]: "%len(ethData) + string.join(["%02x"%ord(b) for b in ethData]," ")
-
+'''
 s.close()
