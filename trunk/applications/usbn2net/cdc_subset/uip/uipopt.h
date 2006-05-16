@@ -130,10 +130,10 @@ typedef unsigned short uip_stats_t;
  */
 #define UIP_PINGADDRCONF 0
 
-#define UIP_IPADDR0     192 /**< The first octet of the IP address of
+#define UIP_IPADDR0     10 /**< The first octet of the IP address of
 			       this uIP node, if UIP_FIXEDADDR is
 			       1. \hideinitializer */
-#define UIP_IPADDR1     168 /**< The second octet of the IP address of
+#define UIP_IPADDR1     0 /**< The second octet of the IP address of
 			       this uIP node, if UIP_FIXEDADDR is
 			       1. \hideinitializer */
 #define UIP_IPADDR2     0   /**< The third octet of the IP address of
@@ -327,7 +327,8 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_RECEIVE_WINDOW   32768
+//#define UIP_RECEIVE_WINDOW   32768
+#define UIP_RECEIVE_WINDOW   500 
 
 /**
  * Determines if support for TCP urgent data notification should be
@@ -423,7 +424,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_BUFSIZE     1500
+#define UIP_BUFSIZE     200 
 
 
 /**

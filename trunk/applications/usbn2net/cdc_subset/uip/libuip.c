@@ -36,8 +36,7 @@
 #include "uip.h"
 #include "uip_arp.h"
 #include "tapdev.h"
-#include "httpd.h"
-#include "telnet.h"
+#include "httpd/httpd.h"
 
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
 
