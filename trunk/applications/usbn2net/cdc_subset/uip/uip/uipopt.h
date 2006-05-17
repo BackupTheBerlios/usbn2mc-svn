@@ -520,7 +520,7 @@ void uip_log(char *msg);
  * The following example illustrates how this can look.
  \code
 
-void httpd_appcall(void);
+//void httpd_appcall(void);
 #define UIP_APPCALL     httpd_appcall
 
 struct httpd_state {
@@ -532,6 +532,7 @@ struct httpd_state {
 #define UIP_APPSTATE_SIZE (sizeof(struct httpd_state))
  \endcode
  */
+#define UIP_APPSTATE_SIZE 0 
 
 /**
  * \var #define UIP_APPCALL
@@ -552,7 +553,7 @@ struct httpd_state {
 /* Include the header file for the application program that should be
    used. If you don't use the example web server, you should change
    this. */
-#include "httpd.h"
+#include "../exampleapp.h"
 
 
 #endif /* __UIPOPT_H__ */

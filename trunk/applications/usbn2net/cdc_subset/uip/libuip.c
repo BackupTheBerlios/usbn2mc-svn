@@ -35,8 +35,8 @@
 
 #include "uip.h"
 #include "uip_arp.h"
-#include "tapdev.h"
-#include "httpd/httpd.h"
+//#include "tapdev.h"
+//#include "httpd/httpd.h"
 
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
 
@@ -45,22 +45,21 @@
 #endif /* NULL */
 
 /*-----------------------------------------------------------------------------------*/
-int
-main(void)
+void libuip_init(void)
 {
-  u8_t i, arptimer;
-
   /* Initialize the device driver. */ 
-  tapdev_init();
+  //tapdev_init();
 
   /* Initialize the uIP TCP/IP stack. */
   uip_init();
 
   /* Initialize the HTTP server. */
-  httpd_init();
-  
-  arptimer = 0;
-  
+  example_init();
+}
+ 
+
+void libuip_received(void)
+{
   while(1) {
     /* Let the tapdev network device driver read an entire IP packet
        into the uip_buf. If it must wait for more than 0.5 seconds, it
@@ -80,19 +79,6 @@ main(void)
 	}
       }
 
-#if UIP_UDP
-      for(i = 0; i < UIP_UDP_CONNS; i++) {
-	uip_udp_periodic(i);
-	/* If the above function invocation resulted in data that
-	   should be sent out on the network, the global variable
-	   uip_len is set to a value > 0. */
-	if(uip_len > 0) {
-	  uip_arp_out();
-	  tapdev_send();
-	}
-      }
-#endif /* UIP_UDP */
-      
       /* Call the ARP timer function every 10 seconds. */
       if(++arptimer == 20) {	
 	uip_arp_timer();
@@ -122,12 +108,12 @@ main(void)
     }
     
   }
-  return 0;
 }
+
 /*-----------------------------------------------------------------------------------*/
 void
 uip_log(char *m)
 {
-  printf("uIP log message: %s\n", m);
+  UARTWrite("uIP log message: %s\n", m);
 }
 /*-----------------------------------------------------------------------------------*/
