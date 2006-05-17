@@ -178,7 +178,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_FIXEDETHADDR 0
+#define UIP_FIXEDETHADDR 1 
 
 #define UIP_ETHADDR0    0x00  /**< The first octet of the Ethernet
 				 address if UIP_FIXEDETHADDR is
@@ -296,7 +296,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_ACTIVE_OPEN 1
+#define UIP_ACTIVE_OPEN 0 
 
 /**
  * The maximum number of simultaneously open TCP connections.
@@ -328,7 +328,7 @@ typedef unsigned short uip_stats_t;
  * \hideinitializer
  */
 //#define UIP_RECEIVE_WINDOW   32768
-#define UIP_RECEIVE_WINDOW   500 
+#define UIP_RECEIVE_WINDOW   400 
 
 /**
  * Determines if support for TCP urgent data notification should be
@@ -445,7 +445,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_LOGGING     0
+#define UIP_LOGGING    1 
 
 /**
  * Print out a uIP log message.
@@ -520,8 +520,9 @@ void uip_log(char *msg);
  * The following example illustrates how this can look.
  \code
 
-//void httpd_appcall(void);
-#define UIP_APPCALL     httpd_appcall
+void example_app(void);
+
+#define UIP_APPCALL     example_app
 
 struct httpd_state {
   u8_t state; 
@@ -529,10 +530,10 @@ struct httpd_state {
   char *dataptr;
   char *script;
 };
+
 #define UIP_APPSTATE_SIZE (sizeof(struct httpd_state))
  \endcode
  */
-#define UIP_APPSTATE_SIZE 0 
 
 /**
  * \var #define UIP_APPCALL
@@ -553,6 +554,7 @@ struct httpd_state {
 /* Include the header file for the application program that should be
    used. If you don't use the example web server, you should change
    this. */
+
 #include "../exampleapp.h"
 
 

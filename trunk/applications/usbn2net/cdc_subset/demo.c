@@ -11,6 +11,8 @@
 #include "../../../firmware/usbn960x/usbnapi.h"
 #include "usbn2mc.h"
 
+#include "uip/libuip.h"
+
 void Terminal(char cmd);
 
 SIGNAL(SIG_UART_RECV)
@@ -39,16 +41,26 @@ void wait_ms(int ms)
 void RX(char* data)
 {
   //call uip receive engine
-  
+  //void libuip_init(void);
+
+  libuip_reveicepacketdata(data,46);
+
+  //void libuip_send();
+
 }
 
 
 // this function is for the uip stack to send data to the host
 
-void TX(char* data)
+void TX(char* data, int len)
 {
+  int i;
+  
+  for(i=0;i<len;i++)
+    USBNWrite(TXD1,data[i]);
 
 
+  USBNWrite(TXC1,TX_LAST+TX_EN);
 }
 
 
@@ -93,15 +105,15 @@ int main(void)
   //USBNInterfaceName(conf,interf,"usbstorage");
   
 
-  USBNAddOutEndpoint(conf,interf,1,0x03,BULK,64,0,&RX);
-  USBNAddInEndpoint(conf,interf,1,0x04,BULK,64,0);
-
+  USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&RX);
+  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0);
  
   /********************************************
    * setup uIP Stack 
    *******************************************/ 
 
 
+  libuip_init();
 
  /********************************************
    * start engine 
@@ -112,7 +124,8 @@ int main(void)
   // start usb chip
   USBNStart();
 
-  while(1);
+  //while(1);
+  libuip_loop();
 }
 
 

@@ -104,7 +104,7 @@ void _USBNReceiveEvent(void)
     USBNRead(RXS1);
 
     *bufp = USBNRead(RXD1);
-    for(i;i<63;i++) 
+    for(i=0;i<63;i++) 
       *(++bufp)=USBNBurstRead(); 
     
     if(rxfifos.rx1==1){
@@ -120,13 +120,18 @@ void _USBNReceiveEvent(void)
   else if(event & RX_FIFO2) 
   {
     USBNRead(RXS2);
-    for(i=0;i<64;i++) 
-      buf[i]=USBNRead(RXD2); 
 
+    *bufp = USBNRead(RXD2);
+    for(i=0;i<63;i++) 
+      *(++bufp)=USBNBurstRead(); 
+    
     if(rxfifos.rx2==1){
-      ptr = rxfifos.func1;
+      ptr = rxfifos.func2;
       (*ptr)(&buf);
     }
+    USBNWrite(RXC2,FLUSH);   
+    USBNWrite(RXC2,RX_EN);    
+    return;
   }
 
   // dynamic function call
@@ -582,9 +587,11 @@ void _USBNSetConfiguration(DeviceRequest *req)
 USBNWrite(TXC1,FLUSH);
 USBNWrite(EPC1,EP_EN+0x03);      // enable EP1 at adr 1
 
+
 USBNWrite(RXC1,FLUSH);
 USBNWrite(EPC2,EP_EN+0x02); 
 USBNWrite(RXC1,RX_EN);
+
 
 USBNWrite(TXC3,FLUSH);
 USBNWrite(EPC5,EP_EN+0x05); 

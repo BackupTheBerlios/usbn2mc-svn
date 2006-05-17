@@ -59,7 +59,7 @@ int main(void)
 
 
   USBNDeviceClass(0x02); // ethernet
-  USBNDeviceSubClass(0x00);
+  USBNDeviceSubClass(0x02);
   USBNDeviceProtocol(0x00);
   
   conf = USBNAddConfiguration();

@@ -33,10 +33,10 @@
  */
 
 
-#include "uip.h"
-#include "uip_arp.h"
-//#include "tapdev.h"
-//#include "httpd/httpd.h"
+#include "uip/uip.h"
+#include "uip/uip_arp.h"
+
+#include <avr/signal.h>
 
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
 
@@ -52,21 +52,53 @@ void libuip_init(void)
 
   /* Initialize the uIP TCP/IP stack. */
   uip_init();
+  uip_log("started");
+
 
   /* Initialize the HTTP server. */
   example_init();
+  
+  uip_arp_init();
 }
- 
 
-void libuip_received(void)
+
+
+void libuip_reveicepacketdata(char *data,int length)
 {
+  int i;
+  //uip_log("get data");
+  // add data to tcp stack
+  for(i=0;i<length;i++){
+    uip_buf[i]=data[i];
+    //SendHex(uip_buf[i]);
+  }
+  uip_len = uip_len + length;
+}
+
+
+void libuip_send()
+{
+ TX(uip_buf,uip_len); 
+ //TX(uip_buf,42); 
+    
+ uip_len=0;
+
+
+}
+
+void libuip_loop(void)
+{
+  u8_t i, arptimer;
+  arptimer=0;
+
   while(1) {
+    cli();
     /* Let the tapdev network device driver read an entire IP packet
        into the uip_buf. If it must wait for more than 0.5 seconds, it
        will return with the return value 0. If so, we know that it is
        time to call upon the uip_periodic(). Otherwise, the tapdev has
        received an IP packet that is to be processed by uIP. */
-    uip_len = tapdev_read();
+    //uip_len = tapdev_read();
     if(uip_len == 0) {
       for(i = 0; i < UIP_CONNS; i++) {
 	uip_periodic(i);
@@ -74,19 +106,22 @@ void libuip_received(void)
 	   should be sent out on the network, the global variable
 	   uip_len is set to a value > 0. */
 	if(uip_len > 0) {
+	  uip_log("len > 0");  
 	  uip_arp_out();
-	  tapdev_send();
+	  libuip_send();
 	}
       }
-
       /* Call the ARP timer function every 10 seconds. */
+      
       if(++arptimer == 20) {	
 	uip_arp_timer();
 	arptimer = 0;
       }
       
     } else {
+
       if(BUF->type == htons(UIP_ETHTYPE_IP)) {
+	uip_log("eth found");
 	uip_arp_ipin();
 	uip_input();
 	/* If the above function invocation resulted in data that
@@ -94,26 +129,30 @@ void libuip_received(void)
 	   uip_len is set to a value > 0. */
 	if(uip_len > 0) {
 	  uip_arp_out();
-	  tapdev_send();
+	  //tapdev_send();
+	  libuip_send();
 	}
       } else if(BUF->type == htons(UIP_ETHTYPE_ARP)) {
+	uip_log("arp found");
 	uip_arp_arpin();
 	/* If the above function invocation resulted in data that
 	   should be sent out on the network, the global variable
 	   uip_len is set to a value > 0. */	
 	if(uip_len > 0) {	
-	  tapdev_send();
+	  //tapdev_send();
+	  //SendHex(uip_len+30);
+	  libuip_send();
 	}
       }
     }
-    
+     sei();
   }
 }
 
-/*-----------------------------------------------------------------------------------*/
-void
-uip_log(char *m)
+
+void uip_log(char *m)
 {
-  UARTWrite("uIP log message: %s\n", m);
+  UARTWrite("uIP log message: ", m);
+  UARTWrite(m);
+  UARTWrite("\r\n");
 }
-/*-----------------------------------------------------------------------------------*/

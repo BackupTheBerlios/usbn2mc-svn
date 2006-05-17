@@ -247,6 +247,7 @@ uip_arp_ipin(void)
      (uip_hostaddr[1] & uip_arp_netmask[1])) {
     return;
   }
+  uip_log("arp update");
   uip_arp_update(IPBUF->srcipaddr, &(IPBUF->ethhdr.src));
   
   return;
