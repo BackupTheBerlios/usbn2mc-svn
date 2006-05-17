@@ -156,10 +156,10 @@ typedef unsigned short uip_stats_t;
 			       this uIP node, if UIP_FIXEDADDR is
 			       1. \hideinitializer */
 
-#define UIP_DRIPADDR0   192 /**< The first octet of the IP address of
+#define UIP_DRIPADDR0   10 /**< The first octet of the IP address of
 			       the default router, if UIP_FIXEDADDR is
 			       1. \hideinitializer */
-#define UIP_DRIPADDR1   168 /**< The second octet of the IP address of
+#define UIP_DRIPADDR1   0 /**< The second octet of the IP address of
 			       the default router, if UIP_FIXEDADDR is
 			       1. \hideinitializer */
 #define UIP_DRIPADDR2   0   /**< The third octet of the IP address of
@@ -253,7 +253,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_UDP           0
+#define UIP_UDP          0
 
 /**
  * Toggles if UDP checksums should be used or not.
@@ -296,7 +296,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_ACTIVE_OPEN 0 
+#define UIP_ACTIVE_OPEN 1 
 
 /**
  * The maximum number of simultaneously open TCP connections.
@@ -316,7 +316,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_LISTENPORTS 10
+#define UIP_LISTENPORTS 10 
 
 /**
  * The size of the advertised receiver's window.
@@ -328,7 +328,7 @@ typedef unsigned short uip_stats_t;
  * \hideinitializer
  */
 //#define UIP_RECEIVE_WINDOW   32768
-#define UIP_RECEIVE_WINDOW   400 
+#define UIP_RECEIVE_WINDOW   200 
 
 /**
  * Determines if support for TCP urgent data notification should be
@@ -339,7 +339,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_URGDATA      1
+#define UIP_URGDATA     1 
 
 /**
  * The initial retransmission timeout counted in timer pulses.
@@ -434,7 +434,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_STATISTICS  1
+#define UIP_STATISTICS 0 
 
 /**
  * Determines if logging of certain events should be compiled in.

@@ -821,7 +821,6 @@ uip_process(u8_t flag)
     UIP_LOG("tcp: bad checksum.");    
     goto drop;
   }
-  
   /* Demultiplex this segment. */
   /* First check any active connections. */
   for(uip_connr = &uip_conns[0]; uip_connr < &uip_conns[UIP_CONNS]; ++uip_connr) {
@@ -841,6 +840,7 @@ uip_process(u8_t flag)
   if((BUF->flags & TCP_CTL) != TCP_SYN)
     goto reset;
   
+
   tmp16 = BUF->destport;
   /* Next, check listening connections. */  
   for(c = 0; c < UIP_LISTENPORTS; ++c) {

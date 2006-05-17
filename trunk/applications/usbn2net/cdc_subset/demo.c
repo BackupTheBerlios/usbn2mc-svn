@@ -59,7 +59,6 @@ void TX(char* data, int len)
   for(i=0;i<len;i++)
     USBNWrite(TXD1,data[i]);
 
-
   USBNWrite(TXC1,TX_LAST+TX_EN);
 }
 

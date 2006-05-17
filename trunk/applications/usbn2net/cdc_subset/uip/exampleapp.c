@@ -8,6 +8,7 @@ void example_init(void)
 
 void example_app(void)
 {
+  uip_log("example app");
   if(uip_newdata() || uip_rexmit())
 	  uip_send("ok\n",3);
 }
