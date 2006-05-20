@@ -30,6 +30,7 @@ void usbn2net_send();
 void usbn2net_event(void);
 
 void usbn2net_toggle();
+void usbn2net_txcallback();
 
 //setup tcp ip stack
 void usbn2net_init(void);
@@ -99,7 +100,7 @@ int main(void)
   
 
   USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&usbn2net_reveive);
-  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0);
+  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0,&usbn2net_txcallback);
  
   /********************************************
    * setup uIP Stack 
@@ -249,35 +250,73 @@ int send_blocks=0;
 void usbn2net_send()
 {
   int i;
-  cli();
- 
-  USBNWrite(TXC1,FLUSH);
-
-  UARTWrite("**************send to bulk ");
-  SendHex(uip_len);
-  UARTWrite("\r\n");
 
   // send till len = 0 
 
+  //togl=0;
+
+  USBNWrite(TXC1,FLUSH);
   if(uip_len > 64)
   {
     for(i=0;i<63;i++)
-      USBNWrite(TXD1,uip_buf[i+(send_blocks*64)]);
+      USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
 
-    usbn2net_toggle();
     send_blocks++;
     uip_len=uip_len-63;
-    //usbn2net_send();
+    usbn2net_toggle();
   }
   else {
     for(i=0;i<uip_len;i++)
       USBNWrite(TXD1,uip_buf[i]);
 
-    usbn2net_toggle();
     uip_len=0;
+    usbn2net_toggle();
   }
  
-    sei();
+}
+
+
+void usbn2net_txcallback()
+{
+  int i;
+  UARTWrite("callback");
+  USBNWrite(TXC1,FLUSH);
+ /* 
+  for(i=0;i<uip_len;i++)
+      USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
+
+*/
+  USBNWrite(TXD1,0x55);
+  if(uip_len!=0)
+   //usbn2net_toggle();
+  USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
+  uip_len=0;
+
+  /*
+  int i;
+  USBNWrite(TXC1,FLUSH);
+  int i;
+  USBNRead(TXS1);
+  USBNWrite(TXC1,FLUSH);
+  //UARTWrite("callback");
+ 
+  if(uip_len > 63)
+  {
+    for(i=0;i<63;i++)
+      USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
+
+    usbn2net_toggle();
+    send_blocks++;
+    uip_len=uip_len-63;
+  }
+  else {
+    for(i=0;i<uip_len;i++)
+      USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
+
+    uip_len=0;
+    usbn2net_toggle();
+//  }
+*/
 }
 
 void usbn2net_toggle()
