@@ -2,7 +2,6 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
-#include <avr/signal.h>
 #include <inttypes.h>
 
 #include "uart.h"
@@ -24,51 +23,38 @@ SIGNAL(SIG_INTERRUPT0)
 }
 
 
+int togl=0;
 
 // testfunction where called when data on ep2, buf is a ptr to a 64 byte field 
-void SetGetPort(char *buf)
+void Receive(char *buf)
 {
-  #define SETPORT 0x01
-  #define GETPORT 0x02
-  char port,pin,value,portorg;
+  int i;
+  for(i=0;i<64;i++)
+    SendHex(buf[i]);
 
-  port = buf[1];
-  pin  = buf[2];
-  value= buf[3];
+  UARTWrite("\r\nSend Back\r\n");
 
-  // this function is called when data where ready
-  if(buf[0]==SETPORT)
-  {
-    if(port==1)
-      portorg = PORTA;
-
-    if(port==2)
-      portorg = PORTB;
-      
-    pin--;
-    
-    ((value) ? ((portorg) |= (1<<(pin))) : ((portorg) &= ~(1<<(pin))));
-  
-    //if(port==1)
-      //PORTA=portorg;
-
-    if(port==2)
-      PORTB=portorg;
-  }
-  else if (buf[0]==GETPORT)
-  {
-  }
- 
-
-
-  // send new port state
   USBNWrite(TXC1,FLUSH);
-  if(buf[1]==1)
-    USBNWrite(TXD1,PINA);
-  if(buf[1]==2)
-    USBNWrite(TXD1,PORTB);
+  for(i=0;i<64;i++)
+    USBNWrite(TXD1,i);
 
   USBNWrite(TXC1,TX_LAST+TX_EN);
+
+}
+
+// called at transfer irq
+void TransferISR()
+{
+  //UARTWrite("ready for next\r\n");
+  int i;
+
+  USBNWrite(TXC1,FLUSH);
+  
+  for(i=0;i<56;i++)
+    USBNWrite(TXD1,i);
+
+
+  USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
 }
 
 
@@ -103,24 +89,15 @@ int main(void)
   //USBNInterfaceName(conf,interf,"usbstorage");
   
 
-  USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&SetGetPort);
-  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0);
+  USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&Receive);
+  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0,&TransferISR);
 
-  
-  MCUCR |=  (1 << ISC01); // fallende flanke
-
-  GICR |= (1 << INT0);
-  sei();
   
   USBNInitMC();
 
   // start usb chip
   USBNStart();
 
-  DDRB=0xff;
-  DDRA=0x00;
-
-  PORTB=0x00;
   while(1);
 }
 

@@ -17,6 +17,7 @@
 */
 
 #include <avr/io.h>
+#include <avr/signal.h>
 #include "usbn2mc.h"
 #include "uart.h"
 
@@ -60,6 +61,11 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 
 void USBNInitMC(void)
 {
+  MCUCR |=  (1 << ISC01); // fallende flanke
+    
+  GICR |= (1 << INT0);
+  sei();
+
   USB_CTRL_DDR = 0xf8;
   //USB_CTRL_DDR = 0xff;
   //USB_CTRL_PORT |= ((PF_RD | PF_WR | PF_CS | PF_RESET) & ~(PF_A0));

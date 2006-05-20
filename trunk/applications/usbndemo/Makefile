@@ -48,7 +48,7 @@ F_OSC = 3686400
 FORMAT = ihex
 
 # Target file name (without extension).
-TARGET = vlab
+TARGET = usbndemo
 
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -436,4 +436,4 @@ build elf hex eep lss sym coff extcoff \
 clean clean_list program
 
 download:
-	avrdude -p m32 -c bsd -U flash:w:vlab.hex -E noreset
+	avrdude -p m32 -c bsd -U flash:w:usbndemo.hex -E noreset

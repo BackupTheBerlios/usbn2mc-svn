@@ -1,12 +1,12 @@
 all:
-	gcc -o vlabc vlabc.c -lusb
+	gcc -o usbndemo usbndemo.c -lusb
 
 install:
-	cp vlabc /usr/bin
-	chmod o+rx /usr/bin/vlabc
+	cp usbndemo /usr/bin
+	chmod o+rx /usr/bin/usbndemo
 	cat usb.usermap >> /etc/hotplug/usb.usermap
-	cp hotplug.vlab /etc/hotplug/usb/vlab
-	chmod o+x /etc/hotplug/usb/vlab
+	cp hotplug.usbndemo /etc/hotplug/usb/usbndemo
+	chmod o+x /etc/hotplug/usb/usbndemo
 	
 clean:
-	rm vlab
+	rm usbndemo
