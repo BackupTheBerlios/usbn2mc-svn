@@ -36,7 +36,6 @@
 #include "uip/uip.h"
 #include "uip/uip_arp.h"
 
-#include <avr/signal.h>
 
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
 
@@ -68,8 +67,9 @@ void libuip_reveicepacketdata(char *data,int length)
   int i;
   //uip_log("get data");
   // add data to tcp stack
+  
   for(i=0;i<length;i++){
-    uip_buf[i]=data[i];
+    uip_buf[i+uip_len]=data[i];
     //SendHex(uip_buf[i]);
   }
   uip_len = uip_len + length;
@@ -86,13 +86,13 @@ void libuip_send()
 
 }
 
-void libuip_loop(void)
+void libuip_event(void)
 {
   u8_t i, arptimer;
-  arptimer=0;
+ // arptimer=0;
 
-  while(1) {
-    cli();
+ // while(1) {
+  //  cli();
     /* Let the tapdev network device driver read an entire IP packet
        into the uip_buf. If it must wait for more than 0.5 seconds, it
        will return with the return value 0. If so, we know that it is
@@ -145,8 +145,8 @@ void libuip_loop(void)
 	}
       }
     }
-     sei();
-  }
+ //    sei();
+ // }
 }
 
 

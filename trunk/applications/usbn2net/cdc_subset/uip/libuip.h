@@ -39,6 +39,6 @@ void libuip_reveicepacketdata(char *data,int length);
 
 void libuip_send();
 
-void libuip_loop(void);
+void libuip_event(void);
 
 void uip_log(char *m);
