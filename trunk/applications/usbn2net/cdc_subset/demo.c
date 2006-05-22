@@ -119,40 +119,7 @@ int main(void)
   USBNStart();
 
   while(1);
-  //libuip_loop();
 }
-
-
-/*
-// add own vendor requests
-
-void USBNDecodeVendorRequest(DeviceRequest *req)
-{
-  //SendHex(req->bRequest);       // decode request code
-  SendHex(req->wLength);       // decode request code
-  USBNWrite(RXC0,RX_EN);
-  USBNRead(RXD0);
-  USBNRead(RXD0);
-
-  //USBNWrite(TXC0,FLUSH);
-  //USBNWrite(TXD0,0x24);
-  //USBNWrite(TXD0,0x25);
-}
-
-
-void USBNDecodeClassRequest(DeviceRequest *req)
-{
-  //SendHex(req->bRequest);       // decode request code
-  SendHex(req->wLength);       // decode request code
-  USBNWrite(RXC0,RX_EN);
-  USBNRead(RXD0);
-  USBNRead(RXD0);
-}
-*/
-
-
-
-
 
 
 /*-----------------------------------------------------------------------------------*/
@@ -160,19 +127,19 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 
 int in_ip_incomplete=0;
 int ip_length=0;
+int fillindex=0;
 
 // get data from usb bus
 void usbn2net_reveive(char* data)
 {
-  //UARTWrite("isr start\r\n");
+  uip_log("receive");
   int i;
   for(i=0;i<64;i++)
   {
-    //SendHex(data[i]); 
-    uip_buf[i+uip_len] = data[i];
+    uip_buf[i+fillindex] = data[i];
   }
-  //UARTWrite("\n\r\n\r");
- 
+
+/******************
   if(in_ip_incomplete)
   {
 
@@ -190,6 +157,7 @@ void usbn2net_reveive(char* data)
     }
   }
   
+*****************************/ 
   if(BUF->type == htons(UIP_ETHTYPE_IP)) 
   {
     //look into ip length field to get all data from usb bus (ip-length + 14 bytes)
@@ -207,27 +175,30 @@ void usbn2net_reveive(char* data)
     {
       // paket is not complete!
       in_ip_incomplete=1;
-      uip_len=64;
+      fillindex=fillindex+64;
+      if(fillindex>=ip_length)
+      {
+	uip_len=ip_length;
+	fillindex=0;
+	usbn2net_event();
+      }
     }
   }
- 
   
   // only allow this if if no further data from ip frame will be received
   // if frame is reveived complete call usbn2net_event
   if(BUF->type == htons(UIP_ETHTYPE_ARP)) {
     uip_len=42;
     usbn2net_event();
-    
+  
+    /*
     // send till uip_buf is clear 
     while(uip_len!=0)
     {
       usbn2net_event();
     }
+    */
   }
-
- 
-  
-  // UARTWrite("isr stop\r\n");
 }
 
 int togl=0;
@@ -237,6 +208,7 @@ int send_blocks=0;
 //void usbn2net_send(char* data, int len)
 void usbn2net_send()
 {
+  uip_log("send");
   int i;
 
   // send till len = 0 
@@ -246,25 +218,32 @@ void usbn2net_send()
   USBNWrite(TXC1,FLUSH);
   if(uip_len > 64)
   {
-    UARTWrite("eins\r\n");
-    for(i=0;i<63;i++)
-      USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
+    uip_log("part of message\r\n");
+
+    for(i=0;i<64;i++)
+      USBNWrite(TXD1,uip_buf[i+(send_blocks*64)]);
 
     send_blocks++;
-    uip_len=uip_len-63;
+    uip_len=uip_len-64;
+    
+    togl=1; // first icmp frame
     usbn2net_toggle();
   }
+  //send complete message at once
   else {
-    UARTWrite("zwei\r\n");
+    uip_log("short message\r\n");
     for(i=0;i<uip_len;i++)
       USBNWrite(TXD1,uip_buf[i]);
 
     uip_len=0;
-    usbn2net_toggle();
+    //usbn2net_toggle();
+    USBNWrite(TXC1,TX_LAST+TX_EN);
   }
 }
 
 
+
+// is called after tx event
 void usbn2net_txcallback()
 {
   int i;
@@ -272,42 +251,43 @@ void usbn2net_txcallback()
   if(uip_len!=0){
     UARTWrite("callback\r\n");
     USBNWrite(TXC1,FLUSH);
-  
+    for(i=0;i<34;i++)
+      USBNWrite(TXD1,uip_buf[i+(send_blocks*64)]);
+/*
     USBNWrite(TXD1,0x55);
     USBNWrite(TXD1,0x55);
     USBNWrite(TXD1,0x55);
     USBNWrite(TXD1,0x55);
-  
+ */ 
     uip_len=0;
-    USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
+    send_blocks=0;
+    usbn2net_toggle();
+    //USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
   }
 }
 
+
+// togl pid for in endpoint
 void usbn2net_toggle()
 {
   if(togl==0)
   {
-    USBNWrite(TXC1,TX_LAST+TX_EN);
     togl=1;
+    USBNWrite(TXC1,TX_LAST+TX_EN);
   } else 
   {
-    //USBNWrite(TXC1,TX_LAST+TX_EN);
-    USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
     togl=0;
+    USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
   }
-  
 }
 
 
 void usbn2net_init(void)
 {
-  /* Initialize the device driver. */ 
-  //tapdev_init();
-
   /* Initialize the uIP TCP/IP stack. */
   uip_init();
+  
   uip_log("started");
-
 
   /* Initialize the HTTP server. */
   example_init();
@@ -317,20 +297,14 @@ void usbn2net_init(void)
 
 
 
+// is only allowed to call when a complete package is in uip_buf
 void usbn2net_event(void)
 {
-  u8_t i, arptimer;
- // arptimer=0;
-
- // while(1) {
-  //  cli();
-    /* Let the tapdev network device driver read an entire IP packet
-       into the uip_buf. If it must wait for more than 0.5 seconds, it
-       will return with the return value 0. If so, we know that it is
-       time to call upon the uip_periodic(). Otherwise, the tapdev has
-       received an IP packet that is to be processed by uIP. */
-    //uip_len = tapdev_read();
+  u8_t i;
+ uip_log("event"); 
+  //uip_len = tapdev_read();
     if(uip_len == 0) {
+  
       for(i = 0; i < UIP_CONNS; i++) {
 	uip_periodic(i);
 	/* If the above function invocation resulted in data that
@@ -339,7 +313,7 @@ void usbn2net_event(void)
 	if(uip_len > 0) {
 	  uip_log("len > 0");  
 	  uip_arp_out();
-	  //usbn2net_send();
+	  usbn2net_send();
 	}
       }
       /* Call the ARP timer function every 10 seconds. */
@@ -381,15 +355,10 @@ void usbn2net_event(void)
 	   should be sent out on the network, the global variable
 	   uip_len is set to a value > 0. */	
 	if(uip_len > 0) {	
-	  //tapdev_send();
-	  //SendHex(uip_len+30);
-	  //usbn2net_send(uip_buf,42);
 	  usbn2net_send();
 	}
       }
     }
- //    sei();
- // }
 }
 
 
