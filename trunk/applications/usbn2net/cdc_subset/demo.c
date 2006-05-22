@@ -249,22 +249,17 @@ void usbn2net_txcallback()
   int i;
 
   if(uip_len!=0){
-    UARTWrite("callback\r\n");
+    uip_log("callback\r\n");
     USBNWrite(TXC1,FLUSH);
     for(i=0;i<34;i++)
       USBNWrite(TXD1,uip_buf[i+(send_blocks*64)]);
-/*
-    USBNWrite(TXD1,0x55);
-    USBNWrite(TXD1,0x55);
-    USBNWrite(TXD1,0x55);
-    USBNWrite(TXD1,0x55);
- */ 
+    
     uip_len=0;
     send_blocks=0;
     usbn2net_toggle();
-    //USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
   }
 }
+
 
 
 // togl pid for in endpoint
