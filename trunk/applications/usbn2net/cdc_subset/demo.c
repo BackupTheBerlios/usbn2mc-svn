@@ -49,7 +49,7 @@ SIGNAL(SIG_INTERRUPT0)
 {
   USBNInterrupt();
 }
-
+/*
 void wait_ms(int ms)
 {
   int i;
@@ -57,7 +57,7 @@ void wait_ms(int ms)
    _delay_ms(1);
 }
 
-
+*/
 
 int main(void)
 {
@@ -158,7 +158,7 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 /*-----------------------------------------------------------------------------------*/
 
 
-int ip_incomplete=0;
+int in_ip_incomplete=0;
 int ip_length=0;
 
 // get data from usb bus
@@ -173,33 +173,21 @@ void usbn2net_reveive(char* data)
   }
   //UARTWrite("\n\r\n\r");
  
-  if(ip_incomplete)
+  if(in_ip_incomplete)
   {
 
     //uip_len = ip_length-64 if result smaller than 64 else reveice next package
     if( (ip_length-64) <= 64)
     {
-      ip_incomplete=0;
+      in_ip_incomplete=0;
       // message complete
       uip_len = ip_length+14;
-    /*  
-      UARTWrite("\n\r\n\r");
-      UARTWrite("ip complete ");
-      SendHex(uip_len);
-
-      UARTWrite("\r\n\r\n");
-      for(i=0;i<uip_len;i++)
-	SendHex(uip_buf[i]);
-      
-      UARTWrite("\r\n\r\n");
-      */
       usbn2net_event();
     }
     else
     {
       UARTWrite("ip incomplete\r\n");
     }
-
   }
   
   if(BUF->type == htons(UIP_ETHTYPE_IP)) 
@@ -218,7 +206,7 @@ void usbn2net_reveive(char* data)
     else
     {
       // paket is not complete!
-      ip_incomplete=1;
+      in_ip_incomplete=1;
       uip_len=64;
     }
   }
@@ -239,7 +227,7 @@ void usbn2net_reveive(char* data)
 
  
   
- // UARTWrite("isr stop\r\n");
+  // UARTWrite("isr stop\r\n");
 }
 
 int togl=0;
@@ -258,6 +246,7 @@ void usbn2net_send()
   USBNWrite(TXC1,FLUSH);
   if(uip_len > 64)
   {
+    UARTWrite("eins\r\n");
     for(i=0;i<63;i++)
       USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
 
@@ -266,57 +255,32 @@ void usbn2net_send()
     usbn2net_toggle();
   }
   else {
+    UARTWrite("zwei\r\n");
     for(i=0;i<uip_len;i++)
       USBNWrite(TXD1,uip_buf[i]);
 
     uip_len=0;
     usbn2net_toggle();
   }
- 
 }
 
 
 void usbn2net_txcallback()
 {
   int i;
-  UARTWrite("callback");
-  USBNWrite(TXC1,FLUSH);
- /* 
-  for(i=0;i<uip_len;i++)
-      USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
 
-*/
-  USBNWrite(TXD1,0x55);
-  if(uip_len!=0)
-   //usbn2net_toggle();
-  USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
-  uip_len=0;
-
-  /*
-  int i;
-  USBNWrite(TXC1,FLUSH);
-  int i;
-  USBNRead(TXS1);
-  USBNWrite(TXC1,FLUSH);
-  //UARTWrite("callback");
- 
-  if(uip_len > 63)
-  {
-    for(i=0;i<63;i++)
-      USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
-
-    usbn2net_toggle();
-    send_blocks++;
-    uip_len=uip_len-63;
-  }
-  else {
-    for(i=0;i<uip_len;i++)
-      USBNWrite(TXD1,uip_buf[i+(send_blocks*63)]);
-
+  if(uip_len!=0){
+    UARTWrite("callback\r\n");
+    USBNWrite(TXC1,FLUSH);
+  
+    USBNWrite(TXD1,0x55);
+    USBNWrite(TXD1,0x55);
+    USBNWrite(TXD1,0x55);
+    USBNWrite(TXD1,0x55);
+  
     uip_len=0;
-    usbn2net_toggle();
-//  }
-*/
+    USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
+  }
 }
 
 void usbn2net_toggle()
@@ -327,6 +291,7 @@ void usbn2net_toggle()
     togl=1;
   } else 
   {
+    //USBNWrite(TXC1,TX_LAST+TX_EN);
     USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
     togl=0;
   }
