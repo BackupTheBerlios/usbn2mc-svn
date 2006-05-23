@@ -156,16 +156,19 @@ void usbn2net_reveive(char* data)
     else
     {
       // paket is not complete!
-      in_ip_incomplete=1;
+      //in_ip_incomplete=1;
       fillindex=fillindex+64;
 
       // if packet is complete start tcp stack
-      if(fillindex>=ip_length)
+      if(fillindex>=(ip_length+14))
       {
-	uip_len=ip_length;
+	uip_len=ip_length+14;
 	fillindex=0;
 	usbn2net_event();
       }
+      else {
+	return ;
+      } 
     }
   }
   

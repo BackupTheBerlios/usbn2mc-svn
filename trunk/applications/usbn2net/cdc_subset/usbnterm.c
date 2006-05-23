@@ -8,7 +8,6 @@
 #include "../../../firmware/usbn960x/usbnapi.h"
 #include "usbn2mc.h"
 
-
 //this is only my debug  tool
 void Terminal(char cmd)
 {  
@@ -23,6 +22,7 @@ void Terminal(char cmd)
     case 'i':
       USBNStart();   
     break;
+    
     // write to usb register
     case 'w':
       //UARTWrite("write to USB reg:");

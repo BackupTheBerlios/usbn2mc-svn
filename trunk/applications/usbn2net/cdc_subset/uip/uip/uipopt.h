@@ -296,7 +296,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_ACTIVE_OPEN 1 
+#define UIP_ACTIVE_OPEN 0 
 
 /**
  * The maximum number of simultaneously open TCP connections.
@@ -307,7 +307,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_CONNS       10
+#define UIP_CONNS      3 
 
 /**
  * The maximum number of simultaneously listening TCP ports.
@@ -316,7 +316,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_LISTENPORTS 10 
+#define UIP_LISTENPORTS 2 
 
 /**
  * The size of the advertised receiver's window.

@@ -1,10 +1,10 @@
 
 #ifndef UIP_APPCALL     
-#define UIP_APPCALL     example_app
+  #define UIP_APPCALL     example_app
 #endif
 
 #ifndef UIP_APPSTATE_SIZE 
-#define UIP_APPSTATE_SIZE 0 
+  #define UIP_APPSTATE_SIZE 0 
 #endif
 
 
