@@ -139,25 +139,7 @@ void usbn2net_reveive(char* data)
     uip_buf[i+fillindex] = data[i];
   }
 
-/******************
-  if(in_ip_incomplete)
-  {
-
-    //uip_len = ip_length-64 if result smaller than 64 else reveice next package
-    if( (ip_length-64) <= 64)
-    {
-      in_ip_incomplete=0;
-      // message complete
-      uip_len = ip_length+14;
-      usbn2net_event();
-    }
-    else
-    {
-      UARTWrite("ip incomplete\r\n");
-    }
-  }
   
-*****************************/ 
   if(BUF->type == htons(UIP_ETHTYPE_IP)) 
   {
     //look into ip length field to get all data from usb bus (ip-length + 14 bytes)
@@ -176,6 +158,8 @@ void usbn2net_reveive(char* data)
       // paket is not complete!
       in_ip_incomplete=1;
       fillindex=fillindex+64;
+
+      // if packet is complete start tcp stack
       if(fillindex>=ip_length)
       {
 	uip_len=ip_length;
@@ -236,8 +220,8 @@ void usbn2net_send()
       USBNWrite(TXD1,uip_buf[i]);
 
     uip_len=0;
-    //usbn2net_toggle();
-    USBNWrite(TXC1,TX_LAST+TX_EN);
+    usbn2net_toggle();
+    //USBNWrite(TXC1,TX_LAST+TX_EN);
   }
 }
 
@@ -246,12 +230,20 @@ void usbn2net_send()
 // is called after tx event
 void usbn2net_txcallback()
 {
-  int i;
+  int i,limit;
 
   if(uip_len!=0){
     uip_log("callback\r\n");
     USBNWrite(TXC1,FLUSH);
-    for(i=0;i<34;i++)
+
+    if(uip_len > 64){
+      uip_len=uip_len-64;
+      limit=64;
+    }
+    else {
+      limit = uip_len;
+    }
+    for(i=0;i<limit;i++)
       USBNWrite(TXD1,uip_buf[i+(send_blocks*64)]);
     
     uip_len=0;
