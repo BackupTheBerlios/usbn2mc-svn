@@ -9,25 +9,11 @@ void example_init(void)
 
 void example_app(void)
 {
-  uip_log("example app");
+  //uip_log("example app");
  
-  if(uip_acked())
+  if(uip_newdata() || uip_rexmit())
   {
-      uip_log("->acked");
-  }
-  if(uip_connected())
-  {
-      uip_log("->connected");
-  }
-
-  if(uip_newdata())
-  {
-    uip_log("->new data");
-  }
-/*
-  if(uip_newdata() || uip_rexmit()){
+    //uip_log("->new data");
     uip_send("ok\n",3);
-    uip_log("example ok send");
   }
-*/ 
 }

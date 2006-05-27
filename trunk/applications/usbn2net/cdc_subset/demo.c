@@ -149,7 +149,7 @@ void usbn2net_reveive(char* data)
     // the ip packet is smaller than 64 Bytes
     if(ip_length <=50)
     {
-      uip_len = ip_length+14;
+      uip_len = ip_length+UIP_LLH_LEN;
       // start uIP Event
       usbn2net_event();
     }
@@ -160,9 +160,9 @@ void usbn2net_reveive(char* data)
       fillindex=fillindex+64;
 
       // if packet is complete start tcp stack
-      if(fillindex>=(ip_length+14))
+      if(fillindex>=(ip_length+UIP_LLH_LEN))
       {
-	uip_len=ip_length+14;
+	uip_len=ip_length+UIP_LLH_LEN;
 	fillindex=0;
 	usbn2net_event();
       }
@@ -196,9 +196,16 @@ int send_blocks=0;
 void usbn2net_send()
 {
   uip_log("send");
+  SendHex(uip_len);
   int i;
 
   // send till len = 0 
+  if(uip_len > 54)
+  {
+    uip_log("get appdata");
+    for(i=0;i<uip_len-54;i++)
+      uip_buf[54+i] = uip_appdata[i];
+  }
 
   //togl=0;
 
