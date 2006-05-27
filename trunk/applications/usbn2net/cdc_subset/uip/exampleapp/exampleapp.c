@@ -1,4 +1,4 @@
-#include "uip/uip.h"
+#include "exampleapp.h"
 
 void example_init(void)
 {

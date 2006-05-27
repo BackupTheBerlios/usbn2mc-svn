@@ -1,3 +1,4 @@
+#include "../uip/uip.h"
 
 #ifndef UIP_APPCALL     
   #define UIP_APPCALL     example_app
