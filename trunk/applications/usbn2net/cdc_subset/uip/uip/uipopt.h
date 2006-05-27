@@ -555,7 +555,7 @@ struct httpd_state {
    used. If you don't use the example web server, you should change
    this. */
 
-#include "../exampleapp.h"
+#include "../app/exampleapp.h"
 
 
 #endif /* __UIPOPT_H__ */
