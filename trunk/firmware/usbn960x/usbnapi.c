@@ -46,6 +46,11 @@ void USBNInit(void)
   rxfifos.rx2 = 0;
   rxfifos.rx3 = 0;
 
+  txfifos.tx1 = 0;
+  txfifos.tx2 = 0;
+  txfifos.tx3 = 0;
+
+
   DescriptorList=NULL;
   StringList=NULL;
 }
@@ -285,8 +290,19 @@ void USBNAddOutEndpoint(int configuration, int interface, int epnr,
 
 // add in endpoint
 void USBNAddInEndpoint(int configuration, int interface, int epnr, 
-			int epadr,char attr, int fifosize, int intervall)
+			int epadr,char attr, int fifosize, int intervall, void *fkt)
 {
+  // FIXME (must be defined when set configuration is called)
+  if(fkt!=NULL)
+  {
+    switch(epnr)
+    {
+      case 1: txfifos.tx1=1; txfifos.func1 = fkt; break;
+      case 2: txfifos.tx2=1; txfifos.func2 = fkt; break;
+      case 3: txfifos.tx3=1; txfifos.func3 = fkt; break;
+    }
+  }
+
   _USBNAddEndpoint(configuration,interface,epnr,epadr+0x80,attr,fifosize,intervall);
 }
 

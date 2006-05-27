@@ -47,6 +47,19 @@ struct RxFIFOCaller
 };
 
 
+struct TxFIFOCaller txfifos;
+
+struct TxFIFOCaller
+{
+  uint8_t tx1;
+  uint8_t tx2;
+  uint8_t tx3;
+
+  void* func1;
+  void* func2;
+  void* func3;
+};
+
 struct list_entry
 {
   void *data;

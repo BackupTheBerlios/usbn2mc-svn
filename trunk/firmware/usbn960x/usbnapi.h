@@ -85,7 +85,7 @@ void USBNAddOutEndpoint(int configuration, int interface, int epnr,
 
 /// define new in enpoint ( from function to host )
 void USBNAddInEndpoint(int configuration, int interface, int epnr, 
-		int epadr, char attr, int fifosize, int intervall);
+		int epadr, char attr, int fifosize, int intervall,void *fkt);
 
 /// add endpoint
 void _USBNAddEndpoint(int configuration, int interface, int epnr, 

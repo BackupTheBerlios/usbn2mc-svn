@@ -153,14 +153,28 @@ void _USBNReceiveEvent(void)
 void _USBNTransmitEvent(void)
 {
   unsigned char event;
+  void (*ptr)();
   event = USBNRead(TXEV);
   //USBNDebug("tx event\r\n");
   if(event & TX_FIFO0) _USBNTransmitFIFO0();
+  // dynamic function call
+  
+  else if(event & TX_FIFO1) 
+  {
+    USBNRead(TXS1);
+
+    if(txfifos.tx1==1){
+      ptr = txfifos.func1;
+      (*ptr)();
+    }
+    return;
+  }
   else {
     #if DEBUG
       USBNDebug("tx event\r\n");
     #endif
-    USBNRead(TXS1);                        // get transmitter status
+
+    //USBNRead(TXS1);                        // get transmitter status
     USBNRead(TXS2);                        // get transmitter status
     USBNRead(TXS3);                        // get transmitter status
   }
