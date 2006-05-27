@@ -202,7 +202,7 @@ void usbn2net_send()
   // send till len = 0 
   if(uip_len > 54)
   {
-    uip_log("get appdata");
+    //uip_log("get appdata");
     for(i=0;i<uip_len-54;i++)
       uip_buf[54+i] = uip_appdata[i];
   }

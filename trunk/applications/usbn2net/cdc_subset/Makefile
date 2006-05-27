@@ -54,7 +54,7 @@ TARGET = demo
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c uart.c usbnterm.c ../../../firmware/usbn960x/usbn960x.c usbn2mc.c \
 	../../../firmware/usbn960x/fifo.c ../../../firmware/usbn960x/usbnapi.c \
-	uip/uip/uip_arch.c  uip/uip/uip.c uip/exampleapp.c uip/uip/uip_arp.c \
+	uip/uip/uip_arch.c  uip/uip/uip.c uip/exampleapp/exampleapp.c uip/uip/uip_arp.c \
 
 
 # List Assembler source files here.
