@@ -84,7 +84,7 @@ i /footer.plain
  */
 
 
-#include "uip.h"
+#include "../uip/uip.h"
 #include "httpd.h"
 #include "fs.h"
 #include "fsdata.h"

@@ -67,7 +67,7 @@ struct httpd_state {
 /* UIP_APPSTATE_SIZE: The size of the application-specific state
    stored in the uip_conn structure. */
 #ifndef UIP_APPSTATE_SIZE
-#define UIP_APPSTATE_SIZE (sizeof(struct httpd_state))
+  #define UIP_APPSTATE_SIZE (sizeof(struct httpd_state))
 #endif
 
 #define FS_STATISTICS 1

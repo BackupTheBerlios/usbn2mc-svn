@@ -46,7 +46,7 @@
 #ifndef __FS_H__
 #define __FS_H__
 
-#include "uip.h"
+#include "../uip/uip.h"
 
 /**
  * An open file in the read-only file system.

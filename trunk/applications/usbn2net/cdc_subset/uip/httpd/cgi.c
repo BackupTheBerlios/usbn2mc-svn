@@ -51,7 +51,7 @@
  *
  */
 
-#include "uip.h"
+#include "../uip/uip.h"
 #include "cgi.h"
 #include "httpd.h"
 #include "fs.h"

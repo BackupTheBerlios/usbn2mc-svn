@@ -55,6 +55,10 @@ TARGET = demo
 SRC = $(TARGET).c uart.c usbnterm.c ../../../firmware/usbn960x/usbn960x.c usbn2mc.c \
 	../../../firmware/usbn960x/fifo.c ../../../firmware/usbn960x/usbnapi.c \
 	uip/uip/uip_arch.c  uip/uip/uip.c uip/exampleapp/exampleapp.c uip/uip/uip_arp.c \
+#	uip/uip/uip_arch.c  uip/uip/uip.c uip/uip/uip_arp.c \
+#	uip/httpd/cgi.c uip/httpd/fs.c uip/httpd/httpd.c
+
+#uip/uip/uip_arch.c  uip/uip/uip.c uip/exampleapp/exampleapp.c uip/uip/uip_arp.c \
 
 
 # List Assembler source files here.

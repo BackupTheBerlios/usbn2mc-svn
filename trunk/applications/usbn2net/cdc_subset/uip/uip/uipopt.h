@@ -328,7 +328,7 @@ typedef unsigned short uip_stats_t;
  * \hideinitializer
  */
 //#define UIP_RECEIVE_WINDOW   32768
-#define UIP_RECEIVE_WINDOW   200 
+#define UIP_RECEIVE_WINDOW   201
 
 /**
  * Determines if support for TCP urgent data notification should be
@@ -424,7 +424,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_BUFSIZE     200 
+#define UIP_BUFSIZE     201 
 
 
 /**
@@ -556,6 +556,8 @@ struct httpd_state {
    this. */
 
 #include "../exampleapp/exampleapp.h"
+
+//#include "../httpd/httpd.h"
 
 
 #endif /* __UIPOPT_H__ */

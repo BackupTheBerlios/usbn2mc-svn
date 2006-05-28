@@ -46,7 +46,7 @@
  * $Id: fs.c,v 1.7.2.3 2003/10/07 13:22:27 adam Exp $
  */
 
-#include "uip.h"
+#include "../uip/uip.h"
 #include "httpd.h"
 #include "fs.h"
 #include "fsdata.h"

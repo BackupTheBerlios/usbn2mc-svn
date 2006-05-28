@@ -288,6 +288,7 @@ void usbn2net_init(void)
 
   /* Initialize the HTTP server. */
   example_init();
+  //httpd_init();
   
   uip_arp_init();
 }

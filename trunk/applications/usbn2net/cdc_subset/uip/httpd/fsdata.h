@@ -35,7 +35,7 @@
 #ifndef __FSDATA_H__
 #define __FSDATA_H__
 
-#include "uipopt.h"
+#include "../uip/uipopt.h"
 
 struct fsdata_file {
   const struct fsdata_file *next;
@@ -60,5 +60,4 @@ struct fsdata_file_noconst {
 #endif /* FS_STATISTICS */
 #endif /* FS_STATISTICS */
 };
-
 #endif /* __FSDATA_H__ */
