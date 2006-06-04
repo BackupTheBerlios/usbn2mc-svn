@@ -1,5 +1,6 @@
 all:
-	gcc -o vscopec vscopec.c -lusb
+	gcc -c ../../lib/vscopedevice.c
+	gcc -o demo main.c -lusb
 
 install:
 	cp vscopec /usr/bin
@@ -9,4 +10,4 @@ install:
 	chmod o+x /etc/hotplug/usb/vscope
 	
 clean:
-	rm vscopec
+	rm demo vscopedevice.o 
