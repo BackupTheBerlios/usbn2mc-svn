@@ -25,7 +25,7 @@ int main (int argc,char **argv)
   int send_status;
   long erg,port,pin,value;
   unsigned char send_data[4];
-  unsigned char receive_data[2];
+  unsigned char receive_data[1024];
 
   usb_init();
   //usb_set_debug(2);
@@ -44,8 +44,16 @@ int main (int argc,char **argv)
     vscope_open(vscope_handle);
     usb_bulk_write(vscope_handle,2,send_data,1,1000);
 
-    usb_bulk_read(vscope_handle,0x83,receive_data,2,1000);	
-    printf("%02x %02x\n",receive_data[0],receive_data[1]); // get actual port state
+    int size,i;
+    int sum=0;
+    //for(i=0;i<10;i++)
+    while(1)
+    {
+      size = usb_bulk_read(vscope_handle,0x83,receive_data,1024,1000);	
+      sum = sum + size;
+      printf("%i %i\n",size,sum); // get actual port state
+    }
+
 
     usb_close(vscope_handle);
   }
@@ -55,9 +63,6 @@ int main (int argc,char **argv)
     printf("\tvscope 1       // get  channnel 0 - 7\n");
   }
     
-
-
- 	
 }	
 
 void vscope_open(usb_dev_handle * vscope_handle)

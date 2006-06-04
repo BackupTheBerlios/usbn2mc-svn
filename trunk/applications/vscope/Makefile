@@ -42,17 +42,17 @@ MCU = atmega32
 
 # Main Oscillator Frequency
 # This is only used to define F_OSC in all assembler and c-sources.
-F_OSC = 3686400
+F_OSC = 16000000 
 
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
 
 # Target file name (without extension).
-TARGET = vscope
+TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c uart.c usbnterm.c ../../firmware/usbn960x/usbn960x.c usbn2mc.c ../../firmware/usbn960x/fifo.c ../../firmware/usbn960x/usbnapi.c
+SRC = $(TARGET).c uart.c usbnterm.c ../../firmware/usbn960x/usbn960x.c usbn2mc.c ../../firmware/usbn960x/fifo.c ../../firmware/usbn960x/usbnapi.c vscope.c
 
 
 # List Assembler source files here.
@@ -436,4 +436,4 @@ build elf hex eep lss sym coff extcoff \
 clean clean_list program
 
 download:
-	avrdude -p m32 -c bsd -U flash:w:vscope.hex -E noreset
+	avrdude -p m32 -c bsd -U flash:w:main.hex -E noreset
