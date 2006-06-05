@@ -1,6 +1,6 @@
 all:
 	gcc -c ../../lib/vscopedevice.c
-	gcc -o demo main.c -lusb
+	gcc -o demo main.c vscopedevice.o -lusb
 
 install:
 	cp vscopec /usr/bin

@@ -25,7 +25,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 int main (int argc,char **argv)
 {
+  VScope *vscope;
+  
   printf("start vscopedevice demo\n"); 
+  vscope = openVScope();
+
+  SetVScopeMode(vscope,MODE_COUNTER);
+  StartVScope(vscope);
+  StopVScope(vscope);
+
   return 0;
 }	
 

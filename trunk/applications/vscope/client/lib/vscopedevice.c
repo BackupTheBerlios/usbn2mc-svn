@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include <stdio.h>
+
 #include "vscopedevice.h"
 
 
@@ -26,7 +27,10 @@ VScope* openVScope()
   unsigned char located = 0;
   struct usb_bus *bus;
   struct usb_device *dev;
-  usb_dev_handle *device_handle = 0;
+
+  VScope *tmp = (VScope*)malloc(sizeof(VScope));
+  tmp->vscope_handle=0;
+  //usb_set_debug(2);
  		
   usb_init();
   usb_find_busses();
@@ -39,23 +43,20 @@ VScope* openVScope()
       if (dev->descriptor.idVendor == 0x0400) 
       {	
 	located++;
-	device_handle = usb_open(dev);
-	//printf("vscope Device Found @ Address %s \n", dev->filename);
-	//printf("vscope Vendor ID 0x0%x\n",dev->descriptor.idVendor);
-	//printf("vscope Product ID 0x0%x\n",dev->descriptor.idProduct);
+	tmp->vscope_handle = usb_open(dev);
       }
-      //else printf("** usb device %s found **\n", dev->filename);			
     }	
   }
 
-  if (device_handle==0) return (0);
+  if (tmp->vscope_handle==0) return (0);
   else 
   {
-    //usb_set_configuration(vscope_handle,1);
-    //usb_claim_interface(vscope_handle,0);
-    //usb_set_altinterface(vscope_handle,0);
+    printf("found\n");
+    usb_set_configuration(tmp->vscope_handle,1);
+    usb_claim_interface(tmp->vscope_handle,0);
+    usb_set_altinterface(tmp->vscope_handle,0);
   
-    //return (device_handle);
+    return (tmp);
   }
 }
 
@@ -64,13 +65,13 @@ VScope* openVScope()
 
 int closeVScope(VScope* self)
 {
-	
+  usb_close(self->vscope_handle);	
 }
 
 
-int sendVScopeCommand(VScope* self,char *command, int length)
+int sendVScopeCommand(VScope* self,char *command)
 {
-
+  return usb_bulk_write(self->vscope_handle,2,command,(int)command[1],100);
 }
 
 int readVscopeData(VScope* self, char* data)
@@ -84,19 +85,22 @@ int readVScopeResults(VScope* self,char *data)
 }
 
 
-void SetVScopeMode(VScope* self,int state)
+void SetVScopeMode(VScope* self,char state)
 {
-	
+  char command[3] = {CMD_SETMODE,3,state};
+  sendVScopeCommand(self,command);
 }
 
 void StartVScope(VScope* self)
 {
-
+  char command[2] = {CMD_STARTSCOPE,2};
+  sendVScopeCommand(self,command);
 }
 
 void StopVScope(VScope* self)
 {
-	
+  char command[2] = {CMD_STOPSCOPE,2};
+  sendVScopeCommand(self,command);
 }
 
 int GetVScopeState(VScope* self)

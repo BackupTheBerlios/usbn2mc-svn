@@ -6,9 +6,19 @@
 
 #include "uart.h"
 #include "usbn2mc.h"
-#include "vscope.h"
 
 void Terminal(char cmd);
+
+#include "vscope.h"
+vscope_t vscope;
+
+
+
+#include "fifo.h"
+uint8_t buffer[100];
+fifo_t fifo;
+
+
 
 SIGNAL(SIG_UART_RECV)
 {
@@ -70,21 +80,33 @@ int main(void)
   
 
   USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&VScopeCommand); // scope commands
-  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0,NULL); // scope data
-  USBNAddInEndpoint(conf,interf,1,0x04,BULK,64,0,NULL); //result logging
+  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0,&VScopePingPongTX1); // scope data
+  USBNAddInEndpoint(conf,interf,2,0x03,BULK,64,0,&VScopePingPongTX2); // scope data
+  USBNAddInEndpoint(conf,interf,3,0x04,BULK,64,0,NULL); //result logging
 
   
   USBNInitMC();
+
+  // init fifo
+  fifo_init(&fifo, buffer, 100);   
+
+
+  //setup vscope state and mode
+  vscope.state=STATE_DONOTHING;
+  vscope.mode=MODE_NONE;
 
   // start usb chip
   USBNStart();
 
   DDRB=0xff;
 
-  while(1);
-    //if(bufindex > 64)
-      //bufindex=bufindex-64;
-      //VscopeSendData(buffer);
-    //}
+  while(1)
+  {
+    if(fifo.count > 0)
+    {
+      // send scope data in ping pong mode
+      VScopeSendScopeData();
+    }
+  }
 }
 
