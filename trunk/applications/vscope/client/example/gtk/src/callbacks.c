@@ -51,7 +51,7 @@ void
 on_button5_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
-
+  GetVScopeFIFOLoad(vscope);
 }
 
 
@@ -68,5 +68,13 @@ on_button7_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
 
+}
+
+
+void
+on_btnreaddata_clicked                 (GtkButton       *button,
+                                        gpointer         user_data)
+{
+  readVscopeData(vscope,NULL);
 }
 

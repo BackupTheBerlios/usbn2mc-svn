@@ -1,3 +1,5 @@
+#include "fifo.h"
+
 #define MODE_NONE         0x00
 #define MODE_COUNTER      0x01
 #define MODE_LOGIC        0x02
@@ -18,11 +20,18 @@
 
 int togl;
 
+int8_t fifobuffer[500];
+
 typedef struct {
   uint8_t state;
   uint8_t mode;
+  fifo_t fifo;
+  uint8_t update1;
+  uint8_t update2;
+  uint8_t txreleaser;
 } vscope_t;
 
+vscope_t vscope;
 
 void VScopeSendScopeData();
 void VScopeCommand(char *buf);

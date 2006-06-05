@@ -27,12 +27,18 @@ int main (int argc,char **argv)
 {
   VScope *vscope;
   
-  printf("start vscopedevice demo\n"); 
   vscope = openVScope();
 
   SetVScopeMode(vscope,MODE_COUNTER);
   StartVScope(vscope);
+  int i;
+  char buf[20000];
+  for(i=0;i<100;i++)
+    readVScopeData(vscope,buf,20000);
   StopVScope(vscope);
+
+  for(i=0;i<100;i++)
+   printf("%x",buf[i]);
 
   return 0;
 }	

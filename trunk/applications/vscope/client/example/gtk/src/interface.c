@@ -41,9 +41,10 @@ create_window1 (void)
   GtkWidget *button5;
   GtkWidget *button6;
   GtkWidget *button7;
+  GtkWidget *btnreaddata;
 
   window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (window1), _("window1"));
+  gtk_window_set_title (GTK_WINDOW (window1), _("vscopedevice demo"));
 
   fixed1 = gtk_fixed_new ();
   gtk_widget_show (fixed1);
@@ -99,6 +100,11 @@ create_window1 (void)
   gtk_fixed_put (GTK_FIXED (fixed1), button7, 8, 200);
   gtk_widget_set_size_request (button7, 104, 24);
 
+  btnreaddata = gtk_button_new_with_mnemonic (_("Read Data"));
+  gtk_widget_show (btnreaddata);
+  gtk_fixed_put (GTK_FIXED (fixed1), btnreaddata, 128, 72);
+  gtk_widget_set_size_request (btnreaddata, 80, 24);
+
   g_signal_connect ((gpointer) btnopen, "clicked",
                     G_CALLBACK (on_btnopen_clicked),
                     NULL);
@@ -120,6 +126,9 @@ create_window1 (void)
   g_signal_connect ((gpointer) button7, "clicked",
                     G_CALLBACK (on_button7_clicked),
                     NULL);
+  g_signal_connect ((gpointer) btnreaddata, "clicked",
+                    G_CALLBACK (on_btnreaddata_clicked),
+                    NULL);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (window1, window1, "window1");
@@ -134,6 +143,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, button5, "button5");
   GLADE_HOOKUP_OBJECT (window1, button6, "button6");
   GLADE_HOOKUP_OBJECT (window1, button7, "button7");
+  GLADE_HOOKUP_OBJECT (window1, btnreaddata, "btnreaddata");
 
   return window1;
 }

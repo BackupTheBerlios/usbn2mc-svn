@@ -9,15 +9,9 @@
 
 void Terminal(char cmd);
 
-#include "vscope.h"
-vscope_t vscope;
-
-
-
 #include "fifo.h"
-uint8_t buffer[100];
-fifo_t fifo;
 
+#include "vscope.h"
 
 
 SIGNAL(SIG_UART_RECV)
@@ -36,7 +30,10 @@ SIGNAL(SIG_INTERRUPT0)
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
   //UARTWrite("timer\r\n");
-
+  
+  uint8_t zeichen = 1;
+  fifo_put (&vscope.fifo, zeichen);
+/*
   if(togl==1)
   {
     PORTB = 0xFF;
@@ -46,7 +43,7 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
     PORTB = 0x00;
     togl=1;
   }
-
+*/
 }
 
 int main(void)
@@ -81,32 +78,35 @@ int main(void)
 
   USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&VScopeCommand); // scope commands
   USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0,&VScopePingPongTX1); // scope data
-  USBNAddInEndpoint(conf,interf,2,0x03,BULK,64,0,&VScopePingPongTX2); // scope data
+  //USBNAddInEndpoint(conf,interf,2,0x03,BULK,64,0,&VScopePingPongTX2); // scope data
   USBNAddInEndpoint(conf,interf,3,0x04,BULK,64,0,NULL); //result logging
 
   
   USBNInitMC();
 
   // init fifo
-  fifo_init(&fifo, buffer, 100);   
+  fifo_init(&vscope.fifo, fifobuffer, 500);   
 
 
   //setup vscope state and mode
   vscope.state=STATE_DONOTHING;
   vscope.mode=MODE_NONE;
+  vscope.update1=1;
+  vscope.update2=1;
 
   // start usb chip
   USBNStart();
 
   DDRB=0xff;
 
+  vscope.txreleaser=1;
   while(1)
   {
-    if(fifo.count > 0)
-    {
-      // send scope data in ping pong mode
-      VScopeSendScopeData();
-    }
+    if(vscope.fifo.count == 500)
+      UARTWrite("fifo is full\r\n");
+    
+    if(vscope.fifo.count > 0)
+      VScopeSendScopeData();  // fill fifos
   }
 }
 

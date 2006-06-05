@@ -71,12 +71,14 @@ int closeVScope(VScope* self)
 
 int sendVScopeCommand(VScope* self,char *command)
 {
-  return usb_bulk_write(self->vscope_handle,2,command,(int)command[1],100);
+  return usb_bulk_write(self->vscope_handle,2,command,(int)command[1],1000);
 }
 
-int readVscopeData(VScope* self, char* data)
+int readVScopeData(VScope* self, char* data, int length)
 {
-	
+  int i;
+  i = usb_bulk_read(self->vscope_handle,0x83,data,length,100);	
+  printf("%i\n",i);
 }
 
 int readVScopeResults(VScope* self,char *data)
@@ -118,7 +120,8 @@ int GetVScopeMode(VScope* self)
 
 int GetVScopeFIFOLoad(VScope* self)
 {
-	
+  char command[2] = {CMD_GETFIFOLOAD,2};
+  sendVScopeCommand(self,command);
 }
 
 

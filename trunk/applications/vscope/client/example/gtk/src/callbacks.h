@@ -28,3 +28,7 @@ on_button6_clicked                     (GtkButton       *button,
 void
 on_button7_clicked                     (GtkButton       *button,
                                         gpointer         user_data);
+
+void
+on_btnreaddata_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
