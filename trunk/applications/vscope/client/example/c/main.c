@@ -21,8 +21,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
 #include "../../lib/vscopedevice.h" 
 
+#define VALUES 30000
 
-
+#define BYTE unsigned char
+int Bit_Test(BYTE val, BYTE bit) {
+   BYTE test_val = 0x01;    /* dezimal 1 / binär 0000 0001 */
+   /* Bit an entsprechende Pos. schieben */
+	      test_val = (test_val << bit);
+	         /* 0=Bit nicht gesetzt; 1=Bit gesetzt */
+	         if ((val & test_val) == 0)
+			       return 0;      /* Nicht gesetzt */
+		    else
+	          return 1;      /* gesetzt */
+}
 int main (int argc,char **argv)
 {
   VScope *vscope;
@@ -32,12 +43,11 @@ int main (int argc,char **argv)
   SetVScopeMode(vscope,MODE_COUNTER);
   StartVScope(vscope);
   int i;
-  char buf[20000];
+  char buf[VALUES];
 
-  for(i=0;i<10;i++)
   while(1)
   {
-    i = readVScopeData(vscope,buf,20000);
+    i = readVScopeData(vscope,buf,VALUES);
     if(i>0)
       break;
   }
@@ -46,9 +56,47 @@ int main (int argc,char **argv)
 
   FILE *datei;
   datei = fopen("vscope.vcd", "w");
+  fprintf (datei, "$date\n");
+  fprintf (datei, "\tMon Jun 15 17:13:54 1998\n"); 
+  fprintf (datei, "$end");
+  fprintf (datei, "$version\n");
+  fprintf (datei, "Chronologic Simulation VCS version 4.0.3\n");
+  fprintf (datei, "$end\n");
+
+  fprintf (datei, "$timescale\n");
+  fprintf (datei, "\t1us\n");      
+  fprintf (datei, "$end\n");
+  fprintf (datei, "$scope module vscope $end\n");
+  fprintf (datei, "$var wire       1 !    channel1 $end\n");
+  fprintf (datei, "$var wire       1 *    channel2 $end\n");
+  fprintf (datei, "$var wire       1 $    channel3 $end\n");
+  fprintf (datei, "$var wire       1 (    channel4 $end\n");
+  fprintf (datei, "$var wire       1 )    channel5 $end\n");
+  fprintf (datei, "$var wire       1 ?    channel6 $end\n");
+  fprintf (datei, "$var wire       1 =    channel7 $end\n");
+  fprintf (datei, "$var wire       1 +    channel8 $end\n");
+  fprintf (datei, "$upscope $end\n");
+  fprintf (datei, "$enddefinitions $end\n");
 
 
-  fclose(datei);
+  char sign;
+
+  int ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8;
+
+  for(i=0;i<VALUES;i++)
+  {
+    sign=buf[i];
+    fprintf(datei,"#%i\n%i!\n%i*\n%i$\n%i(\n%i)\n%i?\n%i=\n%i+\n",i*4
+		    ,Bit_Test(sign, 0)?1:0
+		    ,Bit_Test(sign, 1)?1:0
+		    ,Bit_Test(sign, 2)?1:0
+		    ,Bit_Test(sign, 3)?1:0
+		    ,Bit_Test(sign, 4)?1:0
+		    ,Bit_Test(sign, 5)?1:0
+		    ,Bit_Test(sign, 6)?1:0
+		    ,Bit_Test(sign, 7)?1:0);
+  }
+    fclose(datei);
   return 0;
 }	
 
