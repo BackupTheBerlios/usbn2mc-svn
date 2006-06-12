@@ -33,13 +33,22 @@ int main (int argc,char **argv)
   StartVScope(vscope);
   int i;
   char buf[20000];
-  for(i=0;i<100;i++)
-    readVScopeData(vscope,buf,20000);
+
+  for(i=0;i<10;i++)
+  while(1)
+  {
+    i = readVScopeData(vscope,buf,20000);
+    if(i>0)
+      break;
+  }
   StopVScope(vscope);
 
-  for(i=0;i<100;i++)
-   printf("%x",buf[i]);
 
+  FILE *datei;
+  datei = fopen("vscope.vcd", "w");
+
+
+  fclose(datei);
   return 0;
 }	
 
