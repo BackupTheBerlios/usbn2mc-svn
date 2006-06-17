@@ -87,7 +87,7 @@ int main(void)
   USBNStart();
 
   //DDRB=0xff;
-  DDRB=0xff; //in port
+  DDRB=0x00; //in port
   PORTB = 0xff; //internal pull up resistors
 
   vscope.txreleaser=1;
@@ -96,8 +96,9 @@ int main(void)
     //if(vscope.fifo.count == 500)
     //  UARTWrite("fifo is full\r\n");
     
-    //if(vscope.fifo.count > 0)
+    //if(vscope.fifo.count > 1)
     //  VScopeSendScopeData();  // fill fifos
+
     _wait_spinlock();
 
     if(togl==1)

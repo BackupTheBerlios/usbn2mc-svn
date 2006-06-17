@@ -266,7 +266,7 @@ int main(void)
   // wait 2 seconds then start application
 
   wait_ms(2000);
-
+  UARTWrite("\r\nbootloader start app now");
   BootLoaderRunApplication();
  
   while(1);

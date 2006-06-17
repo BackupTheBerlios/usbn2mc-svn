@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../../lib/vscopedevice.h" 
 
 #define VALUES 30000
+#define LOOPS 1 
 #define BYTE unsigned char
 
 int Bit_Test(BYTE val, BYTE bit) {
@@ -42,9 +43,10 @@ int main (int argc,char **argv)
   vscope = openVScope();
 
   SetVScopeMode(vscope,MODE_COUNTER);
+  SetVScopeSampleRate(vscope,SAMPLERATE_5US);
   StartVScope(vscope);
   int i,j=0;
-  char buf[10][VALUES];
+  char buf[LOOPS][VALUES];
 
   while(1)
   {
@@ -52,7 +54,7 @@ int main (int argc,char **argv)
     if(i>0)
       j++; 
 
-    if(j>9)
+    if(j>=LOOPS)
       break;
   }
   StopVScope(vscope);
@@ -83,7 +85,7 @@ int main (int argc,char **argv)
 
   char sign;
 
-  for(j=0;j<10;j++)
+  for(j=0;j<LOOPS;j++)
   {
     for(i=0;i<VALUES;i++)
     {

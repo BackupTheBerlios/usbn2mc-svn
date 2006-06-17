@@ -44,30 +44,28 @@ vscope_t vscope;
 
 void VScopeSendScopeData();
 void VScopeCommand(char *buf);
+void VScopeNothing(char *buf);
 void VScopePingPongTX1();
 void VScopePingPongTX2();
 
 
+void _wait_spinlock();
 
-
-// swap function for spinlock mechanism
-static inline void _inline_spinlock_swap(char*x, char*y)
-{
-  char t;
-  t = *x;
-  *x = *y;
-  *y = t;
-}
-
-char spinlock;
 
 // spinlock for fifo access
-static inline void _wait_spinlock()
+ 
+/*
+void wait_spinlock()
 {
   while(1)
   {
-    if(vscope.spinlock)
+    if(vscope.spinlock){
+      //UARTWrite("");
+      //asm("NOP");
+      vscope.spinlock=0;
       break;
+    }
   }
-  vscope.spinlock=0;
+  //vscope.spinlock=0;
 }
+*/

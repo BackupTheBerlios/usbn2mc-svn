@@ -16,30 +16,21 @@ void VScopePingPongTX1()
 {
   if(vscope.state!=STATE_RUNNING)
     return;
-  //UARTWrite("tx1 demo\r\n");
-  // zum interrupt zeit messen
-  int i;
- /* 
-  if(togl==1){
-    PINB = 0xFF;
-    togl=0;
-  } else {
-    PINB = 0x00;
-    togl=1;
-  }
- */ 
   // stop if there are no further data
   //if(vscope.fifo.count > 63 )
+  int i;
   if(1)
   { 
     // send next 64 bytes
     USBNWrite(TXC1,FLUSH);
     // ******** wait on timer condition and clear condition
+    //_wait_spinlock();
     USBNWrite(TXD1,PINB);
     //USBNWrite(TXD1,fifo_get_nowait(&vscope.fifo));
     for(i=1;i<64;i++)
     {
       // ******** wait on timer condition and clear condition
+      //_wait_spinlock();
       USBNBurstWrite(PINB);
     }
     if(datatogl==1)
@@ -78,11 +69,13 @@ void VScopeSendScopeData()
     //{
       USBNWrite(TXC1,FLUSH);
       // ******** wait on timer condition and clear condition
+      //_wait_spinlock();
       USBNWrite(TXD1,PINB);
       //USBNWrite(TXD1,fifo_get_nowait(&vscope.fifo));
       for(i=1;i<64;i++)
       {
 	// ******** wait on timer condition and clear condition
+	//_wait_spinlock();
 	USBNBurstWrite(PINB);
 	//USBNBurstWrite(fifo_get_nowait(&vscope.fifo));
       }
@@ -136,7 +129,6 @@ void VScopeCommand(char *buf)
       TCCR1A = 0;
       // 16 MHz / 64 = 250K = 4us
       //TCCR1B = (1 << WGM12) | (1 << CS12)  | (1 << CS10); //1024tel vom takt 64uS 15K
-
       switch(vscope.samplerate)
       {
 	case SAMPLERATE_5US:
@@ -151,6 +143,11 @@ void VScopeCommand(char *buf)
 	break;
 	case SAMPLERATE_1MS:
 	  UARTWrite("1ms\n\r");
+	  TCCR1B = (1 << 3) | (1 << CS11); //8tel vom takt = 500ns 
+	  OCR1A = 2000; //200 * 500ns = 1ms
+	break;
+	case 0x09:
+	  UARTWrite("1ms\n\r");
 	  //TCCR1B = (1 << 3) | (1 << CS11); //8tel vom takt = 500ns 
 	  TCCR1B = (1 << 3) | (1 << CS12)  | (1 << CS10); //8tel vom takt = 500ns 
 	  OCR1A = 15000; //200 * 500ns = 1ms
@@ -162,9 +159,8 @@ void VScopeCommand(char *buf)
       }
       // enable interrupt
       TIMSK |= (1 << OCIE1A);
-     
       vscope.state=STATE_RUNNING;
-      //VScopeSendScopeData();
+      VScopeSendScopeData();
     break;
 
     case CMD_STOPSCOPE:
@@ -195,3 +191,25 @@ void VScopeCommand(char *buf)
 }
 
 
+void VScopeNothing(char *buf)
+{
+  if(buf[2]==1)
+  {
+    __asm__ __volatile ("; nur ein asm-Kommentar");
+  }
+}
+void _wait_spinlock()
+{
+  while(1)
+  {
+    if(vscope.spinlock)
+    {
+      VScopeNothing(NULL);
+      vscope.spinlock=0;
+      return;
+    }
+  }
+  //vscope.spinlock=0;
+  return; 
+}
+					      //
