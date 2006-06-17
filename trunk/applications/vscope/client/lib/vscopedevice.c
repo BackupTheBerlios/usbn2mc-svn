@@ -78,7 +78,6 @@ int readVScopeData(VScope* self, char* data, int length)
 {
   int i;
   i = usb_bulk_read(self->vscope_handle,0x83,data,length,100);	
-  //printf("%i\n",i);
   return i;
 }
 

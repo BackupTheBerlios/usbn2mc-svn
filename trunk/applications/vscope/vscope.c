@@ -71,6 +71,12 @@ void VScopeSendScopeData()
       // ******** wait on timer condition and clear condition
       //_wait_spinlock();
       USBNWrite(TXD1,PINB);
+      //_wait_spinlock();
+      //USBNWrite(TXD2,PINB);
+      //USBNBurstWrite(PINB);
+      //_wait_spinlock();
+      //USBNBurstWrite(PINB);
+      //_wait_spinlock();
       //USBNWrite(TXD1,fifo_get_nowait(&vscope.fifo));
       for(i=1;i<64;i++)
       {
@@ -205,11 +211,11 @@ void _wait_spinlock()
     if(vscope.spinlock)
     {
       VScopeNothing(NULL);
+      //UARTWrite("");
       vscope.spinlock=0;
-      return;
+      //return;
+      break;
     }
   }
-  //vscope.spinlock=0;
-  return; 
 }
 					      //

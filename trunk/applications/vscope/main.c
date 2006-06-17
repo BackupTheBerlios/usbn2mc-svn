@@ -30,7 +30,9 @@ SIGNAL(SIG_INTERRUPT0)
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
   // activate signal for next measure
+  //cli();
   vscope.spinlock=1;
+  //sei();
 }
 
 int main(void)
@@ -98,8 +100,10 @@ int main(void)
     
     //if(vscope.fifo.count > 1)
     //  VScopeSendScopeData();  // fill fifos
-
-    _wait_spinlock();
+/*
+    //_wait_spinlock();
+    USBNWrite(RID,0x00);
+    //_wait_spinlock();
 
     if(togl==1)
     {
@@ -110,6 +114,7 @@ int main(void)
       PORTB = 0x00;
       togl=1;
     }
+*/
   }
 }
 

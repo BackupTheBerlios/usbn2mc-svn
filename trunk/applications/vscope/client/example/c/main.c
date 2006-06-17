@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
 #include "../../lib/vscopedevice.h" 
 
-#define VALUES 30000
-#define LOOPS 1 
+#define VALUES 20000
+#define LOOPS 20 
 #define BYTE unsigned char
 
 int Bit_Test(BYTE val, BYTE bit) {
@@ -46,19 +46,25 @@ int main (int argc,char **argv)
   SetVScopeSampleRate(vscope,SAMPLERATE_5US);
   StartVScope(vscope);
   int i,j=0;
+  long s;
   char buf[LOOPS][VALUES];
 
   while(1)
   {
     i = readVScopeData(vscope,buf[j],VALUES);
+    printf("%i\n",i);
     if(i>0)
+    {
       j++; 
+      s=s+i;
+      i=0;
+    }
 
-    if(j>=LOOPS)
+    if(j>(LOOPS-1))
       break;
   }
   StopVScope(vscope);
-
+  printf("Messungen: %x\n",s);
   FILE *datei;
   datei = fopen("vscope.vcd", "w");
   fprintf (datei, "$date\n");
@@ -69,7 +75,7 @@ int main (int argc,char **argv)
   fprintf (datei, "$end\n");
 
   fprintf (datei, "$timescale\n");
-  fprintf (datei, "\t1us\n");      
+  fprintf (datei, "\t1ns\n");      
   fprintf (datei, "$end\n");
   fprintf (datei, "$scope module vscope $end\n");
   fprintf (datei, "$var wire       1 !    channel1 $end\n");
@@ -84,13 +90,13 @@ int main (int argc,char **argv)
   fprintf (datei, "$enddefinitions $end\n");
 
   char sign;
-
+  s=0;
   for(j=0;j<LOOPS;j++)
   {
     for(i=0;i<VALUES;i++)
     {
       sign=buf[j][i];
-      fprintf(datei,"#%i\n%i!\n%i*\n%i$\n%i(\n%i)\n%i?\n%i=\n%i+\n",i*2
+      fprintf(datei,"#%i\n%i!\n%i*\n%i$\n%i(\n%i)\n%i?\n%i=\n%i+\n",s*2500
 		    ,Bit_Test(sign, 0)?1:0
 		    ,Bit_Test(sign, 1)?1:0
 		    ,Bit_Test(sign, 2)?1:0
@@ -99,8 +105,11 @@ int main (int argc,char **argv)
 		    ,Bit_Test(sign, 5)?1:0
 		    ,Bit_Test(sign, 6)?1:0
 		    ,Bit_Test(sign, 7)?1:0);
+      s++;
     }
   }
+
+  printf("Messungen: %x\n",s);
   fclose(datei);
   return 0;
 }	
