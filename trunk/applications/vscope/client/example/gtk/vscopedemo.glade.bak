@@ -4,11 +4,15 @@
 <glade-interface>
 
 <widget class="GtkWindow" id="window1">
+  <property name="width_request">0</property>
+  <property name="height_request">0</property>
   <property name="visible">True</property>
   <property name="title" translatable="yes">vscopedevice demo</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
+  <property name="default_width">305</property>
+  <property name="default_height">350</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="decorated">True</property>
@@ -19,6 +23,8 @@
 
   <child>
     <widget class="GtkFixed" id="fixed1">
+      <property name="width_request">304</property>
+      <property name="height_request">349</property>
       <property name="visible">True</property>
 
       <child>
@@ -37,7 +43,7 @@
 	</widget>
 	<packing>
 	  <property name="x">120</property>
-	  <property name="y">136</property>
+	  <property name="y">248</property>
 	</packing>
       </child>
 
@@ -57,7 +63,7 @@
 	</widget>
 	<packing>
 	  <property name="x">120</property>
-	  <property name="y">168</property>
+	  <property name="y">280</property>
 	</packing>
       </child>
 
@@ -77,7 +83,7 @@
 	</widget>
 	<packing>
 	  <property name="x">120</property>
-	  <property name="y">200</property>
+	  <property name="y">312</property>
 	</packing>
       </child>
 
@@ -100,74 +106,20 @@
       </child>
 
       <child>
-	<widget class="GtkButton" id="btnsetcountermode">
-	  <property name="width_request">144</property>
-	  <property name="height_request">24</property>
-	  <property name="visible">True</property>
-	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Set Counter Mode</property>
-	  <property name="use_underline">True</property>
-	  <property name="relief">GTK_RELIEF_NORMAL</property>
-	  <property name="focus_on_click">True</property>
-	  <signal name="clicked" handler="on_btnsetcountermode_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:01 GMT"/>
-	</widget>
-	<packing>
-	  <property name="x">8</property>
-	  <property name="y">40</property>
-	</packing>
-      </child>
-
-      <child>
-	<widget class="GtkButton" id="btnstart">
-	  <property name="width_request">96</property>
-	  <property name="height_request">24</property>
-	  <property name="visible">True</property>
-	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Start VScope</property>
-	  <property name="use_underline">True</property>
-	  <property name="relief">GTK_RELIEF_NORMAL</property>
-	  <property name="focus_on_click">True</property>
-	  <signal name="clicked" handler="on_btnstart_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:08 GMT"/>
-	</widget>
-	<packing>
-	  <property name="x">8</property>
-	  <property name="y">72</property>
-	</packing>
-      </child>
-
-      <child>
-	<widget class="GtkButton" id="btnstop">
-	  <property name="width_request">96</property>
-	  <property name="height_request">24</property>
-	  <property name="visible">True</property>
-	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Stop VScope</property>
-	  <property name="use_underline">True</property>
-	  <property name="relief">GTK_RELIEF_NORMAL</property>
-	  <property name="focus_on_click">True</property>
-	  <signal name="clicked" handler="on_btnstop_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:12 GMT"/>
-	</widget>
-	<packing>
-	  <property name="x">8</property>
-	  <property name="y">104</property>
-	</packing>
-      </child>
-
-      <child>
-	<widget class="GtkButton" id="button5">
+	<widget class="GtkButton" id="button7">
 	  <property name="width_request">104</property>
 	  <property name="height_request">24</property>
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">FIFO Load</property>
+	  <property name="label" translatable="yes">VScope State</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
-	  <signal name="clicked" handler="on_button5_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:17 GMT"/>
+	  <signal name="clicked" handler="on_button7_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:27 GMT"/>
 	</widget>
 	<packing>
 	  <property name="x">8</property>
-	  <property name="y">136</property>
+	  <property name="y">312</property>
 	</packing>
       </child>
 
@@ -185,25 +137,133 @@
 	</widget>
 	<packing>
 	  <property name="x">8</property>
-	  <property name="y">168</property>
+	  <property name="y">280</property>
 	</packing>
       </child>
 
       <child>
-	<widget class="GtkButton" id="button7">
+	<widget class="GtkButton" id="button5">
 	  <property name="width_request">104</property>
 	  <property name="height_request">24</property>
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">VScope State</property>
+	  <property name="label" translatable="yes">FIFO Load</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
-	  <signal name="clicked" handler="on_button7_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:27 GMT"/>
+	  <signal name="clicked" handler="on_button5_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:17 GMT"/>
 	</widget>
 	<packing>
 	  <property name="x">8</property>
-	  <property name="y">200</property>
+	  <property name="y">248</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkButton" id="btnsetcountermode">
+	  <property name="width_request">144</property>
+	  <property name="height_request">24</property>
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">Set Counter Mode</property>
+	  <property name="use_underline">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
+	  <signal name="clicked" handler="on_btnsetcountermode_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:01 GMT"/>
+	</widget>
+	<packing>
+	  <property name="x">136</property>
+	  <property name="y">8</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkButton" id="btn100us">
+	  <property name="width_request">110</property>
+	  <property name="height_request">25</property>
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">100 us (10 KHz)</property>
+	  <property name="use_underline">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
+	  <signal name="clicked" handler="on_btn100us_clicked" last_modification_time="Sat, 17 Jun 2006 06:30:38 GMT"/>
+	</widget>
+	<packing>
+	  <property name="x">16</property>
+	  <property name="y">88</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkButton" id="btn1ms">
+	  <property name="width_request">111</property>
+	  <property name="height_request">25</property>
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">1 ms (1 kHz)</property>
+	  <property name="use_underline">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
+	  <signal name="clicked" handler="on_btn1ms_clicked" last_modification_time="Sat, 17 Jun 2006 06:32:32 GMT"/>
+	</widget>
+	<packing>
+	  <property name="x">16</property>
+	  <property name="y">120</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkButton" id="btn5us">
+	  <property name="width_request">109</property>
+	  <property name="height_request">25</property>
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">5 us (200kHz)</property>
+	  <property name="use_underline">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
+	  <signal name="clicked" handler="on_btn5us_clicked" last_modification_time="Sat, 17 Jun 2006 06:30:12 GMT"/>
+	</widget>
+	<packing>
+	  <property name="x">16</property>
+	  <property name="y">56</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkButton" id="btnstart">
+	  <property name="width_request">96</property>
+	  <property name="height_request">24</property>
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">Start VScope</property>
+	  <property name="use_underline">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
+	  <signal name="clicked" handler="on_btnstart_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:08 GMT"/>
+	</widget>
+	<packing>
+	  <property name="x">16</property>
+	  <property name="y">176</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkButton" id="btnstop">
+	  <property name="width_request">96</property>
+	  <property name="height_request">24</property>
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">Stop VScope</property>
+	  <property name="use_underline">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
+	  <signal name="clicked" handler="on_btnstop_clicked" last_modification_time="Mon, 05 Jun 2006 12:54:12 GMT"/>
+	</widget>
+	<packing>
+	  <property name="x">120</property>
+	  <property name="y">176</property>
 	</packing>
       </child>
 
@@ -220,8 +280,8 @@
 	  <signal name="clicked" handler="on_btnreaddata_clicked" last_modification_time="Mon, 05 Jun 2006 16:36:23 GMT"/>
 	</widget>
 	<packing>
-	  <property name="x">128</property>
-	  <property name="y">72</property>
+	  <property name="x">8</property>
+	  <property name="y">216</property>
 	</packing>
       </child>
     </widget>

@@ -22,18 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../../lib/vscopedevice.h" 
 
 #define VALUES 30000
-
 #define BYTE unsigned char
+
 int Bit_Test(BYTE val, BYTE bit) {
-   BYTE test_val = 0x01;    /* dezimal 1 / binär 0000 0001 */
-   /* Bit an entsprechende Pos. schieben */
-	      test_val = (test_val << bit);
-	         /* 0=Bit nicht gesetzt; 1=Bit gesetzt */
-	         if ((val & test_val) == 0)
-			       return 0;      /* Nicht gesetzt */
-		    else
-	          return 1;      /* gesetzt */
+  BYTE test_val = 0x01;    /* dezimal 1 / binaer 0000 0001 */
+  /* Bit an entsprechende Pos. schieben */
+  test_val = (test_val << bit);
+  /* 0=Bit nicht gesetzt; 1=Bit gesetzt */
+  if ((val & test_val) == 0)
+    return 0;      /* Nicht gesetzt */
+  else
+  return 1;      /* gesetzt */
 }
+
 int main (int argc,char **argv)
 {
   VScope *vscope;
@@ -42,17 +43,19 @@ int main (int argc,char **argv)
 
   SetVScopeMode(vscope,MODE_COUNTER);
   StartVScope(vscope);
-  int i;
-  char buf[VALUES];
+  int i,j=0;
+  char buf[10][VALUES];
 
   while(1)
   {
-    i = readVScopeData(vscope,buf,VALUES);
+    i = readVScopeData(vscope,buf[j],VALUES);
     if(i>0)
+      j++; 
+
+    if(j>9)
       break;
   }
   StopVScope(vscope);
-
 
   FILE *datei;
   datei = fopen("vscope.vcd", "w");
@@ -78,15 +81,14 @@ int main (int argc,char **argv)
   fprintf (datei, "$upscope $end\n");
   fprintf (datei, "$enddefinitions $end\n");
 
-
   char sign;
 
-  int ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8;
-
-  for(i=0;i<VALUES;i++)
+  for(j=0;j<10;j++)
   {
-    sign=buf[i];
-    fprintf(datei,"#%i\n%i!\n%i*\n%i$\n%i(\n%i)\n%i?\n%i=\n%i+\n",i*4
+    for(i=0;i<VALUES;i++)
+    {
+      sign=buf[j][i];
+      fprintf(datei,"#%i\n%i!\n%i*\n%i$\n%i(\n%i)\n%i?\n%i=\n%i+\n",i*2
 		    ,Bit_Test(sign, 0)?1:0
 		    ,Bit_Test(sign, 1)?1:0
 		    ,Bit_Test(sign, 2)?1:0
@@ -95,8 +97,9 @@ int main (int argc,char **argv)
 		    ,Bit_Test(sign, 5)?1:0
 		    ,Bit_Test(sign, 6)?1:0
 		    ,Bit_Test(sign, 7)?1:0);
+    }
   }
-    fclose(datei);
+  fclose(datei);
   return 0;
 }	
 

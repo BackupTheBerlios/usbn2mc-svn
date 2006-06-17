@@ -75,6 +75,30 @@ void
 on_btnreaddata_clicked                 (GtkButton       *button,
                                         gpointer         user_data)
 {
-  readVscopeData(vscope,NULL);
+  //readVScopeData(vscope,NULL);
+}
+
+
+void
+on_btn100us_clicked                    (GtkButton       *button,
+                                        gpointer         user_data)
+{
+  SetVScopeSampleRate(vscope,SAMPLERATE_100US);
+}
+
+
+void
+on_btn1ms_clicked                      (GtkButton       *button,
+                                        gpointer         user_data)
+{
+  SetVScopeSampleRate(vscope,SAMPLERATE_1MS);
+}
+
+
+void
+on_btn5us_clicked                      (GtkButton       *button,
+                                        gpointer         user_data)
+{
+  SetVScopeSampleRate(vscope,SAMPLERATE_5US);
 }
 

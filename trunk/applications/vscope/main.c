@@ -29,21 +29,8 @@ SIGNAL(SIG_INTERRUPT0)
 
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
-  //UARTWrite("timer\r\n");
-  
-  uint8_t zeichen = 1;
-  fifo_put (&vscope.fifo, zeichen);
-/*
-  if(togl==1)
-  {
-    PORTB = 0xFF;
-    togl=0;
-  }
-  else {
-    PORTB = 0x00;
-    togl=1;
-  }
-*/
+  // activate signal for next measure
+  vscope.spinlock=1;
 }
 
 int main(void)
@@ -93,20 +80,35 @@ int main(void)
   vscope.mode=MODE_NONE;
   vscope.update1=1;
   vscope.update2=1;
+  vscope.samplerate=SAMPLERATE_1MS;
+  vscope.spinlock=0;
 
   // start usb chip
   USBNStart();
 
-  DDRB=0xff;
+  //DDRB=0xff;
+  DDRB=0xff; //in port
+  PORTB = 0xff; //internal pull up resistors
 
   vscope.txreleaser=1;
   while(1)
   {
-    if(vscope.fifo.count == 500)
-      UARTWrite("fifo is full\r\n");
+    //if(vscope.fifo.count == 500)
+    //  UARTWrite("fifo is full\r\n");
     
-    if(vscope.fifo.count > 0)
-      VScopeSendScopeData();  // fill fifos
+    //if(vscope.fifo.count > 0)
+    //  VScopeSendScopeData();  // fill fifos
+    _wait_spinlock();
+
+    if(togl==1)
+    {
+      PORTB = 0xFF;
+      togl=0;
+    }
+    else {
+      PORTB = 0x00;
+      togl=1;
+    }
   }
 }
 

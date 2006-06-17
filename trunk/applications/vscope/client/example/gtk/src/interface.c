@@ -35,34 +35,40 @@ create_window1 (void)
   GtkWidget *entry2;
   GtkWidget *entry3;
   GtkWidget *btnopen;
+  GtkWidget *button7;
+  GtkWidget *button6;
+  GtkWidget *button5;
   GtkWidget *btnsetcountermode;
+  GtkWidget *btn100us;
+  GtkWidget *btn1ms;
+  GtkWidget *btn5us;
   GtkWidget *btnstart;
   GtkWidget *btnstop;
-  GtkWidget *button5;
-  GtkWidget *button6;
-  GtkWidget *button7;
   GtkWidget *btnreaddata;
 
   window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_widget_set_size_request (window1, 0, 0);
   gtk_window_set_title (GTK_WINDOW (window1), _("vscopedevice demo"));
+  gtk_window_set_default_size (GTK_WINDOW (window1), 305, 350);
 
   fixed1 = gtk_fixed_new ();
   gtk_widget_show (fixed1);
   gtk_container_add (GTK_CONTAINER (window1), fixed1);
+  gtk_widget_set_size_request (fixed1, 304, 349);
 
   entry1 = gtk_entry_new ();
   gtk_widget_show (entry1);
-  gtk_fixed_put (GTK_FIXED (fixed1), entry1, 120, 136);
+  gtk_fixed_put (GTK_FIXED (fixed1), entry1, 120, 248);
   gtk_widget_set_size_request (entry1, 160, 27);
 
   entry2 = gtk_entry_new ();
   gtk_widget_show (entry2);
-  gtk_fixed_put (GTK_FIXED (fixed1), entry2, 120, 168);
+  gtk_fixed_put (GTK_FIXED (fixed1), entry2, 120, 280);
   gtk_widget_set_size_request (entry2, 160, 27);
 
   entry3 = gtk_entry_new ();
   gtk_widget_show (entry3);
-  gtk_fixed_put (GTK_FIXED (fixed1), entry3, 120, 200);
+  gtk_fixed_put (GTK_FIXED (fixed1), entry3, 120, 312);
   gtk_widget_set_size_request (entry3, 160, 27);
 
   btnopen = gtk_button_new_with_mnemonic (_("open VScope"));
@@ -70,61 +76,85 @@ create_window1 (void)
   gtk_fixed_put (GTK_FIXED (fixed1), btnopen, 8, 8);
   gtk_widget_set_size_request (btnopen, 120, 24);
 
+  button7 = gtk_button_new_with_mnemonic (_("VScope State"));
+  gtk_widget_show (button7);
+  gtk_fixed_put (GTK_FIXED (fixed1), button7, 8, 312);
+  gtk_widget_set_size_request (button7, 104, 24);
+
+  button6 = gtk_button_new_with_mnemonic (_("VScope Mode"));
+  gtk_widget_show (button6);
+  gtk_fixed_put (GTK_FIXED (fixed1), button6, 8, 280);
+  gtk_widget_set_size_request (button6, 104, 24);
+
+  button5 = gtk_button_new_with_mnemonic (_("FIFO Load"));
+  gtk_widget_show (button5);
+  gtk_fixed_put (GTK_FIXED (fixed1), button5, 8, 248);
+  gtk_widget_set_size_request (button5, 104, 24);
+
   btnsetcountermode = gtk_button_new_with_mnemonic (_("Set Counter Mode"));
   gtk_widget_show (btnsetcountermode);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnsetcountermode, 8, 40);
+  gtk_fixed_put (GTK_FIXED (fixed1), btnsetcountermode, 136, 8);
   gtk_widget_set_size_request (btnsetcountermode, 144, 24);
+
+  btn100us = gtk_button_new_with_mnemonic (_("100 us (10 KHz)"));
+  gtk_widget_show (btn100us);
+  gtk_fixed_put (GTK_FIXED (fixed1), btn100us, 16, 88);
+  gtk_widget_set_size_request (btn100us, 110, 25);
+
+  btn1ms = gtk_button_new_with_mnemonic (_("1 ms (1 kHz)"));
+  gtk_widget_show (btn1ms);
+  gtk_fixed_put (GTK_FIXED (fixed1), btn1ms, 16, 120);
+  gtk_widget_set_size_request (btn1ms, 111, 25);
+
+  btn5us = gtk_button_new_with_mnemonic (_("5 us (200kHz)"));
+  gtk_widget_show (btn5us);
+  gtk_fixed_put (GTK_FIXED (fixed1), btn5us, 16, 56);
+  gtk_widget_set_size_request (btn5us, 109, 25);
 
   btnstart = gtk_button_new_with_mnemonic (_("Start VScope"));
   gtk_widget_show (btnstart);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnstart, 8, 72);
+  gtk_fixed_put (GTK_FIXED (fixed1), btnstart, 16, 176);
   gtk_widget_set_size_request (btnstart, 96, 24);
 
   btnstop = gtk_button_new_with_mnemonic (_("Stop VScope"));
   gtk_widget_show (btnstop);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnstop, 8, 104);
+  gtk_fixed_put (GTK_FIXED (fixed1), btnstop, 120, 176);
   gtk_widget_set_size_request (btnstop, 96, 24);
-
-  button5 = gtk_button_new_with_mnemonic (_("FIFO Load"));
-  gtk_widget_show (button5);
-  gtk_fixed_put (GTK_FIXED (fixed1), button5, 8, 136);
-  gtk_widget_set_size_request (button5, 104, 24);
-
-  button6 = gtk_button_new_with_mnemonic (_("VScope Mode"));
-  gtk_widget_show (button6);
-  gtk_fixed_put (GTK_FIXED (fixed1), button6, 8, 168);
-  gtk_widget_set_size_request (button6, 104, 24);
-
-  button7 = gtk_button_new_with_mnemonic (_("VScope State"));
-  gtk_widget_show (button7);
-  gtk_fixed_put (GTK_FIXED (fixed1), button7, 8, 200);
-  gtk_widget_set_size_request (button7, 104, 24);
 
   btnreaddata = gtk_button_new_with_mnemonic (_("Read Data"));
   gtk_widget_show (btnreaddata);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnreaddata, 128, 72);
+  gtk_fixed_put (GTK_FIXED (fixed1), btnreaddata, 8, 216);
   gtk_widget_set_size_request (btnreaddata, 80, 24);
 
   g_signal_connect ((gpointer) btnopen, "clicked",
                     G_CALLBACK (on_btnopen_clicked),
                     NULL);
+  g_signal_connect ((gpointer) button7, "clicked",
+                    G_CALLBACK (on_button7_clicked),
+                    NULL);
+  g_signal_connect ((gpointer) button6, "clicked",
+                    G_CALLBACK (on_button6_clicked),
+                    NULL);
+  g_signal_connect ((gpointer) button5, "clicked",
+                    G_CALLBACK (on_button5_clicked),
+                    NULL);
   g_signal_connect ((gpointer) btnsetcountermode, "clicked",
                     G_CALLBACK (on_btnsetcountermode_clicked),
+                    NULL);
+  g_signal_connect ((gpointer) btn100us, "clicked",
+                    G_CALLBACK (on_btn100us_clicked),
+                    NULL);
+  g_signal_connect ((gpointer) btn1ms, "clicked",
+                    G_CALLBACK (on_btn1ms_clicked),
+                    NULL);
+  g_signal_connect ((gpointer) btn5us, "clicked",
+                    G_CALLBACK (on_btn5us_clicked),
                     NULL);
   g_signal_connect ((gpointer) btnstart, "clicked",
                     G_CALLBACK (on_btnstart_clicked),
                     NULL);
   g_signal_connect ((gpointer) btnstop, "clicked",
                     G_CALLBACK (on_btnstop_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) button5, "clicked",
-                    G_CALLBACK (on_button5_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) button6, "clicked",
-                    G_CALLBACK (on_button6_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) button7, "clicked",
-                    G_CALLBACK (on_button7_clicked),
                     NULL);
   g_signal_connect ((gpointer) btnreaddata, "clicked",
                     G_CALLBACK (on_btnreaddata_clicked),
@@ -137,12 +167,15 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, entry2, "entry2");
   GLADE_HOOKUP_OBJECT (window1, entry3, "entry3");
   GLADE_HOOKUP_OBJECT (window1, btnopen, "btnopen");
+  GLADE_HOOKUP_OBJECT (window1, button7, "button7");
+  GLADE_HOOKUP_OBJECT (window1, button6, "button6");
+  GLADE_HOOKUP_OBJECT (window1, button5, "button5");
   GLADE_HOOKUP_OBJECT (window1, btnsetcountermode, "btnsetcountermode");
+  GLADE_HOOKUP_OBJECT (window1, btn100us, "btn100us");
+  GLADE_HOOKUP_OBJECT (window1, btn1ms, "btn1ms");
+  GLADE_HOOKUP_OBJECT (window1, btn5us, "btn5us");
   GLADE_HOOKUP_OBJECT (window1, btnstart, "btnstart");
   GLADE_HOOKUP_OBJECT (window1, btnstop, "btnstop");
-  GLADE_HOOKUP_OBJECT (window1, button5, "button5");
-  GLADE_HOOKUP_OBJECT (window1, button6, "button6");
-  GLADE_HOOKUP_OBJECT (window1, button7, "button7");
   GLADE_HOOKUP_OBJECT (window1, btnreaddata, "btnreaddata");
 
   return window1;

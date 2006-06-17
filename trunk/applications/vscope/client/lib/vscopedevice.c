@@ -78,12 +78,19 @@ int readVScopeData(VScope* self, char* data, int length)
 {
   int i;
   i = usb_bulk_read(self->vscope_handle,0x83,data,length,100);	
-  printf("%i\n",i);
+  //printf("%i\n",i);
+  return i;
 }
 
 int readVScopeResults(VScope* self,char *data)
 {
 	
+}
+
+void SetVScopeSampleRate(VScope* self,char samplerate)
+{
+  char command[3] = {CMD_SETSAMPLERATE,3,samplerate};
+  sendVScopeCommand(self,command);
 }
 
 

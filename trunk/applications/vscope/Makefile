@@ -69,7 +69,7 @@ ASRC =
 # Optimization level, can be [0, 1, 2, 3, s]. 
 # 0 = turn off optimization. s = optimize for size.
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
-OPT = s
+OPT = 0 
 
 # Debugging format.
 # Native formats for AVR-GCC's -g are stabs [default], or dwarf-2.
@@ -276,14 +276,15 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 # Default target.
 all: begin gccversion sizebefore build sizeafter finished end
 
-build: elf hex eep lss sym
+build: elf hex eep lss sym hex2bin
 
 elf: $(TARGET).elf
 hex: $(TARGET).hex
 eep: $(TARGET).eep
 lss: $(TARGET).lss 
 sym: $(TARGET).sym
-
+hex2bin:
+	hex2bin main.hex
 
 
 # Eye candy.
