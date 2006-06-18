@@ -43,7 +43,8 @@ int main (int argc,char **argv)
   
   vscope = openVScope();
 
-  ActivateEdgeTrigger(vscope,1,LOW);
+  //ActivateEdgeTrigger(vscope,1,LOW);
+  ActivatePatternTrigger(vscope,0x0C);
   
   Recording(vscope,SAMPLERATE_100US,VALUES,buf); 
   

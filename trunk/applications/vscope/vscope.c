@@ -143,6 +143,17 @@ void VScopeCommand(char *buf)
       vscope.trigger_value=buf[3];
     break;
 
+    case CMD_SETPATTRIG:
+      vscope.trigger=TRIGGER_PATTERN;
+      uint8_t n = buf[2];
+      // C code which reverses the bits in a byte
+      n = (((n >> 1) & 0x55) | ((n << 1) & 0xaa));
+      n = (((n >> 2) & 0x33) | ((n << 2) & 0xcc));
+      n = (((n >> 4) & 0x0f) | ((n << 4) & 0xf0)); 
+      vscope.trigger_value=n;
+    break;
+
+
     case CMD_DEACTIVTRIG:
       vscope.trigger=TRIGGER_OFF;
     break;

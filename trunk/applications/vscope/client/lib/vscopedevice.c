@@ -176,9 +176,9 @@ void ActivateEdgeTrigger(VScope* self,int channel,int value)
   sendVScopeCommand(self,command);
 }
 
-void ActivatePatternTrigger(VScope* self,char high,char low,char dontcare)
+void ActivatePatternTrigger(VScope* self,char pattern)
 {
-  char command[5] = {CMD_SETPATTRIG,5,high,low,dontcare};
+  char command[3] = {CMD_SETPATTRIG,3,pattern};
   sendVScopeCommand(self,command);
 }
 

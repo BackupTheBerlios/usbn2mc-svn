@@ -36,11 +36,8 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
   {
     if(vscope.trigger==TRIGGER_EDGE)
     {
-      //(1<<(vscope.trigger_channel-1))      
-      //old = Bit_Test(vscope.trigger_last,vscope.trigger_channel-1);
       old = vscope.trigger_last & (1<<(vscope.trigger_channel-1)) ?1:0;
       new = port & (1<<(vscope.trigger_channel-1)) ?1:0;
-      //new = Bit_Test(port,vscope.trigger_channel-1);
       
       if(vscope.trigger_value==1)
       {
@@ -55,6 +52,14 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 	
       vscope.trigger_last=port;
     }
+    if(vscope.trigger==TRIGGER_PATTERN)
+    {
+      if(port == vscope.trigger_value)
+      {
+	vscope.trigger=TRIGGER_OFF;
+      }
+    }
+
   }
   else
   {
