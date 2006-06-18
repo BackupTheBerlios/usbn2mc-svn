@@ -4,6 +4,7 @@
 #define MODE_COUNTER      0x01
 #define MODE_LOGIC        0x02
 #define MODE_1CHANNELAD   0x03
+#define MODE_LOGICINTERN  0x04
 
 
 #define STATE_DONOTHING   0x01

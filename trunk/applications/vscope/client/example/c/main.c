@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
 #include "../../lib/vscopedevice.h" 
 
-#define VALUES 5000
+#define VALUES 1000
 
 #define BYTE unsigned char
 
@@ -43,7 +43,9 @@ int main (int argc,char **argv)
   
   vscope = openVScope();
 
-  Recording(vscope,SAMPLERATE_100US,VALUES,buf); 
+  //Recording(vscope,SAMPLERATE_100US,VALUES,buf); 
+  RecordingInternal(vscope,SAMPLERATE_100US); 
+  GetRecordInternal(vscope,buf,1000);
   
   FILE *datei;
   datei = fopen("vscope.vcd", "w");

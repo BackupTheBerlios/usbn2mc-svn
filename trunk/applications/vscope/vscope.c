@@ -44,9 +44,7 @@ void VScopeCommand(char *buf)
   switch(buf[0])
   { 
     case CMD_SETMODE:
-      UARTWrite("set mode ");
-      SendHex(buf[2]);
-      UARTWrite("\r\n");
+      vscope.mode = buf[2];
     break;
 
     case CMD_SETSAMPLERATE:
@@ -59,13 +57,10 @@ void VScopeCommand(char *buf)
     case CMD_STARTSCOPE:
       UARTWrite("start scope\r\n");
       datatogl=0;
-      //vscope.update2=1;
       fifo_init(&vscope.fifo, fifobuffer, 1000);
 
-
       TCCR1A = 0;
-      // 16 MHz / 64 = 250K = 4us
-      //TCCR1B = (1 << WGM12) | (1 << CS12)  | (1 << CS10); //1024tel vom takt 64uS 15K
+
       switch(vscope.samplerate)
       {
 	case SAMPLERATE_5US:
@@ -141,7 +136,6 @@ void VScopeCommand(char *buf)
       //VScopeSendScopeData();
       VScopePingPongTX1();
     break;
-
 
     default:
       UARTWrite("unknown command\r\n");

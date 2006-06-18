@@ -147,18 +147,26 @@ int GetVScopeFIFOLoad(VScope* self)
 
 void Recording(VScope* self,char samplerate,int numbers,char* data)
 {
-  SetVScopeMode(self,MODE_COUNTER);
+  SetVScopeMode(self,MODE_LOGIC);
   SetVScopeSampleRate(self,samplerate);
   StartVScope(self);
   readVScopeData(self, data, numbers);
   StopVScope(self);
 }
 
+
 void RecordingInternal(VScope* self,char samplerate)
 {
+  SetVScopeMode(self,MODE_LOGICINTERN);
+  SetVScopeSampleRate(self,samplerate);
+  StartVScope(self);
 }
-void GetRecordInternal(VScope* self,char*data,int length)
+
+void GetRecordInternal(VScope* self,char*data,int lengths)
 {
+  if(lengths>1000)
+    lengths=1000;
+  readVScopeData(self, data, lengths);
 }
 
 void ActivateEdgeTrigger(VScope* self,char high,char low, char dontcare)

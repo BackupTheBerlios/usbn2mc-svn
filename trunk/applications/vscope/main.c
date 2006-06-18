@@ -102,15 +102,26 @@ int main(void)
   int datatogl=0;
 
   int fifostate=1;
-  while(1){
-  
-    if(vscope.fifo.count>=1000)
-     {
-	     UARTWrite("f");
-     }
+  int internstate=1;
   int i,j;
+  while(1){
 
-  if(vscope.fifo.count>0 &&vscope.tx==1)
+    if(vscope.fifo.count>=1000)
+    {
+	if(vscope.mode==MODE_LOGICINTERN)
+	{
+	  vscope.state=STATE_DONOTHING;
+          TCCR1B = (1 << WGM12) | (0 << CS12) | (0 << CS11) | (0 << CS10);
+	    if(internstate)
+	    {
+	      UARTWrite("intern stoped");
+	      internstate=0;
+	    }
+	  vscope.mode=MODE_LOGIC;
+	}
+    }
+
+  if(vscope.fifo.count>0 &&vscope.tx==1 && vscope.mode==MODE_LOGIC)
   {
     vscope.tx=0;
     USBNWrite(TXC1,FLUSH);
