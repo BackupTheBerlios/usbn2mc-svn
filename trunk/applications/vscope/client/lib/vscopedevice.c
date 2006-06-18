@@ -76,9 +76,23 @@ int sendVScopeCommand(VScope* self,char *command)
 
 int readVScopeData(VScope* self, char* data, int length)
 {
-  int i;
-  i = usb_bulk_read(self->vscope_handle,0x83,data,length,100);	
-  return i;
+  int i,j,dataindex=0;
+  char tmp[length];
+  char command[2] = {CMD_GETDATA,2};
+
+  while(1) 
+  {
+    sendVScopeCommand(self,command);
+    i = usb_bulk_read(self->vscope_handle,0x83,tmp,length,100);	
+    for(j=0;((j<i) && (dataindex<length));j++)
+    {
+      data[dataindex]=tmp[j];
+      dataindex++;
+    }
+    if(dataindex >= (length-1))
+      break;
+  }
+  return dataindex;
 }
 
 int readVScopeResults(VScope* self,char *data)
@@ -129,5 +143,35 @@ int GetVScopeFIFOLoad(VScope* self)
   char command[2] = {CMD_GETFIFOLOAD,2};
   sendVScopeCommand(self,command);
 }
+
+
+void Recording(VScope* self,char samplerate,int numbers,char* data)
+{
+  SetVScopeMode(self,MODE_COUNTER);
+  SetVScopeSampleRate(self,samplerate);
+  StartVScope(self);
+  readVScopeData(self, data, numbers);
+  StopVScope(self);
+}
+
+void RecordingInternal(VScope* self,char samplerate)
+{
+}
+void GetRecordInternal(VScope* self,char*data,int length)
+{
+}
+
+void ActivateEdgeTrigger(VScope* self,char high,char low, char dontcare)
+{
+}
+void ActivatePatternTrigger(VScope* self,char pattern,char dontcare)
+{
+}
+
+void DeActivateTrigger(VScope* self)
+{
+}
+
+
 
 

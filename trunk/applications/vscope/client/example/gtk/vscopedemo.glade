@@ -232,6 +232,24 @@
       </child>
 
       <child>
+	<widget class="GtkButton" id="btnreaddata">
+	  <property name="width_request">80</property>
+	  <property name="height_request">24</property>
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">Read Data</property>
+	  <property name="use_underline">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
+	  <signal name="clicked" handler="on_btnreaddata_clicked" last_modification_time="Mon, 05 Jun 2006 16:36:23 GMT"/>
+	</widget>
+	<packing>
+	  <property name="x">8</property>
+	  <property name="y">216</property>
+	</packing>
+      </child>
+
+      <child>
 	<widget class="GtkButton" id="btnstart">
 	  <property name="width_request">96</property>
 	  <property name="height_request">24</property>
@@ -245,7 +263,7 @@
 	</widget>
 	<packing>
 	  <property name="x">16</property>
-	  <property name="y">176</property>
+	  <property name="y">184</property>
 	</packing>
       </child>
 
@@ -263,25 +281,25 @@
 	</widget>
 	<packing>
 	  <property name="x">120</property>
-	  <property name="y">176</property>
+	  <property name="y">184</property>
 	</packing>
       </child>
 
       <child>
-	<widget class="GtkButton" id="btnreaddata">
-	  <property name="width_request">80</property>
+	<widget class="GtkButton" id="btn100ms">
+	  <property name="width_request">112</property>
 	  <property name="height_request">24</property>
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Read Data</property>
+	  <property name="label" translatable="yes">100 ms (10 Hz)</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
-	  <signal name="clicked" handler="on_btnreaddata_clicked" last_modification_time="Mon, 05 Jun 2006 16:36:23 GMT"/>
+	  <signal name="clicked" handler="on_btn100ms_clicked" last_modification_time="Sun, 18 Jun 2006 06:46:02 GMT"/>
 	</widget>
 	<packing>
-	  <property name="x">8</property>
-	  <property name="y">216</property>
+	  <property name="x">16</property>
+	  <property name="y">152</property>
 	</packing>
       </child>
     </widget>

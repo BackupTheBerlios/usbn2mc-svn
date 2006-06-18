@@ -14,97 +14,28 @@
 int datatogl=0;
 void VScopePingPongTX1()
 {
-  if(vscope.state!=STATE_RUNNING)
-    return;
-  // stop if there are no further data
-  //if(vscope.fifo.count > 63 )
-  int i;
-  if(1)
-  { 
-    // send next 64 bytes
-    USBNWrite(TXC1,FLUSH);
-    // ******** wait on timer condition and clear condition
-    //_wait_spinlock();
-    USBNWrite(TXD1,PINB);
-    //USBNWrite(TXD1,fifo_get_nowait(&vscope.fifo));
-    for(i=1;i<64;i++)
-    {
-      // ******** wait on timer condition and clear condition
-      //_wait_spinlock();
-      USBNBurstWrite(PINB);
-    }
-    if(datatogl==1)
-    {
-      USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
-      datatogl=0;
-    }else
-    {
-      USBNWrite(TXC1,TX_LAST+TX_EN);
-      datatogl=1;
-    }
-  }
-  else {
-    vscope.update1=1;
-    datatogl=0;
-    return;
-  }
+  vscope.tx=1;
 }
 
 void VScopePingPongTX2()
 {
   UARTWrite("tx2 demo\r\n");
   USBNWrite(EPC1,EP_EN+3);
-  vscope.update2=1;
+  //vscope.update2=1;
 }
-
 
 // send data to the application on pc
 void VScopeSendScopeData()
 {
+  //UARTWrite("read data\r\n");
   int i;
-  // interrupts off
-  if(vscope.update1==1)
-  {
-    //if(vscope.fifo.count > 63 )
-    //{
-      USBNWrite(TXC1,FLUSH);
-      // ******** wait on timer condition and clear condition
-      //_wait_spinlock();
-      USBNWrite(TXD1,PINB);
-      //_wait_spinlock();
-      //USBNWrite(TXD2,PINB);
-      //USBNBurstWrite(PINB);
-      //_wait_spinlock();
-      //USBNBurstWrite(PINB);
-      //_wait_spinlock();
-      //USBNWrite(TXD1,fifo_get_nowait(&vscope.fifo));
-      for(i=1;i<64;i++)
-      {
-	// ******** wait on timer condition and clear condition
-	//_wait_spinlock();
-	USBNBurstWrite(PINB);
-	//USBNBurstWrite(fifo_get_nowait(&vscope.fifo));
-      }
-
-      USBNWrite(TXC1,TX_LAST+TX_EN);
-      vscope.update1=0;
-    //}
-  }
-/*
-  if(vscope.update2==1)
-  {
-    USBNWrite(TXC2,FLUSH);
-    USBNWrite(TXD2,fifo_get_nowait(&vscope.fifo));
-    for(i=1;i<64;i++)
+  USBNWrite(TXC1,FLUSH);
+  
+  USBNWrite(TXD1,fifo_get_nowait(&vscope.fifo));
+  for(i=1;i<64;i++)
       USBNBurstWrite(fifo_get_nowait(&vscope.fifo));
-
-    USBNWrite(TXC2,TX_LAST+TX_EN+TX_TOGL);
-    vscope.update2=0;
-  }
-*/
-  // global interrupts on
+  USBNWrite(TXC1,TX_LAST+TX_EN);
 }
-
 
 // get and extract commands from the application on the pc
 void VScopeCommand(char *buf)
@@ -113,7 +44,6 @@ void VScopeCommand(char *buf)
   switch(buf[0])
   { 
     case CMD_SETMODE:
-      vscope.spinlock=0xff;	    
       UARTWrite("set mode ");
       SendHex(buf[2]);
       UARTWrite("\r\n");
@@ -129,8 +59,9 @@ void VScopeCommand(char *buf)
     case CMD_STARTSCOPE:
       UARTWrite("start scope\r\n");
       datatogl=0;
-      vscope.update1=1;
       //vscope.update2=1;
+      fifo_init(&vscope.fifo, fifobuffer, 1000);
+
 
       TCCR1A = 0;
       // 16 MHz / 64 = 250K = 4us
@@ -142,6 +73,16 @@ void VScopeCommand(char *buf)
 	  TCCR1B = (1 << 3) | (1 << CS11); //8tel vom takt = 500ns 
 	  OCR1A = 10; //10 * 500ns = 5us
 	break;
+	case SAMPLERATE_10US:
+	  UARTWrite("100us\n\r");
+	  TCCR1B = (1 << 3) | (1 << CS11); //8tel vom takt = 500ns 
+	  OCR1A = 20; //200 * 500ns = 100us
+	break;
+	case SAMPLERATE_50US:
+	  UARTWrite("100us\n\r");
+	  TCCR1B = (1 << 3) | (1 << CS11); //8tel vom takt = 500ns 
+	  OCR1A = 100; //200 * 500ns = 100us
+	break;
 	case SAMPLERATE_100US:
 	  UARTWrite("100us\n\r");
 	  TCCR1B = (1 << 3) | (1 << CS11); //8tel vom takt = 500ns 
@@ -152,11 +93,15 @@ void VScopeCommand(char *buf)
 	  TCCR1B = (1 << 3) | (1 << CS11); //8tel vom takt = 500ns 
 	  OCR1A = 2000; //200 * 500ns = 1ms
 	break;
-	case 0x09:
-	  UARTWrite("1ms\n\r");
-	  //TCCR1B = (1 << 3) | (1 << CS11); //8tel vom takt = 500ns 
-	  TCCR1B = (1 << 3) | (1 << CS12)  | (1 << CS10); //8tel vom takt = 500ns 
-	  OCR1A = 15000; //200 * 500ns = 1ms
+	case SAMPLERATE_10MS:
+	  UARTWrite("10ms\n\r");
+	  TCCR1B = (1 << 3) | (1 << CS12) ; //6250 *16M/256 = 100ms 
+	  OCR1A = 625;
+	break;
+	case SAMPLERATE_100MS:
+	  UARTWrite("100ms\n\r");
+	  TCCR1B = (1 << 3) | (1 << CS12) ; //6250 *16M/256 = 100ms 
+	  OCR1A = 6250;
 	break;
 	default:
 	  UARTWrite("default\n\r");
@@ -166,10 +111,10 @@ void VScopeCommand(char *buf)
       // enable interrupt
       TIMSK |= (1 << OCIE1A);
       vscope.state=STATE_RUNNING;
-      VScopeSendScopeData();
     break;
 
     case CMD_STOPSCOPE:
+      vscope.fifo.count=0;
       vscope.state=STATE_DONOTHING;
       UARTWrite("stop scope\r\n");
       TCCR1B = (1 << WGM12) | (0 << CS12) | (0 << CS11) | (0 << CS10); // Stop (Timer/Counter) 
@@ -191,31 +136,15 @@ void VScopeCommand(char *buf)
       UARTWrite("\r\n");
     break;
 
+    case CMD_GETDATA:
+      //UARTWrite("get scope state\r\n");
+      //VScopeSendScopeData();
+      VScopePingPongTX1();
+    break;
+
+
     default:
       UARTWrite("unknown command\r\n");
   }
 }
 
-
-void VScopeNothing(char *buf)
-{
-  if(buf[2]==1)
-  {
-    __asm__ __volatile ("; nur ein asm-Kommentar");
-  }
-}
-void _wait_spinlock()
-{
-  while(1)
-  {
-    if(vscope.spinlock)
-    {
-      VScopeNothing(NULL);
-      //UARTWrite("");
-      vscope.spinlock=0;
-      //return;
-      break;
-    }
-  }
-}
-					      //

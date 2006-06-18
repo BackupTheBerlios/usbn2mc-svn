@@ -42,9 +42,10 @@ create_window1 (void)
   GtkWidget *btn100us;
   GtkWidget *btn1ms;
   GtkWidget *btn5us;
+  GtkWidget *btnreaddata;
   GtkWidget *btnstart;
   GtkWidget *btnstop;
-  GtkWidget *btnreaddata;
+  GtkWidget *btn100ms;
 
   window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_size_request (window1, 0, 0);
@@ -111,20 +112,25 @@ create_window1 (void)
   gtk_fixed_put (GTK_FIXED (fixed1), btn5us, 16, 56);
   gtk_widget_set_size_request (btn5us, 109, 25);
 
-  btnstart = gtk_button_new_with_mnemonic (_("Start VScope"));
-  gtk_widget_show (btnstart);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnstart, 16, 176);
-  gtk_widget_set_size_request (btnstart, 96, 24);
-
-  btnstop = gtk_button_new_with_mnemonic (_("Stop VScope"));
-  gtk_widget_show (btnstop);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnstop, 120, 176);
-  gtk_widget_set_size_request (btnstop, 96, 24);
-
   btnreaddata = gtk_button_new_with_mnemonic (_("Read Data"));
   gtk_widget_show (btnreaddata);
   gtk_fixed_put (GTK_FIXED (fixed1), btnreaddata, 8, 216);
   gtk_widget_set_size_request (btnreaddata, 80, 24);
+
+  btnstart = gtk_button_new_with_mnemonic (_("Start VScope"));
+  gtk_widget_show (btnstart);
+  gtk_fixed_put (GTK_FIXED (fixed1), btnstart, 16, 184);
+  gtk_widget_set_size_request (btnstart, 96, 24);
+
+  btnstop = gtk_button_new_with_mnemonic (_("Stop VScope"));
+  gtk_widget_show (btnstop);
+  gtk_fixed_put (GTK_FIXED (fixed1), btnstop, 120, 184);
+  gtk_widget_set_size_request (btnstop, 96, 24);
+
+  btn100ms = gtk_button_new_with_mnemonic (_("100 ms (10 Hz)"));
+  gtk_widget_show (btn100ms);
+  gtk_fixed_put (GTK_FIXED (fixed1), btn100ms, 16, 152);
+  gtk_widget_set_size_request (btn100ms, 112, 24);
 
   g_signal_connect ((gpointer) btnopen, "clicked",
                     G_CALLBACK (on_btnopen_clicked),
@@ -150,14 +156,17 @@ create_window1 (void)
   g_signal_connect ((gpointer) btn5us, "clicked",
                     G_CALLBACK (on_btn5us_clicked),
                     NULL);
+  g_signal_connect ((gpointer) btnreaddata, "clicked",
+                    G_CALLBACK (on_btnreaddata_clicked),
+                    NULL);
   g_signal_connect ((gpointer) btnstart, "clicked",
                     G_CALLBACK (on_btnstart_clicked),
                     NULL);
   g_signal_connect ((gpointer) btnstop, "clicked",
                     G_CALLBACK (on_btnstop_clicked),
                     NULL);
-  g_signal_connect ((gpointer) btnreaddata, "clicked",
-                    G_CALLBACK (on_btnreaddata_clicked),
+  g_signal_connect ((gpointer) btn100ms, "clicked",
+                    G_CALLBACK (on_btn100ms_clicked),
                     NULL);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
@@ -174,9 +183,10 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, btn100us, "btn100us");
   GLADE_HOOKUP_OBJECT (window1, btn1ms, "btn1ms");
   GLADE_HOOKUP_OBJECT (window1, btn5us, "btn5us");
+  GLADE_HOOKUP_OBJECT (window1, btnreaddata, "btnreaddata");
   GLADE_HOOKUP_OBJECT (window1, btnstart, "btnstart");
   GLADE_HOOKUP_OBJECT (window1, btnstop, "btnstop");
-  GLADE_HOOKUP_OBJECT (window1, btnreaddata, "btnreaddata");
+  GLADE_HOOKUP_OBJECT (window1, btn100ms, "btn100ms");
 
   return window1;
 }

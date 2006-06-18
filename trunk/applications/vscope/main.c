@@ -30,9 +30,18 @@ SIGNAL(SIG_INTERRUPT0)
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
   // activate signal for next measure
-  //cli();
-  vscope.spinlock=1;
-  //sei();
+  fifo_put (&vscope.fifo, PINB);
+
+if(togl==1)
+{
+PORTA = 0xFF;
+togl=0;
+}
+else {
+PORTA = 0x00;
+togl=1;
+}
+
 }
 
 int main(void)
@@ -74,47 +83,57 @@ int main(void)
   USBNInitMC();
 
   // init fifo
-  fifo_init(&vscope.fifo, fifobuffer, 500);   
+  //fifo_init(&vscope.fifo, fifobuffer, 1000);   
 
 
   //setup vscope state and mode
   vscope.state=STATE_DONOTHING;
   vscope.mode=MODE_NONE;
-  vscope.update1=1;
-  vscope.update2=1;
   vscope.samplerate=SAMPLERATE_1MS;
-  vscope.spinlock=0;
 
   // start usb chip
   USBNStart();
 
   //DDRB=0xff;
+  DDRA=0xff;
   DDRB=0x00; //in port
   PORTB = 0xff; //internal pull up resistors
 
-  vscope.txreleaser=1;
-  while(1)
-  {
-    //if(vscope.fifo.count == 500)
-    //  UARTWrite("fifo is full\r\n");
-    
-    //if(vscope.fifo.count > 1)
-    //  VScopeSendScopeData();  // fill fifos
-/*
-    //_wait_spinlock();
-    USBNWrite(RID,0x00);
-    //_wait_spinlock();
+  int datatogl=0;
 
-    if(togl==1)
+  int fifostate=1;
+  while(1){
+  
+    if(vscope.fifo.count>=1000)
+     {
+	     UARTWrite("f");
+     }
+  int i,j;
+
+  if(vscope.fifo.count>0 &&vscope.tx==1)
+  {
+    vscope.tx=0;
+    USBNWrite(TXC1,FLUSH);
+
+    USBNWrite(TXD1,fifo_get_nowait(&vscope.fifo));
+
+    if(vscope.fifo.count<63)
+      j=vscope.fifo.count;
+    else j=63;
+    for(i=0;i<j;i++)
+      USBNBurstWrite(fifo_get_nowait(&vscope.fifo));
+
+  
+    if(datatogl==1)
     {
-      PORTB = 0xFF;
-      togl=0;
+      USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
+      datatogl=0;
+    }else
+    {
+      USBNWrite(TXC1,TX_LAST+TX_EN);
+      datatogl=1;
     }
-    else {
-      PORTB = 0x00;
-      togl=1;
-    }
-*/
+  }
   }
 }
 
