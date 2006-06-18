@@ -48,3 +48,8 @@ on_btn5us_clicked                      (GtkButton       *button,
 void
 on_btn100ms_clicked                    (GtkButton       *button,
                                         gpointer         user_data);
+
+gboolean
+on_main_destroy_event                  (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);

@@ -16,7 +16,7 @@
 int
 main (int argc, char *argv[])
 {
-  GtkWidget *window1;
+  GtkWidget *main;
 
 #ifdef ENABLE_NLS
   bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
@@ -34,8 +34,8 @@ main (int argc, char *argv[])
    * (except popup menus), just so that you see something after building
    * the project. Delete any components that you don't want shown initially.
    */
-  window1 = create_window1 ();
-  gtk_widget_show (window1);
+  main = create_main ();
+  gtk_widget_show (main);
 
   gtk_main ();
   return 0;

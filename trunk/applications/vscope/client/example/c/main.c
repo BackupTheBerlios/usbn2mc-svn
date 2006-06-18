@@ -45,6 +45,7 @@ int main (int argc,char **argv)
 
   //ActivateEdgeTrigger(vscope,1,LOW);
   ActivatePatternTrigger(vscope,0x0C);
+  //DeActivateTrigger(vscope);
   
   Recording(vscope,SAMPLERATE_100US,VALUES,buf); 
   

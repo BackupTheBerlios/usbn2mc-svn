@@ -111,3 +111,13 @@ on_btn100ms_clicked                    (GtkButton       *button,
   SetVScopeSampleRate(vscope,SAMPLERATE_100MS);
 }
 
+
+gboolean
+on_main_destroy_event                  (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data)
+{
+
+  return FALSE;
+}
+

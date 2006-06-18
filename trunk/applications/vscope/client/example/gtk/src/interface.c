@@ -27,167 +27,418 @@
   g_object_set_data (G_OBJECT (component), name, widget)
 
 GtkWidget*
-create_window1 (void)
+create_main (void)
 {
-  GtkWidget *window1;
+  GtkWidget *main;
   GtkWidget *fixed1;
-  GtkWidget *entry1;
-  GtkWidget *entry2;
-  GtkWidget *entry3;
-  GtkWidget *btnopen;
-  GtkWidget *button7;
+  GtkWidget *frame6;
+  GtkWidget *alignment6;
+  GtkWidget *fixed7;
+  GtkWidget *label9;
+  GtkWidget *combobox2;
+  GtkWidget *label6;
+  GtkWidget *frame2;
+  GtkWidget *alignment2;
+  GtkWidget *fixed4;
   GtkWidget *button6;
+  GtkWidget *label8;
+  GtkWidget *label2;
+  GtkWidget *frame1;
+  GtkWidget *alignment1;
+  GtkWidget *fixed3;
+  GtkWidget *label7;
+  GtkWidget *entry2;
+  GtkWidget *combobox1;
   GtkWidget *button5;
-  GtkWidget *btnsetcountermode;
-  GtkWidget *btn100us;
-  GtkWidget *btn1ms;
-  GtkWidget *btn5us;
-  GtkWidget *btnreaddata;
-  GtkWidget *btnstart;
-  GtkWidget *btnstop;
-  GtkWidget *btn100ms;
+  GtkWidget *label1;
+  GtkWidget *frame4;
+  GtkWidget *alignment4;
+  GtkWidget *fixed6;
+  GtkWidget *label4;
+  GtkWidget *frame5;
+  GtkWidget *alignment5;
+  GtkWidget *fixed5;
+  GtkWidget *entry1;
+  GtkWidget *button3;
+  GtkWidget *button4;
+  GtkWidget *label5;
+  GtkWidget *frame3;
+  GtkWidget *alignment3;
+  GtkWidget *hbox1;
+  GtkWidget *fixed8;
+  GtkObject *spinbutton1_adj;
+  GtkWidget *spinbutton1;
+  GtkWidget *radiobutton1;
+  GSList *radiobutton1_group = NULL;
+  GtkWidget *label11;
+  GtkWidget *label12;
+  GtkWidget *label13;
+  GtkWidget *combobox3;
+  GtkWidget *fixed9;
+  GtkWidget *radiobutton2;
+  GtkWidget *vseparator1;
+  GtkWidget *fixed10;
+  GtkWidget *radiobutton3;
+  GSList *radiobutton3_group = NULL;
+  GtkWidget *label3;
 
-  window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_widget_set_size_request (window1, 0, 0);
-  gtk_window_set_title (GTK_WINDOW (window1), _("vscopedevice demo"));
-  gtk_window_set_default_size (GTK_WINDOW (window1), 305, 350);
+  main = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_widget_set_size_request (main, 700, 400);
+  gtk_window_set_title (GTK_WINDOW (main), _("Logik Analyser"));
+  gtk_window_set_default_size (GTK_WINDOW (main), 700, 400);
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (main), TRUE);
 
   fixed1 = gtk_fixed_new ();
   gtk_widget_show (fixed1);
-  gtk_container_add (GTK_CONTAINER (window1), fixed1);
-  gtk_widget_set_size_request (fixed1, 304, 349);
+  gtk_container_add (GTK_CONTAINER (main), fixed1);
+  gtk_widget_set_size_request (fixed1, 700, 400);
 
-  entry1 = gtk_entry_new ();
-  gtk_widget_show (entry1);
-  gtk_fixed_put (GTK_FIXED (fixed1), entry1, 120, 248);
-  gtk_widget_set_size_request (entry1, 160, 27);
+  frame6 = gtk_frame_new (NULL);
+  gtk_widget_show (frame6);
+  gtk_fixed_put (GTK_FIXED (fixed1), frame6, 24, 161);
+  gtk_widget_set_size_request (frame6, 440, 88);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame6), GTK_SHADOW_ETCHED_OUT);
+
+  alignment6 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment6);
+  gtk_container_add (GTK_CONTAINER (frame6), alignment6);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment6), 0, 0, 12, 0);
+
+  fixed7 = gtk_fixed_new ();
+  gtk_widget_show (fixed7);
+  gtk_container_add (GTK_CONTAINER (alignment6), fixed7);
+
+  label9 = gtk_label_new (_("Abtastrate:"));
+  gtk_widget_show (label9);
+  gtk_fixed_put (GTK_FIXED (fixed7), label9, 88, 24);
+  gtk_widget_set_size_request (label9, 82, 17);
+
+  combobox2 = gtk_combo_box_new_text ();
+  gtk_widget_show (combobox2);
+  gtk_fixed_put (GTK_FIXED (fixed7), combobox2, 184, 16);
+  gtk_widget_set_size_request (combobox2, 131, 27);
+
+  label6 = gtk_label_new (_("Abtastrate / Messwerte"));
+  gtk_widget_show (label6);
+  gtk_frame_set_label_widget (GTK_FRAME (frame6), label6);
+  gtk_label_set_use_markup (GTK_LABEL (label6), TRUE);
+
+  frame2 = gtk_frame_new (NULL);
+  gtk_widget_show (frame2);
+  gtk_fixed_put (GTK_FIXED (fixed1), frame2, 262, 256);
+  gtk_widget_set_size_request (frame2, 200, 130);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_ETCHED_OUT);
+
+  alignment2 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment2);
+  gtk_container_add (GTK_CONTAINER (frame2), alignment2);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 0, 0, 12, 0);
+
+  fixed4 = gtk_fixed_new ();
+  gtk_widget_show (fixed4);
+  gtk_container_add (GTK_CONTAINER (alignment2), fixed4);
+
+  button6 = gtk_button_new_with_mnemonic (_("Starten"));
+  gtk_widget_show (button6);
+  gtk_fixed_put (GTK_FIXED (fixed4), button6, 112, 80);
+  gtk_widget_set_size_request (button6, 62, 24);
+
+  label8 = gtk_label_new (_("Speichertiefe: 1000 Messwerte, ab Start oder Trigger"));
+  gtk_widget_show (label8);
+  gtk_fixed_put (GTK_FIXED (fixed4), label8, 0, 0);
+  gtk_widget_set_size_request (label8, 160, 72);
+  gtk_label_set_use_markup (GTK_LABEL (label8), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_FILL);
+  gtk_label_set_line_wrap (GTK_LABEL (label8), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label8), 0.45, 0.48);
+
+  label2 = gtk_label_new (_("Interne Aufnahme"));
+  gtk_widget_show (label2);
+  gtk_frame_set_label_widget (GTK_FRAME (frame2), label2);
+  gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);
+
+  frame1 = gtk_frame_new (NULL);
+  gtk_widget_show (frame1);
+  gtk_fixed_put (GTK_FIXED (fixed1), frame1, 24, 256);
+  gtk_widget_set_size_request (frame1, 230, 130);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_ETCHED_OUT);
+
+  alignment1 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment1);
+  gtk_container_add (GTK_CONTAINER (frame1), alignment1);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment1), 0, 0, 12, 0);
+
+  fixed3 = gtk_fixed_new ();
+  gtk_widget_show (fixed3);
+  gtk_container_add (GTK_CONTAINER (alignment1), fixed3);
+
+  label7 = gtk_label_new (_("Aufnahmezeit"));
+  gtk_widget_show (label7);
+  gtk_fixed_put (GTK_FIXED (fixed3), label7, 0, 0);
+  gtk_widget_set_size_request (label7, 112, 16);
+  gtk_misc_set_alignment (GTK_MISC (label7), 0.14, 0.46);
 
   entry2 = gtk_entry_new ();
   gtk_widget_show (entry2);
-  gtk_fixed_put (GTK_FIXED (fixed1), entry2, 120, 280);
-  gtk_widget_set_size_request (entry2, 160, 27);
+  gtk_fixed_put (GTK_FIXED (fixed3), entry2, 24, 24);
+  gtk_widget_set_size_request (entry2, 98, 27);
 
-  entry3 = gtk_entry_new ();
-  gtk_widget_show (entry3);
-  gtk_fixed_put (GTK_FIXED (fixed1), entry3, 120, 312);
-  gtk_widget_set_size_request (entry3, 160, 27);
+  combobox1 = gtk_combo_box_new_text ();
+  gtk_widget_show (combobox1);
+  gtk_fixed_put (GTK_FIXED (fixed3), combobox1, 128, 24);
+  gtk_widget_set_size_request (combobox1, 72, 24);
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("us"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("ms"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("s"));
 
-  btnopen = gtk_button_new_with_mnemonic (_("open VScope"));
-  gtk_widget_show (btnopen);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnopen, 8, 8);
-  gtk_widget_set_size_request (btnopen, 120, 24);
-
-  button7 = gtk_button_new_with_mnemonic (_("VScope State"));
-  gtk_widget_show (button7);
-  gtk_fixed_put (GTK_FIXED (fixed1), button7, 8, 312);
-  gtk_widget_set_size_request (button7, 104, 24);
-
-  button6 = gtk_button_new_with_mnemonic (_("VScope Mode"));
-  gtk_widget_show (button6);
-  gtk_fixed_put (GTK_FIXED (fixed1), button6, 8, 280);
-  gtk_widget_set_size_request (button6, 104, 24);
-
-  button5 = gtk_button_new_with_mnemonic (_("FIFO Load"));
+  button5 = gtk_button_new_with_mnemonic (_("Starten"));
   gtk_widget_show (button5);
-  gtk_fixed_put (GTK_FIXED (fixed1), button5, 8, 248);
-  gtk_widget_set_size_request (button5, 104, 24);
+  gtk_fixed_put (GTK_FIXED (fixed3), button5, 144, 80);
+  gtk_widget_set_size_request (button5, 58, 25);
 
-  btnsetcountermode = gtk_button_new_with_mnemonic (_("Set Counter Mode"));
-  gtk_widget_show (btnsetcountermode);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnsetcountermode, 136, 8);
-  gtk_widget_set_size_request (btnsetcountermode, 144, 24);
+  label1 = gtk_label_new (_("Echtzeit Aufnahme"));
+  gtk_widget_show (label1);
+  gtk_frame_set_label_widget (GTK_FRAME (frame1), label1);
+  gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
 
-  btn100us = gtk_button_new_with_mnemonic (_("100 us (10 KHz)"));
-  gtk_widget_show (btn100us);
-  gtk_fixed_put (GTK_FIXED (fixed1), btn100us, 16, 88);
-  gtk_widget_set_size_request (btn100us, 110, 25);
+  frame4 = gtk_frame_new (NULL);
+  gtk_widget_show (frame4);
+  gtk_fixed_put (GTK_FIXED (fixed1), frame4, 472, 304);
+  gtk_widget_set_size_request (frame4, 183, 80);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame4), GTK_SHADOW_ETCHED_OUT);
 
-  btn1ms = gtk_button_new_with_mnemonic (_("1 ms (1 kHz)"));
-  gtk_widget_show (btn1ms);
-  gtk_fixed_put (GTK_FIXED (fixed1), btn1ms, 16, 120);
-  gtk_widget_set_size_request (btn1ms, 111, 25);
+  alignment4 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment4);
+  gtk_container_add (GTK_CONTAINER (frame4), alignment4);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment4), 0, 0, 12, 0);
 
-  btn5us = gtk_button_new_with_mnemonic (_("5 us (200kHz)"));
-  gtk_widget_show (btn5us);
-  gtk_fixed_put (GTK_FIXED (fixed1), btn5us, 16, 56);
-  gtk_widget_set_size_request (btn5us, 109, 25);
+  fixed6 = gtk_fixed_new ();
+  gtk_widget_show (fixed6);
+  gtk_container_add (GTK_CONTAINER (alignment4), fixed6);
 
-  btnreaddata = gtk_button_new_with_mnemonic (_("Read Data"));
-  gtk_widget_show (btnreaddata);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnreaddata, 8, 216);
-  gtk_widget_set_size_request (btnreaddata, 80, 24);
+  label4 = gtk_label_new (_("Snapshots"));
+  gtk_widget_show (label4);
+  gtk_frame_set_label_widget (GTK_FRAME (frame4), label4);
+  gtk_label_set_use_markup (GTK_LABEL (label4), TRUE);
 
-  btnstart = gtk_button_new_with_mnemonic (_("Start VScope"));
-  gtk_widget_show (btnstart);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnstart, 16, 184);
-  gtk_widget_set_size_request (btnstart, 96, 24);
+  frame5 = gtk_frame_new (NULL);
+  gtk_widget_show (frame5);
+  gtk_fixed_put (GTK_FIXED (fixed1), frame5, 472, 160);
+  gtk_widget_set_size_request (frame5, 184, 144);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame5), GTK_SHADOW_ETCHED_OUT);
 
-  btnstop = gtk_button_new_with_mnemonic (_("Stop VScope"));
-  gtk_widget_show (btnstop);
-  gtk_fixed_put (GTK_FIXED (fixed1), btnstop, 120, 184);
-  gtk_widget_set_size_request (btnstop, 96, 24);
+  alignment5 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment5);
+  gtk_container_add (GTK_CONTAINER (frame5), alignment5);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment5), 0, 0, 12, 0);
 
-  btn100ms = gtk_button_new_with_mnemonic (_("100 ms (10 Hz)"));
-  gtk_widget_show (btn100ms);
-  gtk_fixed_put (GTK_FIXED (fixed1), btn100ms, 16, 152);
-  gtk_widget_set_size_request (btn100ms, 112, 24);
+  fixed5 = gtk_fixed_new ();
+  gtk_widget_show (fixed5);
+  gtk_container_add (GTK_CONTAINER (alignment5), fixed5);
 
-  g_signal_connect ((gpointer) btnopen, "clicked",
-                    G_CALLBACK (on_btnopen_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) button7, "clicked",
-                    G_CALLBACK (on_button7_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) button6, "clicked",
-                    G_CALLBACK (on_button6_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) button5, "clicked",
-                    G_CALLBACK (on_button5_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) btnsetcountermode, "clicked",
-                    G_CALLBACK (on_btnsetcountermode_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) btn100us, "clicked",
-                    G_CALLBACK (on_btn100us_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) btn1ms, "clicked",
-                    G_CALLBACK (on_btn1ms_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) btn5us, "clicked",
-                    G_CALLBACK (on_btn5us_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) btnreaddata, "clicked",
-                    G_CALLBACK (on_btnreaddata_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) btnstart, "clicked",
-                    G_CALLBACK (on_btnstart_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) btnstop, "clicked",
-                    G_CALLBACK (on_btnstop_clicked),
-                    NULL);
-  g_signal_connect ((gpointer) btn100ms, "clicked",
-                    G_CALLBACK (on_btn100ms_clicked),
+  entry1 = gtk_entry_new ();
+  gtk_widget_show (entry1);
+  gtk_fixed_put (GTK_FIXED (fixed5), entry1, 0, 8);
+  gtk_widget_set_size_request (entry1, 160, 27);
+
+  button3 = gtk_button_new_with_mnemonic (_("Neu Anlegen"));
+  gtk_widget_show (button3);
+  gtk_fixed_put (GTK_FIXED (fixed5), button3, 0, 48);
+  gtk_widget_set_size_request (button3, 116, 25);
+
+  button4 = gtk_button_new_with_mnemonic (_("Messung Analysieren"));
+  gtk_widget_show (button4);
+  gtk_fixed_put (GTK_FIXED (fixed5), button4, 0, 88);
+  gtk_widget_set_size_request (button4, 146, 24);
+
+  label5 = gtk_label_new (_("Datei"));
+  gtk_widget_show (label5);
+  gtk_frame_set_label_widget (GTK_FRAME (frame5), label5);
+  gtk_label_set_use_markup (GTK_LABEL (label5), TRUE);
+
+  frame3 = gtk_frame_new (NULL);
+  gtk_widget_show (frame3);
+  gtk_fixed_put (GTK_FIXED (fixed1), frame3, 24, 16);
+  gtk_widget_set_size_request (frame3, 632, 144);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame3), GTK_SHADOW_ETCHED_OUT);
+
+  alignment3 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment3);
+  gtk_container_add (GTK_CONTAINER (frame3), alignment3);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment3), 0, 0, 12, 0);
+
+  hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox1);
+  gtk_container_add (GTK_CONTAINER (alignment3), hbox1);
+
+  fixed8 = gtk_fixed_new ();
+  gtk_widget_show (fixed8);
+  gtk_box_pack_start (GTK_BOX (hbox1), fixed8, TRUE, TRUE, 0);
+
+  spinbutton1_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
+  spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
+  gtk_widget_show (spinbutton1);
+  gtk_fixed_put (GTK_FIXED (fixed8), spinbutton1, 72, 32);
+  gtk_widget_set_size_request (spinbutton1, 54, 27);
+
+  radiobutton1 = gtk_radio_button_new_with_mnemonic (NULL, _("Flanke"));
+  gtk_widget_show (radiobutton1);
+  gtk_fixed_put (GTK_FIXED (fixed8), radiobutton1, 8, 8);
+  gtk_widget_set_size_request (radiobutton1, 102, 19);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton1), radiobutton1_group);
+  radiobutton1_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton1));
+
+  label11 = gtk_label_new (_("Flanken Wechesel zu"));
+  gtk_widget_show (label11);
+  gtk_fixed_put (GTK_FIXED (fixed8), label11, 0, 64);
+  gtk_widget_set_size_request (label11, 136, 24);
+  gtk_misc_set_alignment (GTK_MISC (label11), 0.26, 0.5);
+
+  label12 = gtk_label_new (_("Kanal"));
+  gtk_widget_show (label12);
+  gtk_fixed_put (GTK_FIXED (fixed8), label12, 8, 40);
+  gtk_widget_set_size_request (label12, 46, 17);
+
+  label13 = gtk_label_new (_("Pegel"));
+  gtk_widget_show (label13);
+  gtk_fixed_put (GTK_FIXED (fixed8), label13, 8, 96);
+  gtk_widget_set_size_request (label13, 46, 17);
+
+  combobox3 = gtk_combo_box_new_text ();
+  gtk_widget_show (combobox3);
+  gtk_fixed_put (GTK_FIXED (fixed8), combobox3, 72, 88);
+  gtk_widget_set_size_request (combobox3, 48, 24);
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), _("High"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), _("Low"));
+
+  fixed9 = gtk_fixed_new ();
+  gtk_widget_show (fixed9);
+  gtk_box_pack_start (GTK_BOX (hbox1), fixed9, TRUE, TRUE, 0);
+
+  radiobutton2 = gtk_radio_button_new_with_mnemonic (NULL, _("Muster"));
+  gtk_widget_show (radiobutton2);
+  gtk_fixed_put (GTK_FIXED (fixed9), radiobutton2, 64, 8);
+  gtk_widget_set_size_request (radiobutton2, 102, 19);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton2), radiobutton1_group);
+  radiobutton1_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton2));
+
+  vseparator1 = gtk_vseparator_new ();
+  gtk_widget_show (vseparator1);
+  gtk_fixed_put (GTK_FIXED (fixed9), vseparator1, 8, 0);
+  gtk_widget_set_size_request (vseparator1, 16, 121);
+
+  fixed10 = gtk_fixed_new ();
+  gtk_widget_show (fixed10);
+  gtk_box_pack_start (GTK_BOX (hbox1), fixed10, TRUE, TRUE, 0);
+
+  radiobutton3 = gtk_radio_button_new_with_mnemonic (NULL, _("keinen Trigger"));
+  gtk_widget_show (radiobutton3);
+  gtk_fixed_put (GTK_FIXED (fixed10), radiobutton3, 120, 8);
+  gtk_widget_set_size_request (radiobutton3, 120, 16);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton3), radiobutton3_group);
+  radiobutton3_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton3));
+
+  label3 = gtk_label_new (_("Trigger Einstellungen"));
+  gtk_widget_show (label3);
+  gtk_frame_set_label_widget (GTK_FRAME (frame3), label3);
+  gtk_label_set_use_markup (GTK_LABEL (label3), TRUE);
+
+  g_signal_connect ((gpointer) main, "destroy_event",
+                    G_CALLBACK (on_main_destroy_event),
                     NULL);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
-  GLADE_HOOKUP_OBJECT_NO_REF (window1, window1, "window1");
-  GLADE_HOOKUP_OBJECT (window1, fixed1, "fixed1");
-  GLADE_HOOKUP_OBJECT (window1, entry1, "entry1");
-  GLADE_HOOKUP_OBJECT (window1, entry2, "entry2");
-  GLADE_HOOKUP_OBJECT (window1, entry3, "entry3");
-  GLADE_HOOKUP_OBJECT (window1, btnopen, "btnopen");
-  GLADE_HOOKUP_OBJECT (window1, button7, "button7");
-  GLADE_HOOKUP_OBJECT (window1, button6, "button6");
-  GLADE_HOOKUP_OBJECT (window1, button5, "button5");
-  GLADE_HOOKUP_OBJECT (window1, btnsetcountermode, "btnsetcountermode");
-  GLADE_HOOKUP_OBJECT (window1, btn100us, "btn100us");
-  GLADE_HOOKUP_OBJECT (window1, btn1ms, "btn1ms");
-  GLADE_HOOKUP_OBJECT (window1, btn5us, "btn5us");
-  GLADE_HOOKUP_OBJECT (window1, btnreaddata, "btnreaddata");
-  GLADE_HOOKUP_OBJECT (window1, btnstart, "btnstart");
-  GLADE_HOOKUP_OBJECT (window1, btnstop, "btnstop");
-  GLADE_HOOKUP_OBJECT (window1, btn100ms, "btn100ms");
+  GLADE_HOOKUP_OBJECT_NO_REF (main, main, "main");
+  GLADE_HOOKUP_OBJECT (main, fixed1, "fixed1");
+  GLADE_HOOKUP_OBJECT (main, frame6, "frame6");
+  GLADE_HOOKUP_OBJECT (main, alignment6, "alignment6");
+  GLADE_HOOKUP_OBJECT (main, fixed7, "fixed7");
+  GLADE_HOOKUP_OBJECT (main, label9, "label9");
+  GLADE_HOOKUP_OBJECT (main, combobox2, "combobox2");
+  GLADE_HOOKUP_OBJECT (main, label6, "label6");
+  GLADE_HOOKUP_OBJECT (main, frame2, "frame2");
+  GLADE_HOOKUP_OBJECT (main, alignment2, "alignment2");
+  GLADE_HOOKUP_OBJECT (main, fixed4, "fixed4");
+  GLADE_HOOKUP_OBJECT (main, button6, "button6");
+  GLADE_HOOKUP_OBJECT (main, label8, "label8");
+  GLADE_HOOKUP_OBJECT (main, label2, "label2");
+  GLADE_HOOKUP_OBJECT (main, frame1, "frame1");
+  GLADE_HOOKUP_OBJECT (main, alignment1, "alignment1");
+  GLADE_HOOKUP_OBJECT (main, fixed3, "fixed3");
+  GLADE_HOOKUP_OBJECT (main, label7, "label7");
+  GLADE_HOOKUP_OBJECT (main, entry2, "entry2");
+  GLADE_HOOKUP_OBJECT (main, combobox1, "combobox1");
+  GLADE_HOOKUP_OBJECT (main, button5, "button5");
+  GLADE_HOOKUP_OBJECT (main, label1, "label1");
+  GLADE_HOOKUP_OBJECT (main, frame4, "frame4");
+  GLADE_HOOKUP_OBJECT (main, alignment4, "alignment4");
+  GLADE_HOOKUP_OBJECT (main, fixed6, "fixed6");
+  GLADE_HOOKUP_OBJECT (main, label4, "label4");
+  GLADE_HOOKUP_OBJECT (main, frame5, "frame5");
+  GLADE_HOOKUP_OBJECT (main, alignment5, "alignment5");
+  GLADE_HOOKUP_OBJECT (main, fixed5, "fixed5");
+  GLADE_HOOKUP_OBJECT (main, entry1, "entry1");
+  GLADE_HOOKUP_OBJECT (main, button3, "button3");
+  GLADE_HOOKUP_OBJECT (main, button4, "button4");
+  GLADE_HOOKUP_OBJECT (main, label5, "label5");
+  GLADE_HOOKUP_OBJECT (main, frame3, "frame3");
+  GLADE_HOOKUP_OBJECT (main, alignment3, "alignment3");
+  GLADE_HOOKUP_OBJECT (main, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (main, fixed8, "fixed8");
+  GLADE_HOOKUP_OBJECT (main, spinbutton1, "spinbutton1");
+  GLADE_HOOKUP_OBJECT (main, radiobutton1, "radiobutton1");
+  GLADE_HOOKUP_OBJECT (main, label11, "label11");
+  GLADE_HOOKUP_OBJECT (main, label12, "label12");
+  GLADE_HOOKUP_OBJECT (main, label13, "label13");
+  GLADE_HOOKUP_OBJECT (main, combobox3, "combobox3");
+  GLADE_HOOKUP_OBJECT (main, fixed9, "fixed9");
+  GLADE_HOOKUP_OBJECT (main, radiobutton2, "radiobutton2");
+  GLADE_HOOKUP_OBJECT (main, vseparator1, "vseparator1");
+  GLADE_HOOKUP_OBJECT (main, fixed10, "fixed10");
+  GLADE_HOOKUP_OBJECT (main, radiobutton3, "radiobutton3");
+  GLADE_HOOKUP_OBJECT (main, label3, "label3");
 
-  return window1;
+  gtk_widget_grab_default (combobox1);
+  return main;
+}
+
+GtkWidget*
+create_filechooserdialog1 (void)
+{
+  GtkWidget *filechooserdialog1;
+  GtkWidget *dialog_vbox1;
+  GtkWidget *dialog_action_area1;
+  GtkWidget *button1;
+  GtkWidget *button2;
+
+  filechooserdialog1 = gtk_file_chooser_dialog_new ("", NULL, GTK_FILE_CHOOSER_ACTION_OPEN, NULL);
+  gtk_window_set_type_hint (GTK_WINDOW (filechooserdialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
+
+  dialog_vbox1 = GTK_DIALOG (filechooserdialog1)->vbox;
+  gtk_widget_show (dialog_vbox1);
+
+  dialog_action_area1 = GTK_DIALOG (filechooserdialog1)->action_area;
+  gtk_widget_show (dialog_action_area1);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
+
+  button1 = gtk_button_new_from_stock ("gtk-cancel");
+  gtk_widget_show (button1);
+  gtk_dialog_add_action_widget (GTK_DIALOG (filechooserdialog1), button1, GTK_RESPONSE_CANCEL);
+  GTK_WIDGET_SET_FLAGS (button1, GTK_CAN_DEFAULT);
+
+  button2 = gtk_button_new_from_stock ("gtk-open");
+  gtk_widget_show (button2);
+  gtk_dialog_add_action_widget (GTK_DIALOG (filechooserdialog1), button2, GTK_RESPONSE_OK);
+  GTK_WIDGET_SET_FLAGS (button2, GTK_CAN_DEFAULT);
+
+  /* Store pointers to all widgets, for use by lookup_widget(). */
+  GLADE_HOOKUP_OBJECT_NO_REF (filechooserdialog1, filechooserdialog1, "filechooserdialog1");
+  GLADE_HOOKUP_OBJECT_NO_REF (filechooserdialog1, dialog_vbox1, "dialog_vbox1");
+  GLADE_HOOKUP_OBJECT_NO_REF (filechooserdialog1, dialog_action_area1, "dialog_action_area1");
+  GLADE_HOOKUP_OBJECT (filechooserdialog1, button1, "button1");
+  GLADE_HOOKUP_OBJECT (filechooserdialog1, button2, "button2");
+
+  gtk_widget_grab_default (button2);
+  return filechooserdialog1;
 }
 
