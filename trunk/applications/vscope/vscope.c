@@ -137,6 +137,18 @@ void VScopeCommand(char *buf)
       VScopePingPongTX1();
     break;
 
+    case CMD_SETEDGETRIG:
+      vscope.trigger=TRIGGER_EDGE;
+      vscope.trigger_channel=buf[2];
+      vscope.trigger_value=buf[3];
+    break;
+
+    case CMD_DEACTIVTRIG:
+      vscope.trigger=TRIGGER_OFF;
+    break;
+
+
+    
     default:
       UARTWrite("unknown command\r\n");
   }

@@ -30,18 +30,47 @@ SIGNAL(SIG_INTERRUPT0)
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
   // activate signal for next measure
-  fifo_put (&vscope.fifo, PINB);
+  uint8_t port=PINB; 
+  int old,new;
+  if(vscope.trigger!=TRIGGER_OFF)
+  {
+    if(vscope.trigger==TRIGGER_EDGE)
+    {
+      //(1<<(vscope.trigger_channel-1))      
+      //old = Bit_Test(vscope.trigger_last,vscope.trigger_channel-1);
+      old = vscope.trigger_last & (1<<(vscope.trigger_channel-1)) ?1:0;
+      new = port & (1<<(vscope.trigger_channel-1)) ?1:0;
+      //new = Bit_Test(port,vscope.trigger_channel-1);
+      
+      if(vscope.trigger_value==1)
+      {
+	if(new==1 && old==0)
+	  vscope.trigger=TRIGGER_OFF;
 
-if(togl==1)
-{
-PORTA = 0xFF;
-togl=0;
-}
-else {
-PORTA = 0x00;
-togl=1;
-}
+      }else
+      {
+	if(new==0 && old==1)
+	  vscope.trigger=TRIGGER_OFF;
+      }
+	
+      vscope.trigger_last=port;
+    }
+  }
+  else
+  {
+    fifo_put (&vscope.fifo, port);
+  }
 
+  /*
+  if(togl==1)
+  {
+    PORTA = 0xFF;
+    togl=0;
+  }
+  else {
+    PORTA = 0x00;
+    togl=1;
+  }*/
 }
 
 int main(void)
@@ -53,13 +82,13 @@ int main(void)
 
   USBNDeviceVendorID(0x0400);
   USBNDeviceProductID(0x9876);
-  USBNDeviceBCDDevice(0x0201);
+  //USBNDeviceBCDDevice(0x0201);
 
 
   char lang[]={0x09,0x04};
   _USBNAddStringDescriptor(lang); // language descriptor
   
-  USBNDeviceManufacture ("www.vscope.de");
+  //USBNDeviceManufacture ("www.vscope.de");
   USBNDeviceProduct	("VScope Device");
   //USBNDeviceSerialNumber("2006-04-24");
 
@@ -90,6 +119,8 @@ int main(void)
   vscope.state=STATE_DONOTHING;
   vscope.mode=MODE_NONE;
   vscope.samplerate=SAMPLERATE_1MS;
+  vscope.trigger=TRIGGER_OFF;
+  vscope.trigger_last=0xff;
 
   // start usb chip
   USBNStart();

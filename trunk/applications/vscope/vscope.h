@@ -7,11 +7,13 @@
 #define MODE_LOGICINTERN  0x04
 
 
+#define TRIGGER_OFF	  0x01
+#define TRIGGER_EDGE	  0x02
+#define TRIGGER_PATTERN	  0x03
+
 #define STATE_DONOTHING   0x01
 #define STATE_RUNNING     0x02
 #define STATE_TRIGGER     0x03
-
-
 
 #define SAMPLERATE_5US	  0x01
 #define SAMPLERATE_10US	  0x02
@@ -30,6 +32,10 @@
 #define CMD_SETSAMPLERATE 0x07
 #define CMD_GETDATA	  0x08
 
+#define CMD_SETEDGETRIG	  0x09
+#define CMD_SETPATTRIG	  0x0A
+#define CMD_DEACTIVTRIG	  0x0B
+#define CMD_GETSNAPSHOT	  0x0C
 
 int togl;
 
@@ -40,8 +46,10 @@ typedef struct {
   uint8_t mode;
   uint8_t samplerate;
   fifo_t fifo;
-  //uint8_t update1;
-  //uint8_t update2;
+  uint8_t trigger;
+  uint8_t trigger_value;
+  uint8_t trigger_channel;
+  uint8_t trigger_last;
   uint8_t tx;
 } vscope_t;
 
@@ -51,5 +59,3 @@ void VScopeSendScopeData();
 void VScopeCommand(char *buf);
 void VScopePingPongTX1();
 void VScopePingPongTX2();
-
-

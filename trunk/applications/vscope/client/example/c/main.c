@@ -43,9 +43,12 @@ int main (int argc,char **argv)
   
   vscope = openVScope();
 
-  //Recording(vscope,SAMPLERATE_100US,VALUES,buf); 
-  RecordingInternal(vscope,SAMPLERATE_100US); 
-  GetRecordInternal(vscope,buf,1000);
+  ActivateEdgeTrigger(vscope,1,LOW);
+  
+  Recording(vscope,SAMPLERATE_100US,VALUES,buf); 
+  
+  //RecordingInternal(vscope,SAMPLERATE_100US); 
+  //GetRecordInternal(vscope,buf,1000);
   
   FILE *datei;
   datei = fopen("vscope.vcd", "w");

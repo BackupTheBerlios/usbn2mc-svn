@@ -169,17 +169,22 @@ void GetRecordInternal(VScope* self,char*data,int lengths)
   readVScopeData(self, data, lengths);
 }
 
-void ActivateEdgeTrigger(VScope* self,char high,char low, char dontcare)
+
+void ActivateEdgeTrigger(VScope* self,int channel,int value)
 {
+  char command[4] = {CMD_SETEDGETRIG,4,channel,value};
+  sendVScopeCommand(self,command);
 }
-void ActivatePatternTrigger(VScope* self,char pattern,char dontcare)
+
+void ActivatePatternTrigger(VScope* self,char high,char low,char dontcare)
 {
+  char command[5] = {CMD_SETPATTRIG,5,high,low,dontcare};
+  sendVScopeCommand(self,command);
 }
 
 void DeActivateTrigger(VScope* self)
 {
+  char command[2] = {CMD_DEACTIVTRIG,2};
+  sendVScopeCommand(self,command);
 }
-
-
-
 
