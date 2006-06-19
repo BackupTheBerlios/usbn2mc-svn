@@ -51,7 +51,7 @@ VScope* openVScope()
   if (tmp->vscope_handle==0) return (0);
   else 
   {
-    printf("found\n");
+    //printf("found\n");
     usb_set_configuration(tmp->vscope_handle,1);
     usb_claim_interface(tmp->vscope_handle,0);
     usb_set_altinterface(tmp->vscope_handle,0);
