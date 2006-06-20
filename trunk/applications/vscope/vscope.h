@@ -48,6 +48,7 @@ typedef struct {
   fifo_t fifo;
   uint8_t trigger;
   uint8_t trigger_value;
+  uint8_t trigger_ignore;
   uint8_t trigger_channel;
   uint8_t trigger_last;
   uint8_t tx;

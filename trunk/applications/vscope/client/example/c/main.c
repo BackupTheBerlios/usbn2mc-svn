@@ -37,6 +37,7 @@ struct globalArgs_t {
 	char *samplerate;		/* # of input files */
 	int samplerate_v;		/* # of input files */
 	int triggervalue;		/* # of input files */
+	int triggerignore;		/* # of input files */
 	int append; 			// append data to given file
 	int verbose; 			// show all you can 
 } globalArgs;
@@ -44,7 +45,7 @@ struct globalArgs_t {
 char * progname;
 VScope *vscope;
 
-static const char *optString = "f:R:T:c:t:s:n:vaq?h";
+static const char *optString = "f:R:T:c:t:i:s:n:vaq?h";
 
 /* Display program usage, and exit.
  */
@@ -55,11 +56,12 @@ void display_usage( void )
 	"Usage: %s [options]\n"
 	"Options:\n"
 	"  -f <vcd-file>			Specify location of data file.\n\n"
-	"  -R <record-type>		Specifiy the record type (online,internal or snapshot).\n"
+	"  -R <record-type>		Specify the record type (online,internal or snapshot).\n"
 	"  -T <trigger-type>		Activate Trigger.\n"
 	"  -c <channel>		      	Specify channel for edge trigger (1-8).\n"
 	"  -t <trigger-value>	      	0 or 1 for edgetrigger.\n"
 	"			      	and the port state in hex at pattern-trigger.\n"
+	"  -i <trigger-ignorevalue>    	Specify the channels which should be ignored at pattern trigger.\n"
 	"  -s <samplerate>            	Specify samplerate 5us|10us|100us|1ms|10ms|100ms\n"
 	"  -n <numbers>                	Number of values to sample.\n"
 	"  -a                         	Add value to given file. Do not override given file.\n"
@@ -227,7 +229,7 @@ void logic2vcd( void )
 		if(globalArgs.verbose)
 			fprintf(stderr,"start pattern trigger value %i\n",
 				globalArgs.triggervalue);
-		ActivatePatternTrigger(vscope,(char)globalArgs.triggervalue);
+		ActivatePatternTrigger(vscope,(char)globalArgs.triggervalue,(char)globalArgs.triggerignore);
 	}
 	else {
 		if(globalArgs.verbose)
@@ -243,7 +245,7 @@ void logic2vcd( void )
 	{
 		if(globalArgs.verbose)
 			fprintf(stderr,"Recording intern\n"); // TODO say if n > 1000
-		RecordingInternal(vscope,SAMPLERATE_100US);
+		RecordingInternal(vscope,globalArgs.samplerate_v);
 		GetRecordInternal(vscope,buf,1000);
 	}
 	// intern - start, catch values
@@ -385,6 +387,9 @@ int main( int argc, char *argv[] )
 				break;
 			case 't':
 				globalArgs.triggervalue = atoi(optarg);
+				break;
+			case 'i':
+				globalArgs.triggerignore = atoi(optarg);
 				break;
 			case 's':
 				globalArgs.samplerate=optarg;	

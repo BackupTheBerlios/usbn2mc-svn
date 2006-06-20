@@ -151,6 +151,12 @@ void VScopeCommand(char *buf)
       n = (((n >> 2) & 0x33) | ((n << 2) & 0xcc));
       n = (((n >> 4) & 0x0f) | ((n << 4) & 0xf0)); 
       vscope.trigger_value=n;
+      n = buf[3];
+      n = (((n >> 1) & 0x55) | ((n << 1) & 0xaa));
+      n = (((n >> 2) & 0x33) | ((n << 2) & 0xcc));
+      n = (((n >> 4) & 0x0f) | ((n << 4) & 0xf0)); 
+      
+      vscope.trigger_ignore=n;
     break;
 
 

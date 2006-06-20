@@ -54,7 +54,8 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
     }
     if(vscope.trigger==TRIGGER_PATTERN)
     {
-      if(port == vscope.trigger_value)
+      // ignore pattern
+      if( (port | vscope.trigger_ignore)  == (vscope.trigger_value|vscope.trigger_ignore))
       {
 	vscope.trigger=TRIGGER_OFF;
       }
