@@ -1,4 +1,4 @@
 all:
-	gcc -o usbprog usbprog.c -lusb
+	gcc -o usbflash usbflash.c -lusb
 clean:
-	rm usbprog
+	rm usbflash
