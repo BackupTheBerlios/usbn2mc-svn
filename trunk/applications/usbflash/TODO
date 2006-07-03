@@ -1,0 +1,36 @@
+usbflash Benedikt Sauter (2006) sauter@ixbat.de
+
+- flexibles updaten fuer weitere controller
+
+- update ueber usbflash tool
+
+- kleines grafisches tool, um zu sehen welche version aktiv ist,
+und um tool upzudaten
+
+-lib fuer usbflash schreiben
+
+- Konsolenandwendung und ein kleines grafisches Frontend
+
+Features:
+
+Mit usbflash ist es moeglich viele verschiedene Mikrocontroller ueber
+USB direkt programmieren zu koennen. Das Projekt besteht aus der
+Hardware, welche nur aus einem ATMega32 (von Atmel) und einen USBN9604
+(von National Semiconductor besteht). Dazu gibt es ein Programmiertool,
+in dem ebenfalls die Funktionen fuer den Update der Programmierhardware
+integriert sind.
+
+Programmieradapter und Programme um Controller zu Flashen gibt es viele, 
+jedoch ist hier eine Kombination entwickelt worden, die flexibel anpassbar 
+und erweiterbar ist. Dadurch kann dieser Adapter fuer viele
+Controller die auch in der Zukunft erst erscheinen verwendet werden.
+
+Mit der Zeit soll ein Pool an "Interfaces" fuer usbflash entstehen.
+So kann man idealerweise wenn man ein Projekt mit einem neuen Controller
+beginnt, direkt auf die Internetseite von usbflash gehen. Hier kann man lesen wie
+der Zielcontroller angeschlossen wird. Ebenfalls kann man sich 
+dann die neuste Version fuer das Interface herunterladen,
+welches dann bequem mit einem Programm in die Programmierhardware uebertragen wird.
+
+Die Oberflaeche oder Bedinung fuer das eigentliche Programmieren sieht fuer
+jeden Typ gleich aus. So kann man intuitiv viele Mikrocontroller programmieren.
