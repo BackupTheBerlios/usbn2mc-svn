@@ -87,6 +87,7 @@ struct usb_dev_handle* easyAVR_Open()
 {
   struct usb_bus *busses;
 
+  usb_set_debug(2);
   usb_init();
   usb_find_busses();
   usb_find_devices();

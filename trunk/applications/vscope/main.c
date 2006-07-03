@@ -66,7 +66,6 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
   {
     fifo_put (&vscope.fifo, port);
   }
-
   /*
   if(togl==1)
   {
