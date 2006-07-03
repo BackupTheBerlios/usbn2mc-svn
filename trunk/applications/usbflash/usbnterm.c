@@ -2,7 +2,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
-#include <avr/signal.h>
+//#include <avr/signal.h>
 #include <inttypes.h>
 
 #include "uart.h"
@@ -91,8 +91,7 @@ void Terminal(char cmd)
 
     case 'b':
       UARTWrite("send test data from fifo1\r\n");
-      int j,i;
-      char stat;
+      int j;
 
       USBNWrite(TXC1,FLUSH);
       USBNWrite(TXD1,0x01);
