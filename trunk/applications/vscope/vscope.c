@@ -122,7 +122,9 @@ void VScopeCommand(char *buf)
 
     case CMD_GETSCOPESTATE:
       UARTWrite("get scope state\r\n");
-
+      USBNWrite(TXC1,FLUSH);
+      USBNWrite(TXD1,vscope.state));
+      USBNWrite(TXC1,TX_LAST+TX_EN);
     break;
 
     case CMD_GETFIFOLOAD:

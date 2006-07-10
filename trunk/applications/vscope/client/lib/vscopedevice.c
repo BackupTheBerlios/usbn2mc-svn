@@ -127,14 +127,14 @@ void StopVScope(VScope* self)
 
 int GetVScopeState(VScope* self)
 {
-	
-	
+  char command[2] = {CMD_GETSCOPESTATE,2};
+  sendVScopeCommand(self,command);
 }
 
 int GetVScopeMode(VScope* self)
 {
-	
-	
+  char command[2] = {CMD_GETSCOPEMODE,2};
+  sendVScopeCommand(self,command);
 }
 
 
@@ -160,6 +160,11 @@ void RecordingInternal(VScope* self,char samplerate)
   SetVScopeMode(self,MODE_LOGICINTERN);
   SetVScopeSampleRate(self,samplerate);
   StartVScope(self);
+  // TODO check here with an endless loop and  GetVScopeState if record is ready
+  while(GetVScopeState(self) !=STATE_DONOTHING)
+  {
+    sleep(1);
+  }
 }
 
 void GetRecordInternal(VScope* self,char*data,int lengths)
