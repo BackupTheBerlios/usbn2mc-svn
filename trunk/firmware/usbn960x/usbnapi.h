@@ -73,6 +73,9 @@ void USBNConfigurationPower(int configuration, int power);
 /// create a new interface
 int USBNAddInterface(int configuration, int number); 
 
+/// create new class interface
+int USBNAddInterfaceClass (int configuration, int number, char class, char subclass, char protocol);
+
 /// set interface name
 void USBNInterfaceName(int configuration, int interface, char *name);
 

@@ -203,6 +203,40 @@ void USBNConfigurationPower (int configuration, int power)
   }
 }
 
+// add new interface to configuration
+int USBNAddInterfaceClass (int configuration, int number, char class, char subclass, char protocol)
+{
+  int index=0;
+  // get new interface number
+  struct list_entry *ptr = DescriptorList;
+  char *values; 	      
+  while(ptr != NULL) {
+    values = (char*)ptr->data;	      
+    if(values[5]==(char)configuration && ptr->type==0x02) // if descr = confi 
+    {
+      values[4]++;
+      index =  values[4];
+    }
+    ptr=ptr->next;
+  }
+  
+  struct usb_interface_descriptor* interf;
+  interf = (struct usb_interface_descriptor*)malloc(sizeof(struct usb_interface_descriptor));
+  interf->bLength = 0x09;  
+  interf->bDescriptorType     = INTERFACE;
+  interf->bInterfaceNumber     = number; // FIXME
+  interf->bAlternateSetting   = 0x00;
+  interf->bNumEndpoints       = 0x00;
+  interf->bInterfaceClass     = class;
+  interf->bInterfaceSubClass   = subclass;
+  interf->bInterfaceProtocol   = protocol;
+  interf->iInterface           = 0x00;
+  
+  _USBNAddToList((void*)interf, 0x09,INTERFACE,(uint8_t)configuration,0,index);
+  return index;
+}
+
+
 
 // add new interface to configuration
 int USBNAddInterface (int configuration, int number)
@@ -552,8 +586,7 @@ void USBNStart(void)
 void USBNInterrupt(void)
 {
   unsigned char maev,mask;
-
- 
+  
   maev = USBNRead(MAEV);
 
   if(maev & RX_EV)  _USBNReceiveEvent();
