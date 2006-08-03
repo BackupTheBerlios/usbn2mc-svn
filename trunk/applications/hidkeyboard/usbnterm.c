@@ -12,6 +12,7 @@
 //this is only my debug  tool
 void Terminal(char cmd)
 {  
+#if 0
   char h,l;
   unsigned char tmp;
   int i;
@@ -21,7 +22,8 @@ void Terminal(char cmd)
   switch(cmd)
   {   
     case 'i':
-      USBNStart();   
+      BootLoaderRunApplication();
+      //USBNStart();   
     break;
     // write to usb register
     case 'w':
@@ -109,5 +111,6 @@ void Terminal(char cmd)
     default:
       UARTWrite("unknown command\r\n");
   }
+#endif
 }
 
