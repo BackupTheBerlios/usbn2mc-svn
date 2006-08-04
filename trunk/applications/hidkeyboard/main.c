@@ -15,9 +15,11 @@ SIGNAL(SIG_UART_RECV)
 {
   Terminal(UARTGetChar());
   UARTWrite("usbn>");
+  
   USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
   USBNWrite(TXD1,0x55);
-  USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
+  //USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
+  USBNWrite(TXC1,TX_EN+TX_LAST);  //enable the TX (DATA1)
 }
 
 
@@ -152,7 +154,7 @@ int main(void)
   const unsigned char easyavrConf[] =
   { 0x09,             // 9 length of this descriptor
     0x02,       // descriptor type = configuration descriptor
-    0x20,0x00,  // total length with first interface ...
+    0x22,0x00,  // total length with first interface ...
     0x01,             // number of interfaces
     0x01,             // number if this config. ( arg for setconfig)
     0x00,       // string index for config
@@ -182,7 +184,7 @@ int main(void)
     0x05,             // descriptor type= endpoint
     0x81,             // endpoint address (e.g. in ep1)
     0x03,             // transfer art ( bulk )
-    0x80,0x00,  // fifo size
+    0x08,0x00,  // fifo size
     0x0A,             // polling intervall in ms
   };
 
