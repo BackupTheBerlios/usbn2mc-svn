@@ -13,11 +13,11 @@ void Terminal(char cmd);
 
 SIGNAL(SIG_UART_RECV)
 {
-  Terminal(UARTGetChar());
-  UARTWrite("usbn>");
+  //Terminal(UARTGetChar());
+  //UARTWrite("usbn>");
   
   USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
-  USBNWrite(TXD1,0x55);
+  USBNWrite(TXD1,UARTGetChar());
   //USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
   USBNWrite(TXC1,TX_EN+TX_LAST);  //enable the TX (DATA1)
 }
