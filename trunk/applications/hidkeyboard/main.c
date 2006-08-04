@@ -15,6 +15,9 @@ SIGNAL(SIG_UART_RECV)
 {
   Terminal(UARTGetChar());
   UARTWrite("usbn>");
+  USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
+  USBNWrite(TXD1,0x55);
+  USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
 }
 
 
@@ -74,7 +77,7 @@ void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
     case GET_DESCRIPTOR:
         ep->Index=0;
 	ep->DataPid=1;
-        ep->Size=63;
+        ep->Size=59;
 	ep->Buf=ReportDescriptorKeyboard;
     break;
     default:
@@ -168,11 +171,12 @@ int main(void)
     // HID Descriptor Keyboard
     0x09,	// length ot this descriptor
     0x21,	// HID Descriptortype
-    0x10,0x10,	// hid class spec
+    0x10,0x01,	// hid class spec
     0x00,	//country
     0x01,	// number of hid descriptors to flollow
     0x22,	// descriptor type
-    0x3f,	// total length of report descriptor
+    0x3b,	// total length of report descriptor
+    0x00,
     //EP1 Descriptor
     0x07,             // length of ep descriptor
     0x05,             // descriptor type= endpoint
