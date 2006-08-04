@@ -9,6 +9,7 @@
 
 void usbHIDWrite(char *msg, int size);
 
+volatile int tx1togl=0; 		// inital value of togl bit
 /* report descriptor keyboard */
 
 char ReportDescriptorKeyboard[] = { 
@@ -105,13 +106,15 @@ const unsigned char easyavrConf[] =
 
 
 
-/* uart interrupt (only for debugging)
+/* uart interrupt (only for debugging) */
 
 SIGNAL(SIG_UART_RECV)
 {
 	char test[]="Hallo";
 	int size = 4;
 	usbHIDWrite(test,size);
+  
+	UARTGetChar();
 }
 
 /* interrupt signael from usb controller */
@@ -160,7 +163,6 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 /* function for sending strings over usb hid device 
  * please use max size of 64 in this version
  */
-int tx1togl=0; 		// inital value of togl bit
 
 void usbHIDWrite(char *msg, int size)
 {
@@ -170,7 +172,8 @@ void usbHIDWrite(char *msg, int size)
 
   for(i=0;i<size;i++)
   {
-  	USBNWrite(TXD1,msg[i]);	// mirror signs of a serial console
+  	//USBNWrite(TXD1,msg[i]);	// mirror signs of a serial console
+  	USBNWrite(TXD1,0xfe);	// mirror signs of a serial console
   }
 
   /* control togl bit of EP1 */
