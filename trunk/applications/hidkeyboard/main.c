@@ -30,22 +30,52 @@ void InterruptEndpoint(char *buf)
 }
 
 /* report descriptor keyboard */
-
-char reportkeyoard[]={0x04,0x03,0x09,0x04};
-
-
+char ReportDescriptorKeyboard[] = { 
+	5, 1, // Usage_Page (Generic Desktop) 
+	9, 6, // Usage (Keyboard) 
+	0xA1, 1, // Collection (Application) 
+	5, 7, // Usage page (Key Codes) 
+	0x19, 224, // Usage_Minimum (224) 
+	0x29, 231, // Usage_Maximum (231) 
+	0x15, 0, // Logical_Minimum (0) 
+	0x25, 1, // Logical_Maximum (1) 
+	0x75, 1, // Report_Size (1) 
+	0x95, 8, // Report_Count (8) 
+	0x81, 2, // Input (Data,Var,Abs) = Modifier Byte 
+	0x81, 1, // Input (Constant) = Reserved Byte 
+	0x19, 0, // Usage_Minimum (0) 
+	0x29, 101, // Usage_Maximum (101) 
+	0x15, 0, // Logical_Minimum (0) 
+	0x25, 101, // Logical_Maximum (101) 
+	0x75, 8, // Report_Size (8) 
+	0x95, 6, // Report_Count (6) 
+	0x81, 0, // Input (Data,Array) = Keycode Bytes(6) 
+	5, 8, // Usage Page (LEDs) 
+	0x19, 1, // Usage_Minimum (1) 
+	0x29, 5, // Usage_Maximum (5) 
+	0x15, 0, // Logical_Minimum (0) 
+	0x25, 1, // Logical_Maximum (1) 
+	0x75, 1, // Report_Size (1) 
+	0x95, 5, // Report_Count (5) 
+	0x91, 2, // Output (Data,Var,Abs) = LEDs (5 bits) 
+	0x95, 3, // Report_Count (3) 
+	0x91, 1, // Output (Constant) = Pad (3 bits) 
+	0xC0 // End_Collection 
+}; 
 
 /*************** usb requests  **************/
 
 // reponse for requests on interface
-void USBNInterfaceRequests(DeviceRequest *req)
+void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
 {
   // 81 06 22 get report descriptor
   switch(req->bRequest)
   {
     case GET_DESCRIPTOR:
-        //EP0tx.Size=4;
-	//EP0tx.Buf=reportkeyboard;
+        ep->Index=0;
+	ep->DataPid=1;
+        ep->Size=63;
+	ep->Buf=ReportDescriptorKeyboard;
     break;
     default:
       UARTWrite("unkown interface request");
