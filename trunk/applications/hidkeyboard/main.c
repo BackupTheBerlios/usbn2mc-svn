@@ -7,34 +7,10 @@
 #include "uart.h"
 #include "usbn2mc.h"
 
-void Terminal(char cmd);
-
-
-
-SIGNAL(SIG_UART_RECV)
-{
-  //Terminal(UARTGetChar());
-  //UARTWrite("usbn>");
-  
-  USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
-  USBNWrite(TXD1,UARTGetChar());
-  //USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
-  USBNWrite(TXC1,TX_EN+TX_LAST);  //enable the TX (DATA1)
-}
-
-
-SIGNAL(SIG_INTERRUPT0)
-{
-  USBNInterrupt();
-}
-
-
-void InterruptEndpoint(char *buf)
-{
-	UARTWrite("hello");
-}
+void usbHIDWrite(char *msg, int size);
 
 /* report descriptor keyboard */
+
 char ReportDescriptorKeyboard[] = { 
 	5, 1, // Usage_Page (Generic Desktop) 
 	9, 6, // Usage (Keyboard) 
@@ -66,71 +42,12 @@ char ReportDescriptorKeyboard[] = {
 	0x95, 3, // Report_Count (3) 
 	0x91, 1, // Output (Constant) = Pad (3 bits) 
 	0xC0 // End_Collection 
-}; 
-
-/*************** usb requests  **************/
-
-// reponse for requests on interface
-void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
-{
-  // 81 06 22 get report descriptor
-  switch(req->bRequest)
-  {
-    case GET_DESCRIPTOR:
-        ep->Index=0;
-	ep->DataPid=1;
-        ep->Size=59;
-	ep->Buf=ReportDescriptorKeyboard;
-    break;
-    default:
-      UARTWrite("unkown interface request");
-   }
-}
+};
 
 
+/* Device Descriptor */
 
-// vendor requests
-void USBNDecodeVendorRequest(DeviceRequest *req)
-{
-UARTWrite("vendor");
-#if 0
-  //SendHex(req->bRequest);       // decode request code
-  SendHex(req->wLength);       // decode request code
-  USBNWrite(RXC0,RX_EN);
-  USBNRead(RXD0);
-  USBNRead(RXD0);
-
-  //USBNWrite(TXC0,FLUSH);
-  //USBNWrite(TXD0,0x24);
-  //USBNWrite(TXD0,0x25);
-#endif
-}
-
-
-// class requests
-void USBNDecodeClassRequest(DeviceRequest *req)
-{
-  UARTWrite("class  \r\n");
-  SendHex(req->bmRequestType);       // decode request code
-  SendHex(req->bRequest);       // decode request code
-  SendHex(req->wLength);       // decode request code
-
-  //USBNWrite(TXC0,FLUSH);
-  //USBNWrite(TXD0,0x00);
-  //USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
-
-}
-
-
-
-
-/*************** main function  **************/
-int main(void)
-{
-
-  sei();
-
-  const unsigned char easyavrDevice[] =
+const unsigned char easyavrDevice[] =
   { 0x12,             // 18 length of device descriptor
     0x01,       // descriptor type = device descriptor
     0x10,0x01,  // version of usb spec. ( e.g. 1.1)
@@ -147,11 +64,9 @@ int main(void)
     0x01        // number of configs
   };
 
-  // ********************************************************************
-  // configuration descriptor
-  // ********************************************************************
+/* Configuration descriptor */
 
-  const unsigned char easyavrConf[] =
+const unsigned char easyavrConf[] =
   { 0x09,             // 9 length of this descriptor
     0x02,       // descriptor type = configuration descriptor
     0x22,0x00,  // total length with first interface ...
@@ -188,16 +103,105 @@ int main(void)
     0x0A,             // polling intervall in ms
   };
 
-  UARTInit();
 
+
+/* uart interrupt (only for debugging)
+
+SIGNAL(SIG_UART_RECV)
+{
+	char test[]="Hallo";
+	int size = 4;
+	usbHIDWrite(test,size);
+}
+
+/* interrupt signael from usb controller */
+
+SIGNAL(SIG_INTERRUPT0)
+{
+  USBNInterrupt();
+}
+
+
+/*************** usb class HID requests  **************/
+
+// reponse for requests on interface
+void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
+{
+  // 81 06 22 get report descriptor
+  switch(req->bRequest)
+  {
+    case GET_DESCRIPTOR:
+        ep->Index=0;
+	ep->DataPid=1;
+        ep->Size=59;
+	ep->Buf=ReportDescriptorKeyboard;
+    break;
+    default:
+      UARTWrite("unkown interface request");
+   }
+}
+
+
+
+// vendor requests
+void USBNDecodeVendorRequest(DeviceRequest *req)
+{
+}
+
+
+// class requests
+void USBNDecodeClassRequest(DeviceRequest *req)
+{
+}
+
+
+
+
+/* function for sending strings over usb hid device 
+ * please use max size of 64 in this version
+ */
+int tx1togl=0; 		// inital value of togl bit
+
+void usbHIDWrite(char *msg, int size)
+{
+  int i;
+
+  USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
+
+  for(i=0;i<size;i++)
+  {
+  	USBNWrite(TXD1,msg[i]);	// mirror signs of a serial console
+  }
+
+  /* control togl bit of EP1 */
+  if(tx1togl)
+  {
+  	USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
+	tx1togl=0;
+  }
+  else
+  {
+  	USBNWrite(TXC1,TX_EN+TX_LAST);  //enable the TX (DATA1)
+	tx1togl=1;
+  }
+}
+
+
+
+/*************** main function  **************/
+
+int main(void)
+{
+
+  sei();		// activate global interrupts
+  UARTInit();		// only for debugging
+
+  // setup usbstack with your descriptors
   USBNInit(easyavrDevice,easyavrConf);
 
-  //USBNCallbackFIFORX1(&BootLoader);
 
-  USBNInitMC();
-
-  // start usb chip
-  USBNStart();
+  USBNInitMC();		// start usb controller
+  USBNStart();		// start device stack
   
   while(1);
 }
