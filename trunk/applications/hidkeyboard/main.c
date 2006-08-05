@@ -110,9 +110,9 @@ const unsigned char easyavrConf[] =
 
 SIGNAL(SIG_UART_RECV)
 {
-	char test[]="Hallo";
-	int size = 4;
-	usbHIDWrite(test,size);
+	//char test[]="Hallo";
+	//int size = 4;
+	//usbHIDWrite(test,size);
   
 	UARTGetChar();
 }
@@ -173,7 +173,10 @@ void usbHIDWrite(char *msg, int size)
   for(i=0;i<size;i++)
   {
   	//USBNWrite(TXD1,msg[i]);	// mirror signs of a serial console
-  	USBNWrite(TXD1,0xfe);	// mirror signs of a serial console
+  	if(i==2)
+	  USBNWrite(TXD1,0x04);	// mirror signs of a serial console
+	else
+  	USBNWrite(TXD1,0x00);	// mirror signs of a serial console
   }
 
   /* control togl bit of EP1 */
@@ -205,8 +208,17 @@ int main(void)
 
   USBNInitMC();		// start usb controller
   USBNStart();		// start device stack
-  
-  while(1);
+
+   char test[]="Hallo";
+   int size = 4;
+int i,j;		 //
+  while(1){
+	  for(i=0;i<0xFFFF;i++){
+	  	for(j=0;j<0xFFF;j++);
+	  } 	
+	  UARTWrite("next");
+    	usbHIDWrite(test,size);
+  }
 }
 
 
