@@ -12,7 +12,8 @@ void usbHIDWrite(char *msg, int size);
 volatile int tx1togl=0; 		// inital value of togl bit
 /* report descriptor keyboard */
 
-char ReportDescriptorKeyboard[] = { 
+char ReportDescriptorKeyboard[] = 
+{ 
 	5, 1, // Usage_Page (Generic Desktop) 
 	9, 6, // Usage (Keyboard) 
 	0xA1, 1, // Collection (Application) 
@@ -49,60 +50,62 @@ char ReportDescriptorKeyboard[] = {
 /* Device Descriptor */
 
 const unsigned char easyavrDevice[] =
-  { 0x12,             // 18 length of device descriptor
-    0x01,       // descriptor type = device descriptor
-    0x10,0x01,  // version of usb spec. ( e.g. 1.1)
-    0x00,             // device class
-    0x00,             // device subclass
-    0x00,       // protocol code
-    0x08,       // deep of ep0 fifo in byte (e.g. 8)
-    0x00,0x04,  // vendor id
-    0x5D,0xC3,  // product id
-    0x03,0x01,  // revision id (e.g 1.02)
-    0x00,       // index of manuf. string
-    0x00,             // index of product string
-    0x00,             // index of ser. number
-    0x01        // number of configs
-  };
+{ 
+	0x12,             // 18 length of device descriptor
+    	0x01,       // descriptor type = device descriptor
+    	0x10,0x01,  // version of usb spec. ( e.g. 1.1)
+    	0x00,             // device class
+    	0x00,             // device subclass
+    	0x00,       // protocol code
+    	0x08,       // deep of ep0 fifo in byte (e.g. 8)
+    	0x00,0x04,  // vendor id
+    	0x5D,0xC3,  // product id
+    	0x03,0x01,  // revision id (e.g 1.02)
+    	0x00,       // index of manuf. string
+    	0x00,             // index of product string
+    	0x00,             // index of ser. number
+    	0x01        // number of configs
+};
 
 /* Configuration descriptor */
 
 const unsigned char easyavrConf[] =
-  { 0x09,             // 9 length of this descriptor
-    0x02,       // descriptor type = configuration descriptor
-    0x22,0x00,  // total length with first interface ...
-    0x01,             // number of interfaces
-    0x01,             // number if this config. ( arg for setconfig)
-    0x00,       // string index for config
-    0xA0,       // attrib for this configuration ( bus powerded, remote wakup support)
-    0x1A,        // power for this configuration in mA (e.g. 50mA)
-    //InterfaceDescriptor
-    0x09,             // 9 length of this descriptor
-    0x04,       // descriptor type = interface descriptor
-    0x00,             // interface number
-    0x00,             // alternate setting for this interface
-    0x01,             // number endpoints without 0
-    0x03,       	// class code
-    0x01,       // sub-class code
-    0x01,       // protocoll code
-    0x00,       // string index for interface
-    // HID Descriptor Keyboard
-    0x09,	// length ot this descriptor
-    0x21,	// HID Descriptortype
-    0x10,0x01,	// hid class spec
-    0x00,	//country
-    0x01,	// number of hid descriptors to flollow
-    0x22,	// descriptor type
-    0x3b,	// total length of report descriptor
-    0x00,
-    //EP1 Descriptor
-    0x07,             // length of ep descriptor
-    0x05,             // descriptor type= endpoint
-    0x81,             // endpoint address (e.g. in ep1)
-    0x03,             // transfer art ( bulk )
-    0x08,0x00,  // fifo size
-    0x0A,             // polling intervall in ms
-  };
+{ 
+	0x09,             // 9 length of this descriptor
+    	0x02,       // descriptor type = configuration descriptor
+    	0x22,0x00,  // total length with first interface ...
+    	0x01,             // number of interfaces
+    	0x01,             // number if this config. ( arg for setconfig)
+    	0x00,       // string index for config
+    	0xA0,       // attrib for this configuration ( bus powerded, remote wakup support)
+    	0x1A,        // power for this configuration in mA (e.g. 50mA)
+    	//InterfaceDescriptor
+    	0x09,             // 9 length of this descriptor
+    	0x04,       // descriptor type = interface descriptor
+    	0x00,             // interface number
+    	0x00,             // alternate setting for this interface
+    	0x01,             // number endpoints without 0
+    	0x03,       	// class code
+    	0x01,       // sub-class code
+    	0x01,       // protocoll code
+    	0x00,       // string index for interface
+    	// HID Descriptor Keyboard
+    	0x09,	// length ot this descriptor
+    	0x21,	// HID Descriptortype
+    	0x10,0x01,	// hid class spec
+    	0x00,	//country
+    	0x01,	// number of hid descriptors to flollow
+    	0x22,	// descriptor type
+    	0x3b,	// total length of report descriptor
+    	0x00,
+    	//EP1 Descriptor
+    	0x07,             // length of ep descriptor
+    	0x05,             // descriptor type= endpoint
+    	0x81,             // endpoint address (e.g. in ep1)
+    	0x03,             // transfer art ( bulk )
+    	0x08,0x00,  // fifo size
+    	0x0A,             // polling intervall in ms
+};
 
 
 
@@ -110,10 +113,6 @@ const unsigned char easyavrConf[] =
 
 SIGNAL(SIG_UART_RECV)
 {
-	//char test[]="Hallo";
-	//int size = 4;
-	//usbHIDWrite(test,size);
-  
 	UARTGetChar();
 }
 
@@ -121,7 +120,7 @@ SIGNAL(SIG_UART_RECV)
 
 SIGNAL(SIG_INTERRUPT0)
 {
-  USBNInterrupt();
+	USBNInterrupt();
 }
 
 
@@ -130,18 +129,18 @@ SIGNAL(SIG_INTERRUPT0)
 // reponse for requests on interface
 void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
 {
-  // 81 06 22 get report descriptor
-  switch(req->bRequest)
-  {
-    case GET_DESCRIPTOR:
-        ep->Index=0;
-	ep->DataPid=1;
-        ep->Size=59;
-	ep->Buf=ReportDescriptorKeyboard;
-    break;
-    default:
-      UARTWrite("unkown interface request");
-   }
+  	// 81 06 22 get report descriptor
+  	switch(req->bRequest)
+  	{
+    		case GET_DESCRIPTOR:
+        		ep->Index=0;
+			ep->DataPid=1;
+        		ep->Size=59;
+			ep->Buf=ReportDescriptorKeyboard;
+    		break;
+    		default:
+      		UARTWrite("unkown interface request");
+   	}
 }
 
 
@@ -166,30 +165,29 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 
 void usbHIDWrite(char *msg, int size)
 {
-  int i;
+  	int i;
 
-  USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
+  	USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
 
-  for(i=0;i<size;i++)
-  {
-  	//USBNWrite(TXD1,msg[i]);	// mirror signs of a serial console
-  	if(i==2)
-	  USBNWrite(TXD1,0x04);	// mirror signs of a serial console
-	else
-  	USBNWrite(TXD1,0x00);	// mirror signs of a serial console
-  }
+  	for(i=0;i<size;i++)
+  	{
+  		USBNWrite(TXD1,0x00);	// send chars 
+  		USBNWrite(TXD1,0x00);	
+	  	USBNWrite(TXD1,0x04);	
+  		USBNWrite(TXD1,0x00);	
+  	}
 
-  /* control togl bit of EP1 */
-  if(tx1togl)
-  {
-  	USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
-	tx1togl=0;
-  }
-  else
-  {
-  	USBNWrite(TXC1,TX_EN+TX_LAST);  //enable the TX (DATA1)
-	tx1togl=1;
-  }
+  	/* control togl bit of EP1 */
+  	if(tx1togl)
+  	{
+  		USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
+		tx1togl=0;
+  	}
+  	else
+  	{
+  		USBNWrite(TXC1,TX_EN+TX_LAST);  //enable the TX (DATA1)
+		tx1togl=1;
+  	}
 }
 
 
@@ -199,25 +197,29 @@ void usbHIDWrite(char *msg, int size)
 int main(void)
 {
 
-  sei();		// activate global interrupts
-  UARTInit();		// only for debugging
+  	sei();			// activate global interrupts
+  	UARTInit();		// only for debugging
 
-  // setup usbstack with your descriptors
-  USBNInit(easyavrDevice,easyavrConf);
+  	// setup usbstack with your descriptors
+  	USBNInit(easyavrDevice,easyavrConf);
 
 
-  USBNInitMC();		// start usb controller
-  USBNStart();		// start device stack
+  	USBNInitMC();		// start usb controller
+  	USBNStart();		// start device stack
 
-   char test[]="Hallo";
-   int size = 4;
-int i,j;		 //
-  while(1){
+   
+	/* stupid wait loop */
+	int i,j;		 
+  	while(1){
 	  for(i=0;i<0xFFFF;i++){
-	  	for(j=0;j<0xFFF;j++);
-	  } 	
-	  UARTWrite("next");
+	  	for(j=0;j<0xFFFF;j++){}
+	} 	
+	
+	char test[]="Hallo";
+   	int size = 4;
+	/* send string */
     	usbHIDWrite(test,size);
+
   }
 }
 
