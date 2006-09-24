@@ -7,7 +7,9 @@
 #include "uart.h"
 #include "usbn2mc.h"
 
-void usbHIDWrite(char *msg, int size);
+#include "atkeyb.h"
+
+void usbHIDWrite(char hex);
 
 volatile int tx1togl=0; 		// inital value of togl bit
 /* report descriptor keyboard */
@@ -114,6 +116,12 @@ const unsigned char easyavrConf[] =
 SIGNAL(SIG_UART_RECV)
 {
 	UARTGetChar();
+	
+	/*char test[]="Hallo";
+	int size = 4;
+	usbHIDWrite(test,size,0x05);
+	*/
+	
 }
 
 /* interrupt signael from usb controller */
@@ -123,6 +131,11 @@ SIGNAL(SIG_INTERRUPT0)
 	USBNInterrupt();
 }
 
+
+SIGNAL(SIG_INTERRUPT2)
+{
+		atkeyb_interrupt();
+}
 
 /*************** usb class HID requests  **************/
 
@@ -163,19 +176,21 @@ void USBNDecodeClassRequest(DeviceRequest *req)
  * please use max size of 64 in this version
  */
 
-void usbHIDWrite(char *msg, int size)
+void usbHIDWrite(char hex)
 {
   	int i;
 
   	USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
 
-  	for(i=0;i<size;i++)
-  	{
-  		USBNWrite(TXD1,0x00);	// send chars 
-  		USBNWrite(TXD1,0x00);	
-	  	USBNWrite(TXD1,0x04);	
-  		USBNWrite(TXD1,0x00);	
-  	}
+  	USBNWrite(TXD1,0x00);	// send chars 		bei shift = 02
+  	USBNWrite(TXD1,0x00);	
+	USBNWrite(TXD1,hex);	
+  	USBNWrite(TXD1,0x00);	
+
+  	USBNWrite(TXD1,0x00);	
+  	USBNWrite(TXD1,0x00);	
+  	USBNWrite(TXD1,0x00);	
+  	USBNWrite(TXD1,0x00);	
 
   	/* control togl bit of EP1 */
   	if(tx1togl)
@@ -207,20 +222,36 @@ int main(void)
   	USBNInitMC();		// start usb controller
   	USBNStart();		// start device stack
 
-   
+	atkeyb_init();
+
+	
 	/* stupid wait loop */
 	int i,j;		 
-  	while(1){
-	  for(i=0;i<0xFFFF;i++){
-	  	for(j=0;j<0xFFFF;j++){}
-	} 	
-	
-	char test[]="Hallo";
-   	int size = 4;
-	/* send string */
-    	usbHIDWrite(test,size);
+	char key;
+	char test[2];
+  	while(1)
+	{
+		
+		key = atkeyb_getchar();
+		usbHIDWrite(key-93);
+		//usbHIDWrite(key-93);
+		//SendHex(key);
 
-  }
+		//test[0]=key;
+		//test[1]=0x00;
+		//UARTWrite(test);
+		
+
+
+
+	    for(j=0;j<0xFFFF;j++){}
+		usbHIDWrite(0x00);
+/*	
+	  int size = 4;
+	  
+	  usbHIDWrite(test,size,0x04);
+	  */
+	}
 }
 
 

@@ -52,7 +52,7 @@ TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c uart.c usbnterm.c ../../firmware/usbn960xtiny/usbn960x.c usbn2mc.c ../../firmware/usbn960xtiny/usbnapi.c
+SRC = $(TARGET).c uart.c usbnterm.c ../../firmware/usbn960xtiny/usbn960x.c usbn2mc.c ../../firmware/usbn960xtiny/usbnapi.c atkeyb.c
 
 
 # List Assembler source files here.
