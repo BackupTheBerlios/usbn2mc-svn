@@ -28,6 +28,8 @@ int togl=0;
 // testfunction where called when data on ep2, buf is a ptr to a 64 byte field 
 void Receive(char *buf)
 {
+	UARTWrite("recv on ep2\r\n");
+	/*
   int i;
   for(i=0;i<64;i++)
     SendHex(buf[i]);
@@ -39,12 +41,14 @@ void Receive(char *buf)
     USBNWrite(TXD1,i);
 
   USBNWrite(TXC1,TX_LAST+TX_EN);
-
+*/
 }
 
 // called at transfer irq
 void TransferISR()
 {
+	UARTWrite("called after trans\r\n");
+  /*
   //UARTWrite("ready for next\r\n");
   int i;
 
@@ -55,6 +59,7 @@ void TransferISR()
 
 
   USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
+  */
 }
 
 
@@ -66,8 +71,8 @@ int main(void)
   // setup your usbn device
 
   USBNDeviceVendorID(0x0400);
-  USBNDeviceProductID(0x9876);
-  USBNDeviceBCDDevice(0x0201);
+  USBNDeviceProductID(0x0000);
+  USBNDeviceBCDDevice(0x0000);
 
 
   char lang[]={0x09,0x04};
@@ -75,19 +80,16 @@ int main(void)
 
   
   USBNDeviceManufacture ("B.Sauter");
-  USBNDeviceProduct	("usbn2mc");
-  USBNDeviceSerialNumber("2006-04-24");
+  USBNDeviceProduct	("vport");
+  USBNDeviceSerialNumber("2006-10-05");
 
   conf = USBNAddConfiguration();
 
-  //USBNConfigurationName(conf,"StandardKonfiguration");
   USBNConfigurationPower(conf,50);
 
   interf = USBNAddInterface(conf,0);
   USBNAlternateSetting(conf,interf,0);
 
-  //USBNInterfaceName(conf,interf,"usbstorage");
-  
 
   USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&Receive);
   USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0,&TransferISR);

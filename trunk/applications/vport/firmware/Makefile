@@ -436,4 +436,4 @@ build elf hex eep lss sym coff extcoff \
 clean clean_list program
 
 download:
-	avrdude -p m32 -c bsd -U flash:w:usbndemo.hex -E noreset
+	avrdude -p m32 -c bsd -U flash:w:vport.hex -E noreset
