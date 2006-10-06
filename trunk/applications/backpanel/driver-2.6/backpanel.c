@@ -1,5 +1,5 @@
 /*
- * tinkerface is an own build multi I/O converter 
+ * backpanel is an own build multi I/O converter 
  * rs232, i2c,p arallel I/O port
  *
  *  Copyright (C) 2006 Benedikt Sauter (sauter@ixbat.de)
@@ -11,7 +11,7 @@
  *
  *	WITHOUT ANY WARRANTY
  *
- * This driver is based on the 2.6.3 version of drivers/usb/usb-tinkerfaceeton.c 
+ * This driver is based on the 2.6.3 version of drivers/usb/usb-backpaneleton.c 
  * but has been rewritten to be easy to read and use, as no locks are now
  * needed anymore.
  *
@@ -39,18 +39,18 @@ static int debug;
 #define USB_TINKERFACE_PRODUCT_ID	0xfff0
 
 /* table of devices that work with this driver */
-static struct usb_device_id tinkerface_table [] = {
+static struct usb_device_id backpanel_table [] = {
 	{ USB_DEVICE(USB_TINKERFACE_VENDOR_ID, USB_TINKERFACE_PRODUCT_ID) },
 	{ }					/* Terminating entry */
 };
-MODULE_DEVICE_TABLE (usb, tinkerface_table);
+MODULE_DEVICE_TABLE (usb, backpanel_table);
 
 
 /* Get a minor range for your devices from the usb maintainer */
 #define USB_TINKERFACE_MINOR_BASE	192
 
 /* Structure to hold all of our device specific stuff */
-struct usb_tinkerface {
+struct usb_backpanel {
 	struct usb_device *	udev;			/* the usb device for this device */
 	struct usb_interface *	interface;		/* the interface for this device */
 	unsigned char *		bulk_in_buffer;		/* the buffer to receive data */
@@ -59,29 +59,29 @@ struct usb_tinkerface {
 	__u8			bulk_out_endpointAddr;	/* the address of the bulk out endpoint */
 	struct kref		kref;
 };
-#define to_tinkerface_dev(d) container_of(d, struct usb_tinkerface, kref)
+#define to_backpanel_dev(d) container_of(d, struct usb_backpanel, kref)
 
-static struct usb_driver tinkerface_driver;
+static struct usb_driver backpanel_driver;
 
-static void tinkerface_delete(struct kref *kref)
+static void backpanel_delete(struct kref *kref)
 {	
-	struct usb_tinkerface *dev = to_tinkerface_dev(kref);
+	struct usb_backpanel *dev = to_backpanel_dev(kref);
 
 	usb_put_dev(dev->udev);
 	kfree (dev->bulk_in_buffer);
 	kfree (dev);
 }
 
-static int tinkerface_open(struct inode *inode, struct file *file)
+static int backpanel_open(struct inode *inode, struct file *file)
 {
-	struct usb_tinkerface *dev;
+	struct usb_backpanel *dev;
 	struct usb_interface *interface;
 	int subminor;
 	int retval = 0;
 
 	subminor = iminor(inode);
 
-	interface = usb_find_interface(&tinkerface_driver, subminor);
+	interface = usb_find_interface(&backpanel_driver, subminor);
 	if (!interface) {
 		err ("%s - error, can't find device for minor %d",
 		     __FUNCTION__, subminor);
@@ -105,26 +105,26 @@ exit:
 	return retval;
 }
 
-static int tinkerface_release(struct inode *inode, struct file *file)
+static int backpanel_release(struct inode *inode, struct file *file)
 {
-	struct usb_tinkerface *dev;
+	struct usb_backpanel *dev;
 
-	dev = (struct usb_tinkerface *)file->private_data;
+	dev = (struct usb_backpanel *)file->private_data;
 	if (dev == NULL)
 		return -ENODEV;
 
 	/* decrement the count on our device */
-	kref_put(&dev->kref, tinkerface_delete);
+	kref_put(&dev->kref, backpanel_delete);
 	return 0;
 }
 
-static ssize_t tinkerface_read(struct file *file, char *buffer, size_t count, loff_t *ppos)
+static ssize_t backpanel_read(struct file *file, char *buffer, size_t count, loff_t *ppos)
 {
-	struct usb_tinkerface *dev;
+	struct usb_backpanel *dev;
 	int retval = 0;
 	int bytes_read;
 
-	dev = (struct usb_tinkerface *)file->private_data;
+	dev = (struct usb_backpanel *)file->private_data;
 	
 	/* do a blocking bulk read to get data from the device */
 	retval = usb_bulk_msg(dev->udev,
@@ -144,11 +144,11 @@ static ssize_t tinkerface_read(struct file *file, char *buffer, size_t count, lo
 	return retval;
 }
 
-static void tinkerface_write_bulk_callback(struct urb *urb, struct pt_regs *regs)
+static void backpanel_write_bulk_callback(struct urb *urb, struct pt_regs *regs)
 {
-	struct usb_tinkerface *dev;
+	struct usb_backpanel *dev;
 
-	dev = (struct usb_tinkerface *)urb->context;
+	dev = (struct usb_backpanel *)urb->context;
 
 	/* sync/async unlink faults aren't errors */
 	if (urb->status && 
@@ -164,14 +164,14 @@ static void tinkerface_write_bulk_callback(struct urb *urb, struct pt_regs *regs
 			urb->transfer_buffer, urb->transfer_dma);
 }
 
-static ssize_t tinkerface_write(struct file *file, const char *user_buffer, size_t count, loff_t *ppos)
+static ssize_t backpanel_write(struct file *file, const char *user_buffer, size_t count, loff_t *ppos)
 {
-	struct usb_tinkerface *dev;
+	struct usb_backpanel *dev;
 	int retval = 0;
 	struct urb *urb = NULL;
 	char *buf = NULL;
 
-	dev = (struct usb_tinkerface *)file->private_data;
+	dev = (struct usb_backpanel *)file->private_data;
 
 	/* verify that we actually have some data to write */
 	if (count == 0)
@@ -198,7 +198,7 @@ static ssize_t tinkerface_write(struct file *file, const char *user_buffer, size
 	/* initialize the urb properly */
 	usb_fill_bulk_urb(urb, dev->udev,
 			  usb_sndbulkpipe(dev->udev, dev->bulk_out_endpointAddr),
-			  buf, count, tinkerface_write_bulk_callback, dev);
+			  buf, count, backpanel_write_bulk_callback, dev);
 	urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 
 	/* send the data out the bulk port */
@@ -220,28 +220,28 @@ error:
 	return retval;
 }
 
-static struct file_operations tinkerface_fops = {
+static struct file_operations backpanel_fops = {
 	.owner =	THIS_MODULE,
-	.read =		tinkerface_read,
-	.write =	tinkerface_write,
-	.open =		tinkerface_open,
-	.release =	tinkerface_release,
+	.read =		backpanel_read,
+	.write =	backpanel_write,
+	.open =		backpanel_open,
+	.release =	backpanel_release,
 };
 
 /* 
  * usb class driver info in order to get a minor number from the usb core,
  * and to have the device registered with devfs and the driver core
  */
-static struct usb_class_driver tinkerface_class = {
-	.name =		"usb/tinkerface%d",
-	.fops =		&tinkerface_fops,
+static struct usb_class_driver backpanel_class = {
+	.name =		"usb/backpanel%d",
+	.fops =		&backpanel_fops,
 	.mode =		S_IFCHR | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH,
 	.minor_base =	USB_TINKERFACE_MINOR_BASE,
 };
 
-static int tinkerface_probe(struct usb_interface *interface, const struct usb_device_id *id)
+static int backpanel_probe(struct usb_interface *interface, const struct usb_device_id *id)
 {
-	struct usb_tinkerface *dev = NULL;
+	struct usb_backpanel *dev = NULL;
 	struct usb_host_interface *iface_desc;
 	struct usb_endpoint_descriptor *endpoint;
 	size_t buffer_size;
@@ -300,7 +300,7 @@ static int tinkerface_probe(struct usb_interface *interface, const struct usb_de
 	usb_set_intfdata(interface, dev);
 
 	/* we can register the device now, as it is ready */
-	retval = usb_register_dev(interface, &tinkerface_class);
+	retval = usb_register_dev(interface, &backpanel_class);
 	if (retval) {
 		/* something prevented us from registering this driver */
 		err("Not able to get a minor for this device.");
@@ -314,59 +314,59 @@ static int tinkerface_probe(struct usb_interface *interface, const struct usb_de
 
 error:
 	if (dev)
-		kref_put(&dev->kref, tinkerface_delete);
+		kref_put(&dev->kref, backpanel_delete);
 	return retval;
 }
 
-static void tinkerface_disconnect(struct usb_interface *interface)
+static void backpanel_disconnect(struct usb_interface *interface)
 {
-	struct usb_tinkerface *dev;
+	struct usb_backpanel *dev;
 	int minor = interface->minor;
 
-	/* prevent tinkerface_open() from racing tinkerface_disconnect() */
+	/* prevent backpanel_open() from racing backpanel_disconnect() */
 	lock_kernel();
 
 	dev = usb_get_intfdata(interface);
 	usb_set_intfdata(interface, NULL);
 
 	/* give back our minor */
-	usb_deregister_dev(interface, &tinkerface_class);
+	usb_deregister_dev(interface, &backpanel_class);
 
 	unlock_kernel();
 
 	/* decrement our usage count */
-	kref_put(&dev->kref, tinkerface_delete);
+	kref_put(&dev->kref, backpanel_delete);
 
 	info("USB Skeleton #%d now disconnected", minor);
 }
 
-static struct usb_driver tinkerface_driver = {
+static struct usb_driver backpanel_driver = {
 	.owner =	THIS_MODULE,
-	.name =		"tinkerfaceeton",
-	.probe =	tinkerface_probe,
-	.disconnect =	tinkerface_disconnect,
-	.id_table =	tinkerface_table,
+	.name =		"backpaneleton",
+	.probe =	backpanel_probe,
+	.disconnect =	backpanel_disconnect,
+	.id_table =	backpanel_table,
 };
 
-static int __init usb_tinkerface_init(void)
+static int __init usb_backpanel_init(void)
 {
 	int result;
 
 	/* register this driver with the USB subsystem */
-	result = usb_register(&tinkerface_driver);
+	result = usb_register(&backpanel_driver);
 	if (result)
 		err("usb_register failed. Error number %d", result);
 
 	return result;
 }
 
-static void __exit usb_tinkerface_exit(void)
+static void __exit usb_backpanel_exit(void)
 {
 	/* deregister this driver with the USB subsystem */
-	usb_deregister(&tinkerface_driver);
+	usb_deregister(&backpanel_driver);
 }
 
-module_init (usb_tinkerface_init);
-module_exit (usb_tinkerface_exit);
+module_init (usb_backpanel_init);
+module_exit (usb_backpanel_exit);
 
 MODULE_LICENSE("GPL");
