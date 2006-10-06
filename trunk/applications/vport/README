@@ -1,0 +1,9 @@
+Benedikt Sauter sauter@ixbat.de
+
+
+The project vport is mainly a usb device wich offers many different typical microcontroller interfaces.
+
+You can access the ports in linux over the typical devices, e.g. /dev/ttyUSB0 /dev/i2c0 and so on,
+or over the userspace based libusb.
+
+Over the libusb you can talk with your devices also in Windows and Macintosh.
