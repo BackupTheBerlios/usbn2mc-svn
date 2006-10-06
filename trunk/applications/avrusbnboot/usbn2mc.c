@@ -53,8 +53,9 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 #endif
 }
 
-
-
+void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
+{
+}
 // ********************************************************************
 // This subroutine handles the communication with usbn9604          
 // ********************************************************************

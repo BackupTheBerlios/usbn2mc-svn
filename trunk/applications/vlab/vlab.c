@@ -89,7 +89,7 @@ int main(void)
 
   
   USBNDeviceManufacture ("B.Sauter");
-  USBNDeviceProduct	("usbn2mc");
+  USBNDeviceProduct	("usbn2mc1");
   USBNDeviceSerialNumber("2006-04-24");
 
   conf = USBNAddConfiguration();
@@ -104,7 +104,7 @@ int main(void)
   
 
   USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&SetGetPort);
-  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0);
+  USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0,NULL);
 
   
   MCUCR |=  (1 << ISC01); // fallende flanke
