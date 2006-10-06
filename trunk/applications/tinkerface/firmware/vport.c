@@ -79,8 +79,8 @@ int main(void)
   _USBNAddStringDescriptor(lang); // language descriptor
 
   
-  USBNDeviceManufacture ("B.Sauter");
-  USBNDeviceProduct	("vport");
+  USBNDeviceManufacture ("www.ixbat.de");
+  USBNDeviceProduct	("tinkerface");
   USBNDeviceSerialNumber("2006-10-05");
 
   conf = USBNAddConfiguration();

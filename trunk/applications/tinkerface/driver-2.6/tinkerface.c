@@ -1,323 +1,372 @@
 /*
- * USB Serial Converter Generic functions
+ * tinkerface is an own build multi I/O converter 
+ * rs232, i2c,p arallel I/O port
  *
- * Copyright (C) 1999 - 2002 Greg Kroah-Hartman (greg@kroah.com)
+ *  Copyright (C) 2006 Benedikt Sauter (sauter@ixbat.de)
+ *  
  *
  *	This program is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU General Public License version
- *	2 as published by the Free Software Foundation.
+ *	modify it under the terms of the GNU General Public License as
+ *	published by the Free Software Foundation, version 2.
+ *
+ *	WITHOUT ANY WARRANTY
+ *
+ * This driver is based on the 2.6.3 version of drivers/usb/usb-tinkerfaceeton.c 
+ * but has been rewritten to be easy to read and use, as no locks are now
+ * needed anymore.
  *
  */
 
 #include <linux/config.h>
 #include <linux/kernel.h>
 #include <linux/errno.h>
+#include <linux/init.h>
 #include <linux/slab.h>
-#include <linux/tty.h>
-#include <linux/tty_flip.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
-#include <linux/usb.h>
+#include <linux/kref.h>
 #include <asm/uaccess.h>
-#include "usb-serial.h"
+#include <linux/usb.h>
+#include <linux/tty.h>
+#include <linux/tty_flip.h>
+
+#include "usb-serial.h" 
 
 static int debug;
 
-#ifdef CONFIG_USB_SERIAL_GENERIC
-static __u16 vendor  = 0x05f9;
-static __u16 product = 0xffff;
+/* Define these values to match your devices */
+#define USB_TINKERFACE_VENDOR_ID	0xfff0
+#define USB_TINKERFACE_PRODUCT_ID	0xfff0
 
-module_param(vendor, ushort, 0);
-MODULE_PARM_DESC(vendor, "User specified USB idVendor");
-
-module_param(product, ushort, 0);
-MODULE_PARM_DESC(product, "User specified USB idProduct");
-
-static struct usb_device_id tinkerface_device_ids[2]; /* Initially all zeroes. */
-
-/* All of the device info needed for the Generic Serial Converter */
-struct usb_serial_device_type usb_serial_tinkerface_device = {
-	.owner =		THIS_MODULE,
-	.name =			"Generic",
-	.short_name =		"tinkerface",
-	.id_table =		tinkerface_device_ids,
-	.num_interrupt_in =	NUM_DONT_CARE,
-	.num_bulk_in =		NUM_DONT_CARE,
-	.num_bulk_out =		NUM_DONT_CARE,
-	.num_ports =		1,
-	.shutdown =		usb_serial_tinkerface_shutdown,
+/* table of devices that work with this driver */
+static struct usb_device_id tinkerface_table [] = {
+	{ USB_DEVICE(USB_TINKERFACE_VENDOR_ID, USB_TINKERFACE_PRODUCT_ID) },
+	{ }					/* Terminating entry */
 };
+MODULE_DEVICE_TABLE (usb, tinkerface_table);
 
-/* we want to look at all devices, as the vendor/product id can change
- * depending on the command line argument */
-static struct usb_device_id tinkerface_serial_ids[] = {
-	{.driver_info = 42},
-	{}
+
+/* Get a minor range for your devices from the usb maintainer */
+#define USB_TINKERFACE_MINOR_BASE	192
+
+/* Structure to hold all of our device specific stuff */
+struct usb_tinkerface {
+	struct usb_device *	udev;			/* the usb device for this device */
+	struct usb_interface *	interface;		/* the interface for this device */
+	unsigned char *		bulk_in_buffer;		/* the buffer to receive data */
+	size_t			bulk_in_size;		/* the size of the receive buffer */
+	__u8			bulk_in_endpointAddr;	/* the address of the bulk in endpoint */
+	__u8			bulk_out_endpointAddr;	/* the address of the bulk out endpoint */
+	struct kref		kref;
 };
+#define to_tinkerface_dev(d) container_of(d, struct usb_tinkerface, kref)
 
-static int tinkerface_probe(struct usb_interface *interface,
-			       const struct usb_device_id *id)
+static struct usb_driver tinkerface_driver;
+
+static void tinkerface_delete(struct kref *kref)
+{	
+	struct usb_tinkerface *dev = to_tinkerface_dev(kref);
+
+	usb_put_dev(dev->udev);
+	kfree (dev->bulk_in_buffer);
+	kfree (dev);
+}
+
+static int tinkerface_open(struct inode *inode, struct file *file)
 {
-	const struct usb_device_id *id_pattern;
+	struct usb_tinkerface *dev;
+	struct usb_interface *interface;
+	int subminor;
+	int retval = 0;
 
-	id_pattern = usb_match_id(interface, tinkerface_device_ids);
-	if (id_pattern != NULL)
-		return usb_serial_probe(interface, id);
-	return -ENODEV;
+	subminor = iminor(inode);
+
+	interface = usb_find_interface(&tinkerface_driver, subminor);
+	if (!interface) {
+		err ("%s - error, can't find device for minor %d",
+		     __FUNCTION__, subminor);
+		retval = -ENODEV;
+		goto exit;
+	}
+
+	dev = usb_get_intfdata(interface);
+	if (!dev) {
+		retval = -ENODEV;
+		goto exit;
+	}
+
+	/* increment our usage count for the device */
+	kref_get(&dev->kref);
+
+	/* save our object in the file's private structure */
+	file->private_data = dev;
+
+exit:
+	return retval;
+}
+
+static int tinkerface_release(struct inode *inode, struct file *file)
+{
+	struct usb_tinkerface *dev;
+
+	dev = (struct usb_tinkerface *)file->private_data;
+	if (dev == NULL)
+		return -ENODEV;
+
+	/* decrement the count on our device */
+	kref_put(&dev->kref, tinkerface_delete);
+	return 0;
+}
+
+static ssize_t tinkerface_read(struct file *file, char *buffer, size_t count, loff_t *ppos)
+{
+	struct usb_tinkerface *dev;
+	int retval = 0;
+	int bytes_read;
+
+	dev = (struct usb_tinkerface *)file->private_data;
+	
+	/* do a blocking bulk read to get data from the device */
+	retval = usb_bulk_msg(dev->udev,
+			      usb_rcvbulkpipe(dev->udev, dev->bulk_in_endpointAddr),
+			      dev->bulk_in_buffer,
+			      min(dev->bulk_in_size, count),
+			      &bytes_read, 10000);
+
+	/* if the read was successful, copy the data to userspace */
+	if (!retval) {
+		if (copy_to_user(buffer, dev->bulk_in_buffer, bytes_read))
+			retval = -EFAULT;
+		else
+			retval = bytes_read;
+	}
+
+	return retval;
+}
+
+static void tinkerface_write_bulk_callback(struct urb *urb, struct pt_regs *regs)
+{
+	struct usb_tinkerface *dev;
+
+	dev = (struct usb_tinkerface *)urb->context;
+
+	/* sync/async unlink faults aren't errors */
+	if (urb->status && 
+	    !(urb->status == -ENOENT || 
+	      urb->status == -ECONNRESET ||
+	      urb->status == -ESHUTDOWN)) {
+		dbg("%s - nonzero write bulk status received: %d",
+		    __FUNCTION__, urb->status);
+	}
+
+	/* free up our allocated buffer */
+	usb_buffer_free(urb->dev, urb->transfer_buffer_length, 
+			urb->transfer_buffer, urb->transfer_dma);
+}
+
+static ssize_t tinkerface_write(struct file *file, const char *user_buffer, size_t count, loff_t *ppos)
+{
+	struct usb_tinkerface *dev;
+	int retval = 0;
+	struct urb *urb = NULL;
+	char *buf = NULL;
+
+	dev = (struct usb_tinkerface *)file->private_data;
+
+	/* verify that we actually have some data to write */
+	if (count == 0)
+		goto exit;
+
+	/* create a urb, and a buffer for it, and copy the data to the urb */
+	urb = usb_alloc_urb(0, GFP_KERNEL);
+	if (!urb) {
+		retval = -ENOMEM;
+		goto error;
+	}
+
+	buf = usb_buffer_alloc(dev->udev, count, GFP_KERNEL, &urb->transfer_dma);
+	if (!buf) {
+		retval = -ENOMEM;
+		goto error;
+	}
+
+	if (copy_from_user(buf, user_buffer, count)) {
+		retval = -EFAULT;
+		goto error;
+	}
+
+	/* initialize the urb properly */
+	usb_fill_bulk_urb(urb, dev->udev,
+			  usb_sndbulkpipe(dev->udev, dev->bulk_out_endpointAddr),
+			  buf, count, tinkerface_write_bulk_callback, dev);
+	urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
+
+	/* send the data out the bulk port */
+	retval = usb_submit_urb(urb, GFP_KERNEL);
+	if (retval) {
+		err("%s - failed submitting write urb, error %d", __FUNCTION__, retval);
+		goto error;
+	}
+
+	/* release our reference to this urb, the USB core will eventually free it entirely */
+	usb_free_urb(urb);
+
+exit:
+	return count;
+
+error:
+	usb_buffer_free(dev->udev, count, buf, urb->transfer_dma);
+	usb_free_urb(urb);
+	return retval;
+}
+
+static struct file_operations tinkerface_fops = {
+	.owner =	THIS_MODULE,
+	.read =		tinkerface_read,
+	.write =	tinkerface_write,
+	.open =		tinkerface_open,
+	.release =	tinkerface_release,
+};
+
+/* 
+ * usb class driver info in order to get a minor number from the usb core,
+ * and to have the device registered with devfs and the driver core
+ */
+static struct usb_class_driver tinkerface_class = {
+	.name =		"usb/tinkerface%d",
+	.fops =		&tinkerface_fops,
+	.mode =		S_IFCHR | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH,
+	.minor_base =	USB_TINKERFACE_MINOR_BASE,
+};
+
+static int tinkerface_probe(struct usb_interface *interface, const struct usb_device_id *id)
+{
+	struct usb_tinkerface *dev = NULL;
+	struct usb_host_interface *iface_desc;
+	struct usb_endpoint_descriptor *endpoint;
+	size_t buffer_size;
+	int i;
+	int retval = -ENOMEM;
+
+	/* allocate memory for our device state and initialize it */
+	dev = kmalloc(sizeof(*dev), GFP_KERNEL);
+	if (dev == NULL) {
+		err("Out of memory");
+		goto error;
+	}
+	memset(dev, 0x00, sizeof(*dev));
+	kref_init(&dev->kref);
+
+	dev->udev = usb_get_dev(interface_to_usbdev(interface));
+	dev->interface = interface;
+
+	/* set up the endpoint information */
+	/* use only the first bulk-in and bulk-out endpoints */
+	iface_desc = interface->cur_altsetting;
+	for (i = 0; i < iface_desc->desc.bNumEndpoints; ++i) {
+		endpoint = &iface_desc->endpoint[i].desc;
+
+		if (!dev->bulk_in_endpointAddr &&
+		    ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK)
+					== USB_DIR_IN) &&
+		    ((endpoint->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK)
+					== USB_ENDPOINT_XFER_BULK)) {
+			/* we found a bulk in endpoint */
+			buffer_size = le16_to_cpu(endpoint->wMaxPacketSize);
+			dev->bulk_in_size = buffer_size;
+			dev->bulk_in_endpointAddr = endpoint->bEndpointAddress;
+			dev->bulk_in_buffer = kmalloc(buffer_size, GFP_KERNEL);
+			if (!dev->bulk_in_buffer) {
+				err("Could not allocate bulk_in_buffer");
+				goto error;
+			}
+		}
+
+		if (!dev->bulk_out_endpointAddr &&
+		    ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK)
+					== USB_DIR_OUT) &&
+		    ((endpoint->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK)
+					== USB_ENDPOINT_XFER_BULK)) {
+			/* we found a bulk out endpoint */
+			dev->bulk_out_endpointAddr = endpoint->bEndpointAddress;
+		}
+	}
+	if (!(dev->bulk_in_endpointAddr && dev->bulk_out_endpointAddr)) {
+		err("Could not find both bulk-in and bulk-out endpoints");
+		goto error;
+	}
+
+	/* save our data pointer in this interface device */
+	usb_set_intfdata(interface, dev);
+
+	/* we can register the device now, as it is ready */
+	retval = usb_register_dev(interface, &tinkerface_class);
+	if (retval) {
+		/* something prevented us from registering this driver */
+		err("Not able to get a minor for this device.");
+		usb_set_intfdata(interface, NULL);
+		goto error;
+	}
+
+	/* let the user know what node this device is now attached to */
+	info("USB Skeleton device now attached to USBSkel-%d", interface->minor);
+	return 0;
+
+error:
+	if (dev)
+		kref_put(&dev->kref, tinkerface_delete);
+	return retval;
+}
+
+static void tinkerface_disconnect(struct usb_interface *interface)
+{
+	struct usb_tinkerface *dev;
+	int minor = interface->minor;
+
+	/* prevent tinkerface_open() from racing tinkerface_disconnect() */
+	lock_kernel();
+
+	dev = usb_get_intfdata(interface);
+	usb_set_intfdata(interface, NULL);
+
+	/* give back our minor */
+	usb_deregister_dev(interface, &tinkerface_class);
+
+	unlock_kernel();
+
+	/* decrement our usage count */
+	kref_put(&dev->kref, tinkerface_delete);
+
+	info("USB Skeleton #%d now disconnected", minor);
 }
 
 static struct usb_driver tinkerface_driver = {
 	.owner =	THIS_MODULE,
-	.name =		"usbserial_tinkerface",
+	.name =		"tinkerfaceeton",
 	.probe =	tinkerface_probe,
-	.disconnect =	usb_serial_disconnect,
-	.id_table =	tinkerface_serial_ids,
+	.disconnect =	tinkerface_disconnect,
+	.id_table =	tinkerface_table,
 };
-#endif
 
-int usb_serial_tinkerface_register (int _debug)
+static int __init usb_tinkerface_init(void)
 {
-	int retval = 0;
+	int result;
 
-	debug = _debug;
-#ifdef CONFIG_USB_SERIAL_GENERIC
-	tinkerface_device_ids[0].idVendor = vendor;
-	tinkerface_device_ids[0].idProduct = product;
-	tinkerface_device_ids[0].match_flags = USB_DEVICE_ID_MATCH_VENDOR | USB_DEVICE_ID_MATCH_PRODUCT;
-
-	/* register our tinkerface driver with ourselves */
-	retval = usb_serial_register (&usb_serial_tinkerface_device);
-	if (retval)
-		goto exit;
-	retval = usb_register(&tinkerface_driver);
-	if (retval)
-		usb_serial_deregister(&usb_serial_tinkerface_device);
-exit:
-#endif
-	return retval;
-}
-
-void usb_serial_tinkerface_deregister (void)
-{
-#ifdef CONFIG_USB_SERIAL_GENERIC
-	/* remove our tinkerface driver */
-	usb_deregister(&tinkerface_driver);
-	usb_serial_deregister (&usb_serial_tinkerface_device);
-#endif
-}
-
-int usb_serial_tinkerface_open (struct usb_serial_port *port, struct file *filp)
-{
-	struct usb_serial *serial = port->serial;
-	int result = 0;
-
-	dbg("%s - port %d", __FUNCTION__, port->number);
-
-	/* force low_latency on so that our tty_push actually forces the data through, 
-	   otherwise it is scheduled, and with high data rates (like with OHCI) data
-	   can get lost. */
-	if (port->tty)
-		port->tty->low_latency = 1;
-
-	/* if we have a bulk interrupt, start reading from it */
-	if (serial->num_bulk_in) {
-		/* Start reading from the device */
-		usb_fill_bulk_urb (port->read_urb, serial->dev,
-				   usb_rcvbulkpipe(serial->dev, port->bulk_in_endpointAddress),
-				   port->read_urb->transfer_buffer,
-				   port->read_urb->transfer_buffer_length,
-				   ((serial->type->read_bulk_callback) ?
-				     serial->type->read_bulk_callback :
-				     usb_serial_tinkerface_read_bulk_callback),
-				   port);
-		result = usb_submit_urb(port->read_urb, GFP_KERNEL);
-		if (result)
-			dev_err(&port->dev, "%s - failed resubmitting read urb, error %d\n", __FUNCTION__, result);
-	}
+	/* register this driver with the USB subsystem */
+	result = usb_register(&tinkerface_driver);
+	if (result)
+		err("usb_register failed. Error number %d", result);
 
 	return result;
 }
 
-static void tinkerface_cleanup (struct usb_serial_port *port)
+static void __exit usb_tinkerface_exit(void)
 {
-	struct usb_serial *serial = port->serial;
-
-	dbg("%s - port %d", __FUNCTION__, port->number);
-
-	if (serial->dev) {
-		/* shutdown any bulk reads that might be going on */
-		if (serial->num_bulk_out)
-			usb_kill_urb(port->write_urb);
-		if (serial->num_bulk_in)
-			usb_kill_urb(port->read_urb);
-	}
+	/* deregister this driver with the USB subsystem */
+	usb_deregister(&tinkerface_driver);
 }
 
-void usb_serial_tinkerface_close (struct usb_serial_port *port, struct file * filp)
-{
-	dbg("%s - port %d", __FUNCTION__, port->number);
-	tinkerface_cleanup (port);
-}
+module_init (usb_tinkerface_init);
+module_exit (usb_tinkerface_exit);
 
-int usb_serial_tinkerface_write(struct usb_serial_port *port, const unsigned char *buf, int count)
-{
-	struct usb_serial *serial = port->serial;
-	int result;
-	unsigned char *data;
-
-	dbg("%s - port %d", __FUNCTION__, port->number);
-
-	if (count == 0) {
-		dbg("%s - write request of 0 bytes", __FUNCTION__);
-		return (0);
-	}
-
-	/* only do something if we have a bulk out endpoint */
-	if (serial->num_bulk_out) {
-		spin_lock(&port->lock);
-		if (port->write_urb_busy) {
-			spin_unlock(&port->lock);
-			dbg("%s - already writing", __FUNCTION__);
-			return 0;
-		}
-		port->write_urb_busy = 1;
-		spin_unlock(&port->lock);
-
-		count = (count > port->bulk_out_size) ? port->bulk_out_size : count;
-
-		memcpy (port->write_urb->transfer_buffer, buf, count);
-		data = port->write_urb->transfer_buffer;
-		usb_serial_debug_data(debug, &port->dev, __FUNCTION__, count, data);
-
-		/* set up our urb */
-		usb_fill_bulk_urb (port->write_urb, serial->dev,
-				   usb_sndbulkpipe (serial->dev,
-						    port->bulk_out_endpointAddress),
-				   port->write_urb->transfer_buffer, count,
-				   ((serial->type->write_bulk_callback) ? 
-				     serial->type->write_bulk_callback :
-				     usb_serial_tinkerface_write_bulk_callback), port);
-
-		/* send the data out the bulk port */
-		port->write_urb_busy = 1;
-		result = usb_submit_urb(port->write_urb, GFP_ATOMIC);
-		if (result) {
-			dev_err(&port->dev, "%s - failed submitting write urb, error %d\n", __FUNCTION__, result);
-			/* don't have to grab the lock here, as we will retry if != 0 */
-			port->write_urb_busy = 0;
-		} else
-			result = count;
-
-		return result;
-	}
-
-	/* no bulk out, so return 0 bytes written */
-	return 0;
-}
-
-int usb_serial_tinkerface_write_room (struct usb_serial_port *port)
-{
-	struct usb_serial *serial = port->serial;
-	int room = 0;
-
-	dbg("%s - port %d", __FUNCTION__, port->number);
-
-	if (serial->num_bulk_out) {
-		if (!(port->write_urb_busy))
-			room = port->bulk_out_size;
-	}
-
-	dbg("%s - returns %d", __FUNCTION__, room);
-	return (room);
-}
-
-int usb_serial_tinkerface_chars_in_buffer (struct usb_serial_port *port)
-{
-	struct usb_serial *serial = port->serial;
-	int chars = 0;
-
-	dbg("%s - port %d", __FUNCTION__, port->number);
-
-	if (serial->num_bulk_out) {
-		if (port->write_urb_busy)
-			chars = port->write_urb->transfer_buffer_length;
-	}
-
-	dbg("%s - returns %d", __FUNCTION__, chars);
-	return (chars);
-}
-
-void usb_serial_tinkerface_read_bulk_callback (struct urb *urb, struct pt_regs *regs)
-{
-	struct usb_serial_port *port = (struct usb_serial_port *)urb->context;
-	struct usb_serial *serial = port->serial;
-	struct tty_struct *tty;
-	unsigned char *data = urb->transfer_buffer;
-	int i;
-	int result;
-
-	dbg("%s - port %d", __FUNCTION__, port->number);
-
-	if (urb->status) {
-		dbg("%s - nonzero read bulk status received: %d", __FUNCTION__, urb->status);
-		return;
-	}
-
-	usb_serial_debug_data(debug, &port->dev, __FUNCTION__, urb->actual_length, data);
-
-	tty = port->tty;
-	if (tty && urb->actual_length) {
-		for (i = 0; i < urb->actual_length ; ++i) {
-			/* if we insert more than TTY_FLIPBUF_SIZE characters, we drop them. */
-			if(tty->flip.count >= TTY_FLIPBUF_SIZE) {
-				tty_flip_buffer_push(tty);
-			}
-			/* this doesn't actually push the data through unless tty->low_latency is set */
-			tty_insert_flip_char(tty, data[i], 0);
-		}
-	  	tty_flip_buffer_push(tty);
-	}
-
-	/* Continue trying to always read  */
-	usb_fill_bulk_urb (port->read_urb, serial->dev,
-			   usb_rcvbulkpipe (serial->dev,
-				   	    port->bulk_in_endpointAddress),
-			   port->read_urb->transfer_buffer,
-			   port->read_urb->transfer_buffer_length,
-			   ((serial->type->read_bulk_callback) ? 
-			     serial->type->read_bulk_callback : 
-			     usb_serial_tinkerface_read_bulk_callback), port);
-	result = usb_submit_urb(port->read_urb, GFP_ATOMIC);
-	if (result)
-		dev_err(&port->dev, "%s - failed resubmitting read urb, error %d\n", __FUNCTION__, result);
-}
-
-void usb_serial_tinkerface_write_bulk_callback (struct urb *urb, struct pt_regs *regs)
-{
-	struct usb_serial_port *port = (struct usb_serial_port *)urb->context;
-
-	dbg("%s - port %d", __FUNCTION__, port->number);
-
-	port->write_urb_busy = 0;
-	if (urb->status) {
-		dbg("%s - nonzero write bulk status received: %d", __FUNCTION__, urb->status);
-		return;
-	}
-
-	usb_serial_port_softint((void *)port);
-
-	schedule_work(&port->work);
-}
-
-void usb_serial_tinkerface_shutdown (struct usb_serial *serial)
-{
-	int i;
-
-	dbg("%s", __FUNCTION__);
-
-	/* stop reads and writes on all ports */
-	for (i=0; i < serial->num_ports; ++i) {
-		tinkerface_cleanup(serial->port[i]);
-	}
-}
-
+MODULE_LICENSE("GPL");
