@@ -1,4 +1,4 @@
-obj-m    := vport.o
+obj-m    := tinkerface.o 
 
 KDIR    := /lib/modules/$(shell uname -r)/build
 KMISC   := /lib/modules/$(shell uname -r)/kernel/drivers/usb/serial
@@ -11,7 +11,7 @@ modules:
 
 install: modules
 	install -d $(KMISC)
-	install -m 644 -c vport.ko $(KMISC)
+	install -m 644 -c tinkerface.ko $(KMISC)
 	/sbin/depmod -a
 
 clean:

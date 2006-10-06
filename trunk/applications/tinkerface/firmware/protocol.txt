@@ -1,3 +1,5 @@
+Commands from PC to Device
+
 
 Command format
 
@@ -12,7 +14,6 @@ rs232
 
 	commands:
 		0x00	//command 0x01 = config, 0x02 = data for sending
-
 
 
 	config commmad:
