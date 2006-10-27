@@ -9,7 +9,7 @@ Command format
 
 rs232
 +++++++++++++++++++++++
-	function code = 0x01
+	function code = 0x01	CMD_RS232
 
 
 	commands:
@@ -17,6 +17,10 @@ rs232
 
 
 	config commmad:
+
+		<port> <baud>
+
+
 
 		baud format:
 

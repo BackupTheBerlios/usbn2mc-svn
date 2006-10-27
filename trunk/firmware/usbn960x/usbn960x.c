@@ -72,6 +72,7 @@ void _USBNNackEvent(void)
   event = USBNRead(NAKEV);
   //USBNWrite(RXC1,FLUSH);	//re-enable the receiver  
   //USBNWrite(RXC1,RX_EN);	//re-enable the receiver  
+  USBNDebug("nack event\r\n");
  /* 
   if (EP0tx.Size > EP0tx.usbnfifo)	  //multi-pkt status stage? 
   {
@@ -96,6 +97,7 @@ void _USBNReceiveEvent(void)
   char tmp;
   int i=0;
   
+  USBNDebug("rx event\r\n");
   if(event & RX_FIFO0) _USBNReceiveFIFO0();
   
   // dynamic function call
@@ -155,7 +157,7 @@ void _USBNTransmitEvent(void)
   unsigned char event;
   void (*ptr)();
   event = USBNRead(TXEV);
-  //USBNDebug("tx event\r\n");
+  USBNDebug("tx event\r\n");
   if(event & TX_FIFO0) _USBNTransmitFIFO0();
   // dynamic function call
   
@@ -184,7 +186,7 @@ void _USBNAlternateEvent(void)
 {
   unsigned char event;
   event = USBNRead(ALTEV);
-  //USBNDebug("alt event\r\n");
+  USBNDebug("alt event\r\n");
 
   if(event & ALT_RESET)
   {
@@ -194,19 +196,28 @@ void _USBNAlternateEvent(void)
     USBNWrite(TXC0,FLUSH);
     USBNWrite(RXC0,RX_EN);                    // allow reception
     USBNWrite(NFSR,OPR_ST);                   // NFS = NodeOperational
+  	USBNDebug("reset\r\n");
   }
   else if(event & ALT_SD3)
   {
     USBNWrite(ALTMSK,ALT_RESUME+ALT_RESET);   // adjust interrupts
     USBNWrite(NFSR,SUS_ST);                   // enter suspend state
+  	USBNDebug("sd3\r\n");
   }
   else if(event & ALT_RESUME)
   {
     USBNWrite(ALTMSK,ALT_SD3+ALT_RESET);
     USBNWrite(NFSR,OPR_ST);
+  	USBNDebug("resume\r\n");
   }
+  else if(event & ALT_EOP)
+  {
+  	USBNDebug("eop\r\n");
+  }
+
   else
   {
+  	USBNDebug("else\r\n");
   }
 }
 

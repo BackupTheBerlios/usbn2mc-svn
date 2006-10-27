@@ -555,7 +555,7 @@ void USBNStart(void)
   while(USBNRead(MCNTRL)&SRST);
 
   USBNWrite(CCONF, 0x80);           // clock output off, divisor to 4 MHz
-  //USBNWrite(NAKMSK,0xFF);
+  USBNWrite(NAKMSK,0xFF);
   USBNWrite(NAKMSK,NAK_OUT0);
   USBNWrite(FAR,AD_EN+0x00);            // set default address
   USBNWrite(EPC0,DEF);
@@ -567,7 +567,7 @@ void USBNStart(void)
   USBNWrite(RXMSK, RX_FIFO0+RX_FIFO1+RX_FIFO2+RX_FIFO3);            // data incoming EP0
   USBNWrite(TXMSK, TX_FIFO0+TX_FIFO1+TX_FIFO2+TX_FIFO3);            // data incoming EP0
  
-  USBNWrite(ALTMSK, ALT_RESET+ALT_SD3);
+  USBNWrite(ALTMSK, ALT_RESET+ALT_SD3+ALT_EOP);
   USBNWrite(MAMSK, (INTR_E+RX_EV+ALT+TX_EV+NAK) );
  
   
@@ -585,6 +585,7 @@ void USBNStart(void)
 
 void USBNInterrupt(void)
 {
+  UARTWrite("irq\r\n");
   unsigned char maev,mask;
   
   maev = USBNRead(MAEV);

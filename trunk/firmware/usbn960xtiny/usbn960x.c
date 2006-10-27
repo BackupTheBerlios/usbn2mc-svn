@@ -154,157 +154,166 @@ void _USBNAlternateEvent(void)
 // ********************************************************************
 void _USBNReceiveFIFO0(void)
 {
-  unsigned char rxstatus;
-  char Buf[8];
-  DeviceRequest *req;
-  int i;
+  	unsigned char rxstatus;
+  	char Buf[8];
+  	DeviceRequest *req;
+  	int i;
 
-  #if DEBUG
-  USBNDebug("rx\r\n");
-  #endif
-  rxstatus = USBNRead(RXS0);
+  	#if DEBUG
+  	USBNDebug("rx\r\n");
+  	#endif
+  	rxstatus = USBNRead(RXS0);
 
-  if(rxstatus & SETUP_R)
-  {
-    for(i=0;i<8;i++){ 
-      Buf[i] = USBNRead(EP0rx.usbnData);  
-    }
+  	if(rxstatus & SETUP_R)
+  	{
+    		for(i=0;i<8;i++){ 
+      			Buf[i] = USBNRead(EP0rx.usbnData);  
+    		}
     
-    #if DEBUG
-    for(i=0;i<8;i++)
-      SendHex(Buf[i]); // type - get descr or set address
-    USBNDebug("\r\n");
-    #endif
+    		#if DEBUG
+    		for(i=0;i<8;i++)
+      			SendHex(Buf[i]); // type - get descr or set address
+    		USBNDebug("\r\n");
+    		#endif
 
-    req = (DeviceRequest*)(Buf);
-   
-    USBNWrite(RXC0,FLUSH);		      // make sure the RX is off 
-    USBNWrite(TXC0,FLUSH);		      // make sure the TX is off 
-    USBNWrite(EPC0,USBNRead(EPC0)&0x7F);      // turn of stall
+		req = (DeviceRequest*)(Buf);
+	   
+		USBNWrite(RXC0,FLUSH);		      // make sure the RX is off 
+		USBNWrite(TXC0,FLUSH);		      // make sure the TX is off 
+		USBNWrite(EPC0,USBNRead(EPC0)&0x7F);      // turn of stall
+		// noch ein switch um zu entscheiden obs fuers device, interface endpoint oder andere ist
 
-    switch (req->bmRequestType & 0x60)  // decode request type     
-    {
-      case DO_STANDARD:			      // standard request 
-        switch (req->bRequest)	      // decode request code     
-        {
-#if 0
-          case CLR_FEATURE:
-	  #if DEBUG 
-	    USBNDebug("CLR FEATURE\n\r");
-	  #endif
-            //_USBNClearFeature(req);
-          break;
-          case GET_CONFIGURATION:
-	  #if DEBUG 
-            //USBNDebug("GET CONFIG\n\r");
-	    USBNWrite(TXD0,USBNFunctionInfo.ConfigurationIndex);
-	  #endif
-          break;
-#endif
-          case GET_DESCRIPTOR:
-	  #if DEBUG 
-            USBNDebug("GET DESCRIPTOR\n\r");
-	  #endif
-            _USBNGetDescriptor(req);
-          break;
-#if 0
-          case GET_INTERFACE:
-	  #if DEBUG
-            USBNDebug("GET INTERFACE\n\r");	
-	  #endif
-          break;
-          case GET_STATUS:
-	  #if DEBUG
-            USBNDebug("GET STATUS\n\r");	
-	  #endif
-          break;
-#endif
-          case SET_ADDRESS:
-	  #if DEBUG
-            USBNDebug("SET ADDRESS ");	
-	  #endif
-	    USBNWrite(EPC0,DEF);
-	    USBNWrite(FAR,AD_EN+req->wValue);
-          break;
-          case SET_CONFIGURATION:
-	  #if DEBUG
-            USBNDebug("SET CONFIGURATION\n\r");	
-	  #endif
-            _USBNSetConfiguration(req); 
-          break;
-#if 0
-          case SET_FEATURE:
-	  #if DEBUG
-            USBNDebug("SET FEATURE\n\r");	
-	  #endif
-          break;
-#endif
-          case SET_INTERFACE:
-	  #if DEBUG
-            USBNDebug("SET INTERFACE\n\r");	
-	  #endif
-            //if(EP0rx.Buf[2])
-            //   USBNWrite(EPC1,0);      // stall the endpoint
-	    USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
-          break;
-          default:				// unsupported standard req
-	  #if DEBUG
-            USBNDebug("unsupported standard req\n\r");
-	  #endif
-            USBNWrite(EPC0,USBNRead(EPC0)+STALL);      // stall the endpoint
-          break;
-        }      
-      break;
-#if 0
-      case DO_CLASS:				// class request        
-	#if DEBUG
-        USBNDebug("Class request\n\r");
-	#endif
-	USBNDecodeClassRequest(req);
-	USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
-      break;
-      case DO_VENDOR:				// vendor request        
-	#if DEBUG
-        USBNDebug("Vendor request\n\r");
-	#endif
-	USBNDecodeVendorRequest(req);
-	USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
-      break;              
-      default:					// unsupported req type    
-	#if DEBUG
-	USBNDebug("unsupported req type\r\n");
-	#endif
-        USBNWrite(EPC0,USBNRead(EPC0)+STALL);      // stall the endpoint 
-      break;
-#endif
-    }
-
-      //the following is done for all setup packets.  Note that if
-      //no data was stuffed into the FIFO, the result of the fol-
-      //lowing will be a zero-length response.                   
-      
-      // only for stage 2 transfers
-      if(req->bmRequestType == 0x00)
-	USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
-  }
-  else                              // if not a setuppacket
-  {
-    //USBNDebug("error transmit\r\n");
-    if (EP0tx.Size > EP0tx.usbnfifo)   // multi-pkt status stage? 
-    {
-#if 0
-      if ((rxstatus& 0x5F)!=0x10)   // length error??          
-      {
-	#if DEBUG
-	USBNDebug("length error\r\n");
-	#endif
-      }
-#endif
-      EP0tx.Size=0;                // exit multi-packet mode  
-      USBNWrite(TXC0,FLUSH);       // flush TX0 and disable   
-      USBNWrite(RXC0,RX_EN);          // re-enable the receiver  
-    }
-  } 
+		switch (req->bmRequestType & 0x60)  // decode request type     
+		{
+			case DO_STANDARD:	      // standard request 
+				if((req->bmRequestType & 0x1f)==0x00)
+				{
+					switch (req->bRequest)	      // decode request code     
+					{
+						#if 0
+						case CLR_FEATURE:
+							#if DEBUG 
+							USBNDebug("CLR FEATURE\n\r");
+							#endif
+							//_USBNClearFeature(req);
+						break;
+						case GET_CONFIGURATION:
+							#if DEBUG 
+							//USBNDebug("GET CONFIG\n\r");
+							USBNWrite(TXD0,USBNFunctionInfo.ConfigurationIndex);
+							#endif
+						break;
+						#endif
+						case GET_DESCRIPTOR:
+							#if DEBUG 
+							USBNDebug("GET DESCRIPTOR\n\r");
+							#endif
+							_USBNGetDescriptor(req);
+						break;
+							#if 0
+							case GET_INTERFACE:
+							#if DEBUG
+							USBNDebug("GET INTERFACE\n\r");	
+							#endif
+						break;	
+						case GET_STATUS:
+							#if DEBUG
+							USBNDebug("GET STATUS\n\r");	
+							#endif
+						break;
+							#endif
+						case SET_ADDRESS:
+							#if DEBUG
+							USBNDebug("SET ADDRESS ");	
+							#endif
+							USBNWrite(EPC0,DEF);
+							USBNWrite(FAR,AD_EN+req->wValue);
+						break;
+						case SET_CONFIGURATION:
+							#if DEBUG
+							USBNDebug("SET CONFIGURATION\n\r");	
+							#endif
+							_USBNSetConfiguration(req); 
+						break;
+						#if 0
+						case SET_FEATURE:
+							#if DEBUG
+							USBNDebug("SET FEATURE\n\r");	
+							#endif
+						break;
+						#endif
+						case SET_INTERFACE:
+							#if DEBUG
+							USBNDebug("SET INTERFACE\n\r");	
+							#endif
+							//if(EP0rx.Buf[2])
+							//   USBNWrite(EPC1,0);      // stall the endpoint
+							USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+						break;
+						default:				// unsupported standard req
+							//#if DEBUG
+							USBNDebug("unsupported standard req\n\r");
+							//#endif
+							USBNWrite(EPC0,USBNRead(EPC0)+STALL);      // stall the endpoint
+						break;
+					}      
+				}
+				else
+				{
+					// default request but for interface not for device
+					USBNInterfaceRequests(req,&EP0tx);
+					_USBNTransmit(&EP0tx);
+				}
+			break;
+			//#if 0
+			case DO_CLASS:				// class request        
+				#if DEBUG
+				USBNDebug("Class request\n\r");
+				#endif
+				USBNDecodeClassRequest(req);
+				USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+			break;
+			case DO_VENDOR:				// vendor request        
+				#if DEBUG
+				USBNDebug("Vendor request\n\r");
+				#endif
+				USBNDecodeVendorRequest(req);
+				USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+			break;              
+			default:					// unsupported req type    
+				#if DEBUG
+				USBNDebug("unsupported req type\r\n");
+				#endif
+				USBNWrite(EPC0,USBNRead(EPC0)+STALL);      // stall the endpoint 
+			break;	
+		}
+		//#endif
+		//the following is done for all setup packets.  Note that if
+		//no data was stuffed into the FIFO, the result of the fol-
+		//lowing will be a zero-length response.                   
+		
+		// only for stage 2 transfers
+		if(req->bmRequestType == 0x00)
+			USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+	}
+	else                              // if not a setuppacket
+	{
+		//USBNDebug("error transmit\r\n");
+		if (EP0tx.Size > EP0tx.usbnfifo)   // multi-pkt status stage? 
+		{
+			#if 0
+			if ((rxstatus& 0x5F)!=0x10)   // length error??          
+			{
+				#if DEBUG
+				USBNDebug("length error\r\n");
+				#endif
+			}
+			#endif
+			EP0tx.Size=0;                // exit multi-packet mode  
+			USBNWrite(TXC0,FLUSH);       // flush TX0 and disable   
+			USBNWrite(RXC0,RX_EN);          // re-enable the receiver  
+		}
+	}		 
 }
 
 
@@ -528,8 +537,8 @@ void _USBNSetConfiguration(DeviceRequest *req)
   // load fct pointer list for out eps
   //
 
-//USBNWrite(TXC1,FLUSH);
-//USBNWrite(EPC1,EP_EN+0x03);      // enable EP1 at adr 1
+USBNWrite(TXC1,FLUSH);
+USBNWrite(EPC1,EP_EN+0x01);      // enable EP1 at adr 1
 
 USBNWrite(RXC1,FLUSH);
 USBNWrite(EPC2,EP_EN+0x02); 

@@ -25,24 +25,39 @@ SIGNAL(SIG_INTERRUPT0)
 
 int togl=0;
 
-// testfunction where called when data on ep2, buf is a ptr to a 64 byte field 
-void Receive(char *buf)
+
+/**
+ * extract command message 
+ */ 
+
+void ParseCommand(char *buf)
 {
-	UARTWrite("recv on ep2\r\n");
-	/*
-  int i;
-  for(i=0;i<64;i++)
-    SendHex(buf[i]);
+  	int i;
 
-  UARTWrite("\r\nSend Back\r\n");
+	UARTWrite("new command\r\n");
 
+	switch(buf[0])
+	{
+		case 0x00:
+			// uart
+		break:
+
+
+		default:
+				// unkown
+	}
+/*
+	
   USBNWrite(TXC1,FLUSH);
   for(i=0;i<64;i++)
     USBNWrite(TXD1,i);
 
   USBNWrite(TXC1,TX_LAST+TX_EN);
 */
+
 }
+
+
 
 // called at transfer irq
 void TransferISR()
@@ -91,7 +106,7 @@ int main(void)
   USBNAlternateSetting(conf,interf,0);
 
 
-  USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&Receive);
+  USBNAddOutEndpoint(conf,interf,1,0x02,BULK,64,0,&ParseCommand);
   USBNAddInEndpoint(conf,interf,1,0x03,BULK,64,0,&TransferISR);
 
   
