@@ -559,10 +559,10 @@ void USBNStart(void)
   USBNWrite(NAKMSK,NAK_OUT0);
   USBNWrite(FAR,AD_EN+0x00);            // set default address
   USBNWrite(EPC0,DEF);
-  USBNWrite(TXC0,FLUSH);            // FLUSHTX0;
+  USBNWrite(TTXC0,FLUSH);            // FLUSHTX0;
 
-  USBNWrite(RXC0,RX_EN+FLUSH);            // enable EP0 receive
-  //USBNWrite(RXC1,RX_EN);            // enable EP0 receive
+  USBNWrite(RRXC0,RX_EN+FLUSH);            // enable EP0 receive
+  //USBNWrite(RRXC1,RX_EN);            // enable EP0 receive
  
   USBNWrite(RXMSK, RX_FIFO0+RX_FIFO1+RX_FIFO2+RX_FIFO3);            // data incoming EP0
   USBNWrite(TXMSK, TX_FIFO0+TX_FIFO1+TX_FIFO2+TX_FIFO3);            // data incoming EP0

@@ -1,6 +1,7 @@
 
+
 void UARTInit(void);
-void UARTInitDynamic(uint8_t baud, char flags);
+void UARTInitDynamic(int baud, char flags);
 void UARTPutChar(unsigned char sign);
 unsigned char UARTGetChar(void);
 void UARTWrite(char* msg);

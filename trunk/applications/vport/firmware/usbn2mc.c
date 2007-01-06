@@ -29,6 +29,7 @@
 
 void USBNDecodeVendorRequest(DeviceRequest *req)
 {
+	#if 0
   //SendHex(req->bRequest);       // decode request code
   SendHex(req->wLength);       // decode request code
   USBNWrite(RXC0,RX_EN);
@@ -38,16 +39,19 @@ void USBNDecodeVendorRequest(DeviceRequest *req)
   //USBNWrite(TXC0,FLUSH);
   //USBNWrite(TXD0,0x24);
   //USBNWrite(TXD0,0x25);
+	#endif
 }
 
 
 void USBNDecodeClassRequest(DeviceRequest *req)
 {
+	#if 0
   //SendHex(req->bRequest);       // decode request code
   SendHex(req->wLength);       // decode request code
   USBNWrite(RXC0,RX_EN);
   USBNRead(RXD0);
   USBNRead(RXD0);
+	#endif
 }
 
 
@@ -61,9 +65,15 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 
 void USBNInitMC(void)
 {
-  MCUCR |=  (1 << ISC01); // fallende flanke
+	// interrupt on INT0 pin raising edge (atmega128)
+	EICRA = (1<<ISC01) | (1<<ISC00);
+	// 	  
+	// turn on interrupts!
+	EIMSK = (1 << INT0); // allow extern irq 0
+  
+	//MCUCR |=  (1 << ISC01); // fallende flanke
     
-  GICR |= (1 << INT0);
+  //GICR |= (1 << INT0);
   sei();
 
   USB_CTRL_DDR = 0xf8;

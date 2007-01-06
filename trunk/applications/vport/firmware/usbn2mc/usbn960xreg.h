@@ -30,21 +30,21 @@
 #define EPC0       0x20                 /*Endpoint0    register   */   
 #define TXD0       0x21                 /*TX   data    register 0 */  
 #define TXS0       0x22                 /*TX   status  register 0 */ 
-#define TXC0       0x23                 /*TX   command register 0 */  
+#define TTXC0       0x23                 /*TX   command register 0 */  
  
 #define RXD0       0x25                 /*RX   data    register 0 */   
 #define RXS0       0x26                 /*RX   status  register 0 */   
-#define RXC0       0x27                 /*RX   command register 0 */   
+#define RRXC0       0x27                 /*RX   command register 0 */   
  
 #define EPC1       0x28                 /*Endpoint1    register   */   
 #define TXD1       0x29                 /*TX   data    register 1 */  
 #define TXS1       0x2A                 /*TX   status  register 1 */ 
-#define TXC1       0x2B                 /*TX   command register 1 */  
+#define TTXC1       0x2B                 /*TX   command register 1 */  
  
 #define EPC2       0x2C                 /*Endpoint2    register   */   
 #define RXD1       0x2D                 /*RX   data    register 1 */   
 #define RXS1       0x2E                 /*RX   status  register 1 */   
-#define RXC1       0x2F                 /*RX   command register 1 */   
+#define RRXC1       0x2F                 /*RX   command register 1 */   
  
 #define EPC3       0x30                 /*Endpoint3    register   */   
 #define TXD2       0x31                 /*TX   data    register 2 */  

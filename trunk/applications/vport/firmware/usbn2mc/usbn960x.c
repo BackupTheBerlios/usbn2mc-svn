@@ -30,14 +30,14 @@ FunctionInfo  USBNFunctionInfo;
 
 void _USBNInitEP0(void)
 {
-  EP0rx.usbnCommand   = RXC0;
+  EP0rx.usbnCommand   = RRXC0;
   EP0rx.usbnData      = RXD0;
   EP0rx.usbnControl   = EPC0;
   EP0rx.DataPid	      = 0;
   EP0rx.usbnfifo      = 8;
 
 
-  EP0tx.usbnCommand   = TXC0;
+  EP0tx.usbnCommand   = TTXC0;
   EP0tx.usbnData      = TXD0;
   EP0tx.usbnControl   = EPC0;
   EP0tx.DataPid	      = 0;
@@ -70,14 +70,14 @@ void _USBNNackEvent(void)
 {
   unsigned char event;
   event = USBNRead(NAKEV);
-  //USBNWrite(RXC1,FLUSH);	//re-enable the receiver  
-  //USBNWrite(RXC1,RX_EN);	//re-enable the receiver  
+  //USBNWrite(RRXC1,FLUSH);	//re-enable the receiver  
+  //USBNWrite(RRXC1,RX_EN);	//re-enable the receiver  
  /* 
   if (EP0tx.Size > EP0tx.usbnfifo)	  //multi-pkt status stage? 
   {
     //USBNDebug("flush");
-    USBNWrite(TXC0,FLUSH);	    //flush TX0 and disable   
-    //USBNWrite(RXC0,RX_EN);	//re-enable the receiver  
+    USBNWrite(TTXC0,FLUSH);	    //flush TX0 and disable   
+    //USBNWrite(RRXC0,RX_EN);	//re-enable the receiver  
     EP0tx.DataPid	      = 1;
   }
   */
@@ -111,8 +111,8 @@ void _USBNReceiveEvent(void)
       ptr = rxfifos.func1;
       (*ptr)(&buf);
     }
-    USBNWrite(RXC1,FLUSH);   
-    USBNWrite(RXC1,RX_EN);    
+    USBNWrite(RRXC1,FLUSH);   
+    USBNWrite(RRXC1,RX_EN);    
     return;
   }
 
@@ -191,8 +191,8 @@ void _USBNAlternateEvent(void)
     USBNWrite(NFSR,RST_ST);                   // NFS = NodeReset
     USBNWrite(FAR,AD_EN+0); 
     USBNWrite(EPC0,0x00);
-    USBNWrite(TXC0,FLUSH);
-    USBNWrite(RXC0,RX_EN);                    // allow reception
+    USBNWrite(TTXC0,FLUSH);
+    USBNWrite(RRXC0,RX_EN);                    // allow reception
     USBNWrite(NFSR,OPR_ST);                   // NFS = NodeOperational
   }
   else if(event & ALT_SD3)
@@ -240,8 +240,8 @@ void _USBNReceiveFIFO0(void)
 
     req = (DeviceRequest*)(Buf);
    
-    USBNWrite(RXC0,FLUSH);		      // make sure the RX is off 
-    USBNWrite(TXC0,FLUSH);		      // make sure the TX is off 
+    USBNWrite(RRXC0,FLUSH);		      // make sure the RX is off 
+    USBNWrite(TTXC0,FLUSH);		      // make sure the TX is off 
     USBNWrite(EPC0,USBNRead(EPC0)&0x7F);      // turn of stall
 
     switch (req->bmRequestType & 0x60)  // decode request type     
@@ -300,7 +300,7 @@ void _USBNReceiveFIFO0(void)
 	  #endif
             //if(EP0rx.Buf[2])
             //   USBNWrite(EPC1,0);      // stall the endpoint
-	    USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+	    USBNWrite(TTXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
           break;
           default:				// unsupported standard req
 	  #if DEBUG
@@ -315,14 +315,14 @@ void _USBNReceiveFIFO0(void)
         USBNDebug("Class request\n\r");
 	#endif
 	//USBNDecodeClassRequest(req);
-	USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+	USBNWrite(TTXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
       break;
       case DO_VENDOR:				// vendor request        
 	#if DEBUG
         USBNDebug("Vendor request\n\r");
 	#endif
 	//USBNDecodeVendorRequest(req);
-	USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+	USBNWrite(TTXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
       break;              
       default:					// unsupported req type    
 	#if DEBUG
@@ -338,7 +338,7 @@ void _USBNReceiveFIFO0(void)
       
       // only for stage 2 transfers
       if(req->bmRequestType == 0x00)
-	USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+	USBNWrite(TTXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
   }
   else                              // if not a setuppacket
   {
@@ -352,8 +352,8 @@ void _USBNReceiveFIFO0(void)
 	#endif
       }
       EP0tx.Size=0;                // exit multi-packet mode  
-      USBNWrite(TXC0,FLUSH);       // flush TX0 and disable   
-      USBNWrite(RXC0,RX_EN);          // re-enable the receiver  
+      USBNWrite(TTXC0,FLUSH);       // flush TX0 and disable   
+      USBNWrite(RRXC0,RX_EN);          // re-enable the receiver  
     }
   } 
 }
@@ -372,7 +372,7 @@ void _USBNTransmitFIFO0(void)
 
   if(txstat & TX_DONE)                            // if transmit completed
   {
-    USBNWrite(TXC0,FLUSH);                        // flush TX0 and disable
+    USBNWrite(TTXC0,FLUSH);                        // flush TX0 and disable
     //USBNDebug("tx done ");
 
     if(txstat & ACK_STAT)                         // ACK received
@@ -386,9 +386,9 @@ void _USBNTransmitFIFO0(void)
       else                                        // not in multi-packet mode
       {
         //USBNDebug("no multi packet ");
-        //USBNWrite(RXC0,FLUSH);          // re-enable the receiver
-        //USBNWrite(TXC0,TX_EN);          // re-enable the receiver
-	USBNWrite(RXC0,RX_EN);               // re-enable the receiver
+        //USBNWrite(RRXC0,FLUSH);          // re-enable the receiver
+        //USBNWrite(TTXC0,TX_EN);          // re-enable the receiver
+	USBNWrite(RRXC0,RX_EN);               // re-enable the receiver
       }
     }
     else                                              
@@ -396,7 +396,7 @@ void _USBNTransmitFIFO0(void)
     {
       USBNDebug("stall handshake ");
       //USBNFunctionInfo.GetDesc=0;          // exit multi-packet mode
-      USBNWrite(RXC0,RX_EN);               // re-enable the receiver
+      USBNWrite(RRXC0,RX_EN);               // re-enable the receiver
     }
   }
   // otherwise something must have gone wrong with the previous
@@ -436,7 +436,7 @@ void _USBNTransmit(EPInfo* ep)
     if(ep->Index < ep->Size)
     {
       
-      USBNWrite(TXC0,FLUSH);       //send data to the FIFO
+      USBNWrite(TTXC0,FLUSH);       //send data to the FIFO
       //USBNDebug(" ");
       for(i=0;((i < 8) & (ep->Index < ep->Size)); i++)
       {
@@ -448,11 +448,11 @@ void _USBNTransmit(EPInfo* ep)
 
       // if end of multipaket
       if(ep->Size<=ep->Index)
-	USBNWrite(RXC0,RX_EN);
+	USBNWrite(RRXC0,RX_EN);
     }
     else
     {
-      USBNWrite(RXC0,RX_EN);
+      USBNWrite(RRXC0,RX_EN);
     }
 
     // toggle mechanism
@@ -598,13 +598,13 @@ void _USBNSetConfiguration(DeviceRequest *req)
   // load fct pointer list for out eps
   //
 
-USBNWrite(TXC1,FLUSH);
+USBNWrite(TTXC1,FLUSH);
 USBNWrite(EPC1,EP_EN+0x03);      // enable EP1 at adr 1
 
 
-USBNWrite(RXC1,FLUSH);
+USBNWrite(RRXC1,FLUSH);
 USBNWrite(EPC2,EP_EN+0x02); 
-USBNWrite(RXC1,RX_EN);
+USBNWrite(RRXC1,RX_EN);
 
 
 USBNWrite(TXC3,FLUSH);
@@ -623,19 +623,19 @@ USBNWrite(EPC5,EP_EN+0x05);
   USBNWrite(EPC4,EP_EN+0x04); 
   USBNWrite(EPC6,EP_EN+0x06); 
 
-  USBNWrite(TXC1,FLUSH);
+  USBNWrite(TTXC1,FLUSH);
   USBNWrite(TXC2,FLUSH);
   USBNWrite(TXC3,FLUSH);
 
-  USBNWrite(RXC1,FLUSH);
+  USBNWrite(RRXC1,FLUSH);
   USBNWrite(RXC2,FLUSH);
   USBNWrite(RXC3,FLUSH);
   
-  USBNWrite(RXC1,RX_EN);
+  USBNWrite(RRXC1,RX_EN);
   USBNWrite(RXC2,RX_EN);
   USBNWrite(RXC3,RX_EN);
 */
-  USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+  USBNWrite(TTXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
   
 }
 

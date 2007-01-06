@@ -16,25 +16,30 @@ void UARTInit(void)
 	//UCSRB |= ( 1 << RXCIE ); // RX interrupt aktivieren
 
 	//UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
+	
+	DDRD |= 0x08f;
+	UBRR1H = 0x00;  UBRR1L = 51;    // Baud rate = 19200 @ 16MHz
+	UCSR1B = (1<<TXEN1)|(1<<RXEN1)|(1<<RXCIE);
+	UCSR1C = ((1<<UCSZ11)|(1<<UCSZ10));// Start 1, Data 8, Stop 1
  	
-	UCSRA = (1 << RXC) | (1 << TXC);
-  	UCSRB = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
-  	UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
+	//UCSRA = (1 << RXC) | (1 << TXC);
+  	//UCSRB = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
+  	//UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
 	
 	//ATmega32 bei 16MHz und für 19200 Baud
-  	UBRRH  = 0;                                   // Highbyte ist 0
-  	UBRRL  = 51;                                  // Lowbyte ist 51 ( dezimal )
+  	//UBRRH  = 0;                                   // Highbyte ist 0
+  	//UBRRL  = 51;                                  // Lowbyte ist 51 ( dezimal )
     // Flush Receive-Buffer
-  	do
-  	{
-     	 uint8_t dummy;
-      	(void) (dummy = UDR);
-  	}
-  	while (UCSRA & (1 << RXC));
+  	//do
+  	//{
+     	 //uint8_t dummy;
+      	//(void) (dummy = UDR);
+  	//}
+  	//while (UCSRA & (1 << RXC));
 }
 
 
-void UARTInitDynamic(uint8_t baud, char flags)
+void UARTInitDynamic(int baud, char flags)
 {
 	// baud
 	switch(baud)
@@ -66,7 +71,6 @@ void UARTInitDynamic(uint8_t baud, char flags)
 		case SERIAL_BAUD230400:
 		break;
 
-		default:
 	}
 
 	// parity
@@ -79,15 +83,20 @@ void UARTInitDynamic(uint8_t baud, char flags)
 void UARTPutChar(unsigned char sign)
 {
   // bei neueren AVRs steht der Status in UCSRA/UCSR0A/UCSR1A, hier z.B. fuer ATmega16:
-  while (!(UCSRA & (1<<UDRE))); /* warten bis Senden moeglich                   */
-  	UDR = sign;                    /* schreibt das Zeichen x auf die Schnittstelle */
+  //while (!(UCSRA & (1<<UDRE))); /* warten bis Senden moeglich                   */
+  //	UDR = sign;                    /* schreibt das Zeichen x auf die Schnittstelle */
+  // bei neueren AVRs steht der Status in UCSRA/UCSR0A/UCSR1A, hier z.B. fuer ATmega16:
+  while (!(UCSR1A & (1<<UDRE))); /* warten bis Senden moeglich                   */
+  	UDR1 = sign;                    /* schreibt das Zeichen x auf die Schnittstelle */
 }
 
 
 unsigned char UARTGetChar(void)
 {
-    while (!(UCSRA & (1<<RXC)));  // warten bis Zeichen verfuegbar
-  return UDR;                   // Zeichen aus UDR an Aufrufer zurueckgeben
+   // while (!(UCSRA & (1<<RXC)));  // warten bis Zeichen verfuegbar
+  //return UDR;                   // Zeichen aus UDR an Aufrufer zurueckgeben
+  while (!(UCSR1A & (1<<RXC)));  // warten bis Zeichen verfuegbar
+    return UDR1;  
 }
 
 void UARTWrite(char* msg)
