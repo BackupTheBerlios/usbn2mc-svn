@@ -36,31 +36,31 @@ void USBNDecodeClassRequest(DeviceRequest *req);
 
 
 /// The Atmega register used to send data/address to the USBN9604
-#define USB_DATA_OUT		PORTC
+#define USB_DATA_OUT		PORTA
 
 /// The Atmega register used to receive data from the USBN9604
-#define USB_DATA_IN		PINC	
+#define USB_DATA_IN		PINA
 
 /// The Atmega register that controls the i/o direction of the USB_DATA_OUT
-#define USB_DATA_DDR		DDRC
+#define USB_DATA_DDR		DDRA
 
 /// The Atmega port used to send control signals to the USBN9604
-#define USB_CTRL_PORT		PORTD
+#define USB_CTRL_PORT		PORTG
 
 /// The Atmega register that controls the i/o direction of USB_CTRL_PORT
-#define USB_CTRL_DDR		DDRD
+#define USB_CTRL_DDR		DDRG
 
 /// The pin address of the chip select signal
 #define  PF_CS    0x08
 
 /// The pin address of the Address enable signal
-#define  PF_A0    0x40
+#define  PF_A0    0x02
 
 /// The pin address of the write strobe signal
-#define  PF_WR    0x20
+#define  PF_WR    0x00
 
 /// The pin address of the read strobe signal
-#define  PF_RD    0x10
+#define  PF_RD    0x01
 
 //#define  PF_RESET    0x10
 

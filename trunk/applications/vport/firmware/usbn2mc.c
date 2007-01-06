@@ -65,21 +65,21 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 
 void USBNInitMC(void)
 {
-	// interrupt on INT0 pin raising edge (atmega128)
-	EICRA = (1<<ISC01) | (1<<ISC00);
+	// interrupt on INT4 pin falling edge (atmega128)
+	EICRB = (1<<ISC41) | (0<<ISC40);
 	// 	  
 	// turn on interrupts!
-	EIMSK = (1 << INT0); // allow extern irq 0
+	EIMSK = (1 << INT4); // allow extern irq4
   
 	//MCUCR |=  (1 << ISC01); // fallende flanke
     
   //GICR |= (1 << INT0);
   sei();
 
-  USB_CTRL_DDR = 0xf8;
-  //USB_CTRL_DDR = 0xff;
-  //USB_CTRL_PORT |= ((PF_RD | PF_WR | PF_CS | PF_RESET) & ~(PF_A0));
-  USB_CTRL_PORT |= ((PF_RD | PF_WR | PF_CS) & ~(PF_A0));
+  USB_CTRL_DDR = 0x7;
+  DDRC = 0x80;
+  USB_CTRL_PORT |= ((PF_RD | PF_WR) & ~(PF_A0));
+  PORTC = 0x80;
 }
 
 
