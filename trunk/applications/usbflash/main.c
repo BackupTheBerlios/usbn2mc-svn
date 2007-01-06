@@ -45,6 +45,7 @@ int main(void)
   int conf, interf;
   UARTInit();
   USBNInit();   
+  
   // setup your usbn device
 
   USBNDeviceVendorID(0x0400);
@@ -89,33 +90,3 @@ int main(void)
 }
 
 
-/*
-
-*******************************************************************
- add own vendor requests
- ********************************************************************
- decode your own vendor requests
-
-void USBNDecodeVendorRequest(DeviceRequest *req)
-{
-  //SendHex(req->bRequest);       // decode request code
-  SendHex(req->wLength);       // decode request code
-  USBNWrite(RXC0,RX_EN);
-  USBNRead(RXD0);
-  USBNRead(RXD0);
-
-  //USBNWrite(TXC0,FLUSH);
-  //USBNWrite(TXD0,0x24);
-  //USBNWrite(TXD0,0x25);
-}
-
-
-void USBNDecodeClassRequest(DeviceRequest *req)
-{
-  //SendHex(req->bRequest);       // decode request code
-  SendHex(req->wLength);       // decode request code
-  USBNWrite(RXC0,RX_EN);
-  USBNRead(RXD0);
-  USBNRead(RXD0);
-}
-*/

@@ -1,7 +1,6 @@
 /* 
  * Benedikt Sauter <sauter@ixbat.de> 2006-04-10
  *
- *
  *  Using:
  *  usbflash -t at89 -r	  // reset 
  *  usbflash -t at89 -e	  // erase
@@ -12,8 +11,19 @@
  *  m8		- atmega8
  *	m32		- atmega32
  *
+ *	Message to usbflash Hardware:
  *
+ * 	type cmd 
+ * 	
+ *	upload:
+ * 	type cmd startaddrhigh staraddrlow len 
  *
+ *	erase:
+ *	type cmd
+ * 
+ *  reset:
+ *	type cmd
+
  */
 
 #include <string.h>
@@ -22,6 +32,7 @@
 #include <stdio.h>
 #include <usb.h>
 
+#define MAXPACKETSIZE	64
 
 #define FALSE 0
 #define TRUE  1
@@ -52,7 +63,7 @@ void atmega_upload(usb_dev_handle * usb_handle,char type,char *file);
 
 void show_help(void) {
 	printf("\nAuthor: Benedikt Sauter <sauter@ixbat.de>"\
-		"\nLicense: GNU General Public License V2 or later\n"\
+		"\nLicense: GNU General Public License V2\n"\
 		"\nusbflash is software for programming Microcontrollers.\n"\
    		"\nUsage: usbprog [OPTION]\n"\
        	"\t-r  reset controller\n"\
@@ -128,6 +139,9 @@ int main (int argc,char **argv)
 }	
 
 
+/******************************************/
+/* functions for at89 */
+
 void at89_reset(usb_dev_handle * usb_handle,char type)
 {
   char send[1];
@@ -148,14 +162,14 @@ void at89_erase(usb_dev_handle * usb_handle,char type)
 
 void at89_upload(usb_dev_handle * usb_handle,char type,char *file)
 {
-  char send[64]; 
+  char send[MAXPACKETSIZE]; 
   FILE *fd;
   int addr=0;
   int index=4;
   int len;
 
   printf("start upload\n");
-  // header 0x02 startaddrhigh staraddrlow len 
+  // cmd startaddrhigh staraddrlow len 
   // split in 60 byte packages
   send[0]=UPLOAD;
 
@@ -172,7 +186,7 @@ void at89_upload(usb_dev_handle * usb_handle,char type,char *file)
     while(!feof(fd))
     {
       send[index++]=fgetc(fd);
-      if(index==63)
+      if(index==(MAXPACKETSIZE-1))
 	break;
     }
     len = index-4;
@@ -180,7 +194,7 @@ void at89_upload(usb_dev_handle * usb_handle,char type,char *file)
     send[1]=(char)(addr>>8);
     send[2]=(char)addr;
     send[3]=(char)len;
-    usb_bulk_write(usb_handle,2,send,64,1000);
+    usb_bulk_write(usb_handle,2,send,MAXPACKETSIZE,1000);
     addr = addr+len;
 
     index=4;
@@ -194,6 +208,76 @@ void at89_upload(usb_dev_handle * usb_handle,char type,char *file)
 
 
 
+
+/******************************************/
+/* functions for atmega */
+
+void atmega_reset(usb_dev_handle * usb_handle,char type)
+{
+  char send[1];
+  send[0]=RESET;
+  printf("start reset\n");
+  usb_bulk_write(usb_handle,2,send,1,1);
+  printf("ready\n");
+}
+
+void atmega_erase(usb_dev_handle * usb_handle,char type)
+{
+  char send[1];
+  send[0]=ERASE;
+  printf("start erasure\n");
+  usb_bulk_write(usb_handle,2,send,1,1);
+  printf("ready\n");
+}
+
+void atmega_upload(usb_dev_handle * usb_handle,char type,char *file)
+{
+  char send[MAXPACKETSIZE]; 
+  FILE *fd;
+  int addr=0;
+  int index=4;
+  int len;
+
+  printf("start upload\n");
+  // cmd startaddrhigh staraddrlow len 
+  // split in 60 byte packages
+  send[0]=UPLOAD;
+
+  fd = fopen(file, "r");
+  if(!fd) {
+    fprintf(stderr, "Unable to open file %s, ignoring.\n", file);
+  }
+ 
+  while(!feof(fd))
+  { 
+    len = 0;
+    while(!feof(fd))
+    {
+      send[index++]=fgetc(fd);
+      if(index==(MAXPACKETSIZE-1))
+	break;
+    }
+    len = index-4;
+
+    send[1]=(char)(addr>>8);
+    send[2]=(char)addr;
+    send[3]=(char)len;
+    usb_bulk_write(usb_handle,2,send,MAXPACKETSIZE,1000);
+    addr = addr+len;
+
+    index=4;
+  }
+
+  fclose(fd);
+ 
+  printf("ready\n");
+
+}
+
+
+
+/******************************************/
+/* usbflash main prog functions */
 
 void usbprog_open(usb_dev_handle * usb_handle)
 {
