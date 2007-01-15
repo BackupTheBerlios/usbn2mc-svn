@@ -1,0 +1,29 @@
+C1 - 100nF            	- CSD 2cent
+C2 - 100nF            	- CSD 2cent
+C3 - 33pF              	- CSD 2cent
+C4 - 33pF              	- CSD 2cent
+C8 - 15pF              	- segor 5cent
+C9 - 15pF              	- segor 5cent
+C10 - 100nF          	- CSD 2cent
+C11 - 1µF Tantal   	-segor 14cent
+
+R1 - 1M                 - CSD 4cent
+R2 - 100K             	- CSD 4cent
+R3 - 1K                 - CSD 4cent
+R4 - 1,5K              	- CSD 4cent
+R5 - 1K                 - CSD 4cent
+R6 - 10K               	- CSD 4cent
+
+Q1 - 24Mhz          	- CSD 25cent
+Q2 - 16Mhz          	- CSD 25cent
+
+LED - 0805          	- CSD 8cent  
+
+Taster                  - CSD 12cent
+
+Usb buchse           	- CSD 34cent
+
+ATMEGA128      		-segor 7,60
+USBN9604          	- segor 6,57
+
+platine                 - HAKA LP 4,60¤
