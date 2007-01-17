@@ -50,17 +50,19 @@ void USBNDecodeClassRequest(DeviceRequest *req);
 /// The Atmega register that controls the i/o direction of USB_CTRL_PORT
 #define USB_CTRL_DDR		DDRG
 
+#define USB_CS_PORT			PORTC
+
 /// The pin address of the chip select signal
 #define  PF_CS    0x08
 
 /// The pin address of the Address enable signal
-#define  PF_A0    0x02
+#define  PF_A0    0x04
 
 /// The pin address of the write strobe signal
-#define  PF_WR    0x00
+#define  PF_WR    0x01
 
 /// The pin address of the read strobe signal
-#define  PF_RD    0x01
+#define  PF_RD    0x02
 
 //#define  PF_RESET    0x10
 
