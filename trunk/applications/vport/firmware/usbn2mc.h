@@ -53,7 +53,7 @@ void USBNDecodeClassRequest(DeviceRequest *req);
 #define USB_CS_PORT			PORTC
 
 /// The pin address of the chip select signal
-#define  PF_CS    0x08
+#define  PF_CS    0x80
 
 /// The pin address of the Address enable signal
 #define  PF_A0    0x04
@@ -63,7 +63,5 @@ void USBNDecodeClassRequest(DeviceRequest *req);
 
 /// The pin address of the read strobe signal
 #define  PF_RD    0x02
-
-//#define  PF_RESET    0x10
 
 #endif /* _MCIFACE_H_ */

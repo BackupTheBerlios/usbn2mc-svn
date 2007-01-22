@@ -132,7 +132,7 @@ int main(void)
 
   // start usb chip
   USBNStart();
-  UARTWrite("waiting for enumaration signal...\r\n");
+  //UARTWrite("waiting for enumaration signal...\r\n");
 
   while(1)
   {
