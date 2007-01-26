@@ -1,0 +1,341 @@
+\documentclass[11pt]{article}
+
+% TODO
+%   - "Linux Inside" Stempel
+
+
+% CV and Expertise
+
+%\usepackage{a4}
+%\usepackage{lscape}
+\usepackage{fancybox,graphicx,url,german}
+
+\evensidemargin=0cm
+\oddsidemargin=0cm
+\hoffset=-0.5cm
+\topmargin=-2cm
+\textwidth=29.7cm
+\textheight=21cm
+
+\pagestyle{empty}
+\parindent=0pt
+
+%\pdfpageheight=\textheight
+%\pdfpagewidth=\textwidth
+
+\begin{document}
+
+
+% ========= PAGE 2 ===============
+\begin{minipage}[t]{7cm}
+\hfill {\Large\sf 2}\\
+\hrule
+\shadowbox{{\sf Das Problem}}
+
+\bigskip
+
+Aktuelle Computer ("`PC"') sind oft 
+
+\begin{itemize}
+\item zu teuer (etwa 1000 Euro)
+\item zu laut 
+\item zu leistungsf"ahig f"ur allt"agliche Anwendungen
+\item zu hohe Stromverbraucher (200 Watt und mehr)
+\item zu gross, schwer und sperrig
+\end{itemize}
+
+\medskip
+
+\shadowbox{{\sf Die L"osung}}
+
+\begin{center}
+  {\large Einen passenden Rechner selberbauen!}
+\end{center}
+
+Vorteile 
+
+\begin{itemize}
+\item macht Spass
+\item man lernt was
+\item man kann verschiedene preiswerte Teile kombinieren
+\item man kann den Rechner nach eigenem Geschmack bauen
+\end{itemize}
+
+
+% \fbox{Just an fbox test}
+
+\end{minipage}
+\hskip 12mm
+\rule[-18.8cm]{0.2pt}{5mm}  % tickmark
+\hskip 12mm
+% ========= PAGE 3 ===============
+\begin{minipage}[t]{7cm}
+\hfill {\Large\sf 3}\\
+\hrule
+
+\shadowbox{{\sf Beispiel}}
+
+\begin{itemize}
+\item Rechnerplatine ({\em "`Mainboard"'}).
+      Via EPIA Mini-ITX {\bf ME-6000} oder "ahnlich (600 MHz, 25 Watt).
+      \url{http://www.mini-itx.de}, \url{http://www.mini-itx.com},
+      120 EUR 
+
+\item Arbeitsspeicher ({\em "`RAM"'}),
+      30 bis 50 EUR  (512 MByte)
+
+\item Festplatte, z.B. Samsung SP1614N (160 GByte),
+      80 EUR 
+
+\item CDROM/DVD Laufwerk, 20 EUR
+
+\item Tastatur, 20 EUR
+
+\item Maus, 20 EUR
+
+\item Geh"ause (mit Netzteil), 50 bis 80 EUR,
+  \url{http://www.mini-itx.de} und \url{http://www.mini-itx.com}
+
+\end{itemize}
+
+% Die Eigenschaften
+
+% \begin{itemize}
+
+% \item Mit 600 MHz Taktfrequenz ausreichend schnell (h"angt vom
+%   Hauptspeicher ab)
+
+% \item Kleine Abmessungen XXX
+
+% \item Geringe Leistungsaufnahme (ca. 20 bis 40 Watt)
+
+% \end{itemize}
+
+Alle Teile kann man bei \url{http://www.mini-itx.de} bestellen. Auch
+einige Augsburger Gesch"afte wie Arlt (\url{http://www.arlt.com}) und 
+K\&M (\url{http://www.kmshop.de}) haben die meisten Teile.
+
+Insgesamt kommt man auf ca. 300 bis 350 Euro Materialkosten (ohne
+Bildschirm).
+
+
+\vskip 5mm
+
+
+\end{minipage}
+\hskip 12mm
+\rule[-18.8cm]{0.2pt}{5mm}  % tickmark
+\hskip 12mm
+% ========= PAGE 4 ===============
+\begin{minipage}[t]{7cm}
+\hfill {\Large\sf 4}\\
+\hrule
+\shadowbox{{\sf Projekte}}
+
+Hier ist das Handbuch zum Mainboard hilfreich.
+
+\begin{itemize}
+\item Speicherriegel mit Gef"uhl in die Rechnerplatine stecken.
+
+\item Festplatte an das "`breite Kabel"' (IDE Flachbandkabel) und an die
+  Stromversorgung stecken. Jumper auf {\em Master}.
+
+\item CDROM-Laufwerk wie die Festplatte anschliessen. Auf dem breiten
+  Kabel sind dazu zwei Anschl"usse vorgesehen. Jumper auf {\em Slave}.
+
+\item Die Bedienelemente der Frontplatte anschliessen, mindestens den
+  Ein-/Ausschalter. 
+
+\item Den weissen Netzteilstecker in die Rechnerplatine stecken (die vielen bunten Kabel).
+
+\end{itemize}
+
+\shadowbox{{\sf Einschalten}}
+
+\begin{itemize}
+  
+\item Direkt nach dem Einschalten die {\tt Entfernen}-Taste dr"ucken
+  und damit in das BIOS wechseln.
+
+\item Im BIOS unter dem Eintrag {\tt Advanced Settings} das CDROM Laufwerk als 
+  erste Boot-Quelle ausw"ahlen.
+
+\end{itemize}
+
+\end{minipage}
+
+
+\newpage % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% ========= PAGE 5 ===============
+\begin{minipage}[t]{7cm}
+\hfill {\Large\sf 5}\\
+\hrule
+
+\medskip
+
+\shadowbox{{\sf GNU/Linux: Das Betriebssystem}}
+
+\begin{itemize}
+  
+\item Freiheit zum Teilen durch freie Nutzungserlaubnis, d.h. das
+  Kopieren der GNU/Linux CDs ist legal. Das ist bei Microsoft Windows verboten!
+
+\item Riesige Sammlung an freien Programmen auf einer DVD oder einem Satz
+  CDROMs.
+
+\item Kostenlos bzw. sehr niedriger Preis 
+\end{itemize}
+
+Zum Ausprobieren empfehle ich {\bf Ubuntu Linux}
+
+\begin{center}
+      \url{http://www.ubuntulinux.org}
+\end{center}
+
+\begin{itemize}
+\item {\bf Live CD}: Linux ausprobieren ohne zu installieren (empfohlen!)
+\item {\bf Install CD}: Zur Installation auf der Festplatte
+\end{itemize}
+
+CDs mit Ubuntu Linux kann man kostenlos anfordern unter
+
+\bigskip
+
+\centerline{\url{http://www.ubuntulinux.org/shipit}}
+
+
+% \Ovalbox{
+%     See my homepage for more information.
+% }
+
+\end{minipage}
+\hskip 12mm
+%\rule[-18.8cm]{0.2pt}{10mm}
+\hskip 12mm
+% ========= PAGE 6 ===============
+\begin{minipage}[t]{7cm}
+\hfill {\Large\sf 6}\\
+\hrule
+
+\medskip
+
+\shadowbox{{\sf Falls man doch Windows braucht}}
+
+Dann empfehle ich, Microsoft Windows unter Linux zu installieren. Dazu
+braucht man spezielle Software ("`virtuelle Maschine"'), z.B.
+
+\begin{itemize}
+
+\item {\bf Win4Lin}, \url{http://www.win4lin.com}. Kostet 30 Euro bei 
+   \url{http://www.ixsoft.de}
+
+\item {\bf VmWare}, \url{http://www.vmware.com}. Kostet etwa 120 Euro f"ur
+  Sch"uler und Lehrer bei \url{http://www.ixsoft.de} 
+
+\end{itemize}
+
+Damit kann man Linux und Windows {\em gleichzeitig} verwenden.
+
+\medskip
+
+\shadowbox{{\sf Mehr zum Thema}}
+
+\medskip
+
+Mein VIA EPIA Projekt an der FH:
+
+\centerline{{\tt http://www.fh-augsburg.de/\~{}hhoegl/}}
+\centerline{{\tt proj/epia/epia.html}}
+
+\bigskip
+
+F"ur alle:
+
+\smallskip
+
+-- \url{http://www.linux-fuer-alle.de}
+
+-- \url{http://www.linuxeinsteiger.info} 
+
+-- \url{http://www.pro-linux.de} 
+
+
+\bigskip
+
+Mehr f"ur Lehrerinnen und Lehrer:
+
+\medskip
+
+-- Karl Sarnow, {\em Linux in der Schule}, Millin Verlag 2005
+
+-- {\em Edu Knoppix} - Freie Software und Bildung e.V.
+\url{http://www.fsub.org}
+
+-- {\em Skolelinux} -- freie Software f"ur Schulen, 
+   \url{http://www.skolelinux.de}
+
+% \vskip 14cm
+
+% \vfill
+
+% {\footnotesize Dieser Text steht unter der {\em Creative Commons
+%    Attribution License},
+%    \url{http://www.creativecommons.org}. 
+% }
+
+\end{minipage}
+\hskip 12mm
+%\rule[-18.8cm]{0.2pt}{10mm}
+% ========= TITLEPAGE ===============
+\begin{minipage}[t]{7cm}
+\hfill {\Large\sf \ }\\
+
+% \bigskip
+
+{\Large
+\begin{center}
+   Schluss mit einfachen USB Schnittstellenwandlern
+	 als Ersatz f"ur USB:
+
+\smallskip
+	USB lernen, verstehen
+
+\smallskip
+	
+	und anwenden mit
+
+\smallskip
+
+	freien USB Stacks
+
+\end{center} 
+}
+
+
+\vskip 5mm
+
+\centerline{\large\bf www.usb-projects.net}
+
+\vskip 5mm
+
+\bigskip
+
+\centerline{FH Augsburg}
+
+\bigskip
+
+\centerline{Benedikt Sauter}
+
+\bigskip
+
+\centerline{{\tt sauter@ixbat.de}}
+
+\bigskip
+
+\centerline{{\tt http://www.usb-projects.net}}
+
+\end{minipage}
+\end{document}
+
+
