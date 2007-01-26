@@ -1,0 +1,89 @@
+\chapter{USB Einführung}
+	\section{Grundkurs}
+		\subsection{Warum ist der Einstieg in USB so schwer?}
+
+			USB ist für Embedded Systeme eine ideal Ergänzung. Schnelle Übertragungsraten,
+			flexible Kommunikationskanäle, integrierte Stromversorgnung und Echtzeitfähigkeit sind
+			nur die bekanntesten Schlagwörter von USB.
+			Doch man sieht immer noch oft die klassiche RS232 Verbindung in neuen Projekten,
+			obwohl es USB bereits seit 1996 gibt. Warum hat es die
+			USB Schnittstelle bis heute nicht geschafft RS232 zu überholen?
+
+		 	Meiner Meinung nach ist das grösste Problem, dass es zu wenig gute Literatur gibt.
+			Oft hört man von Entwicklern, das sie sich schon mal USB angeschaut haben, aber dabei
+			schnell gemerkt, es reicht nicht kurz etwas drüber zu lesen um sie dann
+			einsetzen zu können. Und das liegt daher, dass die meisten Texte und Bücher
+			leicht veränderte Übersetzungen von der knapp 1000-seitigen USB Spezifikation sind.
+
+			Die USB Spezifikation ist im Gegensatz zu vielen anderen Spezifikationen
+			sehr ausführlich geschrieben. Jedoch 
+			ist und bleibt es die Spezifikation von USB, und ist daher völlig ungeeignet als Lernunterlage
+			für das Selbststudium.
+			
+			Und das ist wohl das grösste Problem warum die meisten früh aufgeben. Die Spezifikation
+			ist weit weg von einem Produkt oder einer Realisierung, und das ist genau der
+			falsche Ansatz zum schnellen einarbeiten.
+
+			Mit dieser Internetseite soll genau diesem Problem entgegengewirkt werden. Es wird
+			ein einfaches Modell eingeführt mit dem man schnell in der Lage ist USB verwenden zu
+			können.
+
+		\subsection{Ein kleiner Überblick}
+		Eine USB Schnittstelle hat kein typisches aussehen wie z.B. eine UART Verbindung. 
+		Bei einer UART Verbindung gibt es immer mindestens eine TX und RX Leitung. Die TX ist nur 
+		dafür da um Daten zu senden, und RX um Daten zu empfangen. Und genau so eine feste Regel gibt es bei USB nicht.
+
+		Es ist möglich parallel mehrer RX und TX Leitungen in einer USB Schnittstelle zu definieren. 
+		Dadurch kann man verschiedene Daten über eigene Verbindungen laufen lassen. 
+		Stellen wir uns ruhig die USB Schnittstelle kurz mal so vor. Wir können gezielt Daten 
+		über verschiedenen Leitungen senden. Wenn wir jetzt eine Soundkarte bauen wollen, 
+		brauchen wir zwei TX Leitungen für die zwei Stereokanäle und eine weiteren TX für 
+		Steuerkommandos. Um den Zustand der Karte abfragen zu können wäre noch eine RX Leitung sinnvoll.
+
+		Tatsächlich könnte man so eine UART Verbindung nachbauen, nur würde sie wohl keiner nutzen wollen, 
+		da man mindestens 3 serielle Schnittstellen auf einem Rechner blockieren würde. 
+		Dazu müsste man jedesmal darauf achten, das man ja genau die richtigen Leitungen vom Computer aus mit dem Gerät verbindet.
+
+		Jetzt kommt ein wichtiges Feature von USB ins Spiel. Mit USB kann man dies genau machen. 
+		Man kann sich virtuell die Leitungen so hinlegen wie man sie braucht. Damit ein Computer weiss 
+		was für Leitungen ein Gerät hat, fragt es dieses nach dem anstecken einfach danach. 
+
+		\subsubsection{Endpoints}
+		Wir sollten jetzt schnell wieder die Namen TX und RX vergessen und dafür den Namen Endpoint verwenden. 
+		Denn so werden die Datenübertragungskanäle bei einem USB Gerät genannt. Jedem frei definierten 
+		Endpoint muss eine Datenrichtung zugeordnet werden. Hier ist vielleicht noch gleich zu erwähnen, 
+		dass jeder Endpoint eine Adresse hat. Über die USB Geräteadresse und Endpointadresse kann man so 
+		eindeutig jeden Datenkanal ansprechen. Typischerweise heissen die Enpoints EP0, EP1, EP2 usw... . 
+		Eine spezielle Rolle hat der EP0 in jedem Gerät. Das ist der einzige mit dem man senden und empfangen kann.  
+		Den Endpoint 0 muss es immer geben, da über diesen das Betriebssystem das Gerät nach dessen Eigenschaften abfragt. 
+
+		Was müssen wir uns merken? 
+
+		Wir definieren uns für jeden Datenkanal den man benötigt einen Endpunkt mit der richtigen Richtung und einer Adresse. 
+		Ein Gerät kann maximal 127 Endpunkte haben.
+
+		\subsubsection{Plug and Play - Gerätekennung}
+
+		Jeder kennt das bei USB - wenn man ein Gerät ansteckt meldet das Betriebssystem immer den korrekten Namen von diesem.
+		Früher hab ich mich oft gefragt warum das Betriebssystem das Gerät so gut kennt aber keinen Treiber dafür hat.
+		Das kommt daher das in jedem USB Gerät gespeichert ist, was es für ein Gerät ist und wer es hergestellt hat.
+		Das Betriebssystem kann jederzeit nach diesen Parametern fragen und kann so immer genau sagen welches Gerät am USB Bus
+		hängt. 
+		
+		
+		
+		
+		Es gibt aber noch viel mehr Daten die das Betriebssystem abfragen kann. So müssen sich alle USB Hersteller
+		eine eindeutige Nummer bei www.usb.org holen, und diese in Ihr Gerät eintragen.
+
+		\subsubsection{Configuration}
+
+		\subsubsection{Interfaces}
+		
+
+	\section{Geräte-Stack}
+	\section{Host-Stack}
+	\section{Debuggen}
+	\section{Bausteine}
+
+	
