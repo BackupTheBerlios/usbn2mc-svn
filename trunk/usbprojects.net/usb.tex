@@ -50,30 +50,36 @@
 
 		\subsection{Endpunkte}
 
-		Wir sollten jetzt schnell wieder die Namen TX und RX vergessen und dafür den Namen Endpoint verwenden. 
-		Denn so werden die Datenübertragungskanäle bei einem USB Gerät genannt. Jedem frei definierten 
-		Endpoint muss eine Datenrichtung zugeordnet werden. Hier ist vielleicht noch gleich zu erwähnen, 
-		dass jeder Endpoint eine Adresse hat. Über die USB Geräteadresse und Endpointadresse kann man so 
-		eindeutig jeden Datenkanal ansprechen. Typischerweise heissen die Enpoints EP0, EP1, EP2 usw... . 
-		Eine spezielle Rolle hat der EP0 in jedem Gerät. Das ist der einzige mit dem man senden und empfangen kann.  
-		Den Endpoint 0 muss es immer geben, da über diesen das Betriebssystem das Gerät nach dessen Eigenschaften abfragt. 
+		Wir sollten jetzt schnell wieder die Namen TX und RX vergessen und dafür den Namen Endpunkt verwenden,
+		denn so werden die Datenübertragungskanäle eines USB Gerätes genannt. Jedem Endpunkt muss eine Richtung und Adresse zugewiesen werden. Eine Adresse gibt es bei der klassichen RS232 Verbindung nicht, da jeder Datenkanal (sprich RX,TX,CTS,RTS usw...) eine eigene Leitung hat. Und hier ist der wohl grösste Unterschied zur klassischen RS232 Verbindung. USB ist wie der Name schon in sich trägt ein Bus. Auf einem Bus werden immer nur Datenpakete übertragen. Daher muss jeder Endpunkt in einem Gerät ebenfalls eine Adresse haben. Da Jedes Gerät vom Betriebssystem nach dem anstecken ebenfalls eine Geräteadresse bekommt, kann man so über die Geräte- und Endpunktadresse direkt diese Datenübertragungskanäle antsteuern. 
 
-		Was müssen wir uns merken? 
 
-		Wir definieren uns für jeden Datenkanal den man benötigt einen Endpunkt mit der richtigen Richtung und einer Adresse. 
-		Ein Gerät kann maximal 127 Endpunkte haben.
+		FIFOs müssen hier mit rein.
 
-		\subsection{Plug and Play - Gerätekennung}
+		ebenfalls die übertragungsarten
 
-		Jeder kennt dies bei USB - wenn man ein Gerät ansteckt meldet das Betriebssystem immer den korrekten Namen von diesem.
-		Früher hab ich mich oft gefragt warum das Betriebssystem das Gerät so gut kennt aber keinen Treiber dafür hat.
-		Das kommt daher das in jedem USB Gerät gespeichert ist, was es für ein Gerät ist und wer es hergestellt hat.
-		Das Betriebssystem kann jederzeit nach diesen Parametern fragen und kann so immer genau sagen welches Gerät am USB Bus
-		hängt und gegebenenfalls die entsprechenden Treiber dafür starten.
-		
-		\subsection{Konfiguration}
+Ein Gerät kann maximal 127 Endpunkte haben.
 
 		\subsection{Interface}
+	
+	Ein Interface ist ein Bündel an Endpunkten. Ein Gerät kann mehrere Interfaces anbieten. So könnte unsere
+	Soundkarte ein Interface für den Mono- und eines für den Stereobetrieb haben. Das Interface für den Monobetrieb hat einen Endpunkt für die Steuerkommandos und einen weiteren für die Daten die über einen Lautsprecher ausgegeben werden. Das Interface für den Stereobetrieb hat ebenfalls einen für Steuerkommandos, aber zwei für die Signalausgabe (linker und rechter Kanal). Es kann jederzeit von der Software auf dem PC zwischen den Interfaces hin und hergeschaltet werden. Oft liest man den Begriff Alternate Interface. Dieses Interface kann man parallel zu einem Interface definieren. Wenn man ein normales Interface definiert, gibt man dort die Endpunkte zu diesem an. Entsprechend der FIFO grösse eines Endpunktes wird entsprechend Bandbreite auf den USB Bus reserviert.
+
+daher waere schnell die bandbreite aufgebraucht. wenn man es aber so macht, dass immer nur kurz vor der kommunikation die bandbreite reserviert und danach sofort wieder freigegeben wird, ist eine viel laengere zeit der bus frei fuer andere kommunikationen.
+
+gibt es ein alternate interface zu einem interface so wird beim starten von diesem immer erst das altenate gestartet. das hat den vorteil, dass man schon die richtige schnittstelle (die menge der Endpunkte) vor sich hat, aber nicht den ganzen bus fuer sich reserviert hat. will man jetzt datenaustauschen, so kann man schnell vom alternate interface auf das tatsaechliche wechseln, die daten uebertragen und danach sofort wieder zurueckwechseln. damit ist danach der bus sofort nicht mehr reserviert.
+
+		\subsection{Konfiguration}
+
+		genauso wie interfaces kann ein geraet mehrer konfigurationen haben. ein interface regelt nur die endpunkte sammlung. im gegensatz dazu reguliert eine konfiguration mehr physikalische sachen. 
+
+strom, ..
+
+kamera mit akku betrieb, oder als webcam
+
+		\subsection{Descriptoren}
+
+		\subsection{Plug and Play - Gerätekennung}
 
 		\subsection{USB Klassen}
 
@@ -93,5 +99,15 @@
 		\section{USB Controller}
 		\section{USB Hub Bausteine}
 		\section{USB Host Controller}
+
+
+
+
+
+Und hier stehen wie an einem Punkt, an dem sich die arbeit mit verschiedenen Controller stark unterscheidet. Aber in dem meisten Fällen ist es so, dass die USB Baustein immer einige FIFO Speicher für Endpunkte bereit halten. Das heisst es muss im USB Baustein definiert werden, dass es einen Endpunkt X mit der Adresse Y gibt, und wenn Daten an diesen Endpunkt gesendet werden, sollen diese bitte in den FIFO Nr. Z im USB Baustein abgelegt werden und mir mit einem Interrupt ein Signal gegeben werden. Beim senden arbeitet man meist auch mit internen FIFOs. Hier muss ebenfalls vor der Kommunikation ein FIFO mit einer Endpunktadresse verbunden werden. Dann kann man einfach Daten in den FIFO legen, und der USB Baustein versendet diese entsprechend verpackt mit der richtigen Adresse.
+
+
+Wenn wir jetzt USB das letzte mal mit RS232 vergleichen will ich den wesentlichen Unterschied nochmal betonen. USB ist ein Bus auf dem Datenpakete hin und her gesendet werden. Bei RS232 hat man direkte Datenleitungen zwischen den Datenkommunikationsstellen. Die RS232 Signale kann man relativ einfach selbständig generieren, da man ja nur die entprechenen Pins des RS232 Port ansteuern muss. Bei USB braucht man in der Regel immer einen USB Controller, der einem einiges an arbeit abnimmt.
+
 
 	
