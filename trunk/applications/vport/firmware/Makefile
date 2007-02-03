@@ -48,7 +48,7 @@ F_OSC = 3686400
 FORMAT = ihex
 
 # Target file name (without extension).
-TARGET = vport
+TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -436,4 +436,4 @@ build elf hex eep lss sym coff extcoff \
 clean clean_list program
 
 download:
-	avrdude -p m128 -c usbprog -U flash:w:vport.hex -E noreset
+	avrdude -p m128 -c avrispv2 -P usb -U flash:w:main.hex -E noreset
