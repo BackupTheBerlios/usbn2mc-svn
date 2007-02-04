@@ -54,37 +54,230 @@
 		denn so werden die Datenübertragungskanäle eines USB Gerätes genannt. Jedem Endpunkt muss eine Richtung und Adresse zugewiesen werden. Eine Adresse gibt es bei der klassichen RS232 Verbindung nicht, da jeder Datenkanal (sprich RX,TX,CTS,RTS usw...) eine eigene Leitung hat. Und hier ist der wohl grösste Unterschied zur klassischen RS232 Verbindung. USB ist wie der Name schon in sich trägt ein Bus. Auf einem Bus werden immer nur Datenpakete übertragen. Daher muss jeder Endpunkt in einem Gerät ebenfalls eine Adresse haben. Da Jedes Gerät vom Betriebssystem nach dem anstecken ebenfalls eine Geräteadresse bekommt, kann man so über die Geräte- und Endpunktadresse direkt diese Datenübertragungskanäle antsteuern. 
 
 
-		FIFOs müssen hier mit rein.
+\begin {description}
+	\item[USB Controller (kurzer Ausflug)] :
+	Wenn man Daten über eine Netzwerkverbindung senden will, würde man sich nie Gedanke darüber machen wie man die einzelnen Kupferleitungen
+	schalten muss, damit die Daten richtig übermittelt werden. Genauso ist es meist bei USB. Bei Verwendung von USB sollte man eigentlich
+	damit nicht in Berührung kommen, da dies der USB Controller für einen macht. Hier gibt es ganz verschiedene von ganz einfachen,
+	die gerade mal das Signal für die Busleitungen generieren bis zu grossen komplexeren Controllern mit internen Konfigurationsregistern
+	für die Endpunkte, interne Speicher für ein- und ausgehende Daten und vieles mehr.
+\end {description}
 
-		ebenfalls die übertragungsarten
 
-Ein Gerät kann maximal 127 Endpunkte haben.
+	Die meisten Controller haben interne eine verschiedene Anzahl von kleinen FIFO Speichern (meist bis zu 64 Byte). Diese FIFO Speicher
+	kann man direkt einem Endpunkt zuweisen (für ein- und ausgehene Daten). Die grösse des FIFOs ist ebenfalls wie bis jetzt
+	die Adresse, Richtung ein Konfigurationsparameter für einen Endpunkt. Es gibt noch einen weiteren Parameter,
+	die gewünschte Übertragungsart. Hier ist es so das USB direkt schon für verschiedene Anwendungen passende Übertragungsarten
+	anbietet.
+\begin{description}
+	\item[Bulk]
+		Dies ist wohl die am meist eingesetzte Art. Es können grosse und zeitkritische Datenmengen übertragen werden. Dazu wird
+		immer geprüft ob alle Daten korrekt übertragen worden sind.
+
+	\item[Interrupt]
+		Diese Übertragungsart darf man nicht falsch verstehen. Denn USB ist und bleibt ein Single Master Bus. Das heisst
+		nur der Master kann jegliche Kommunikation initiieren. Es kann kein Gerät beim Master sich anmelden um diesen
+		mitzuteilen, dass es Daten hat. Der Master muss immer zyklisch alle Geräte fragen ob neue Daten vorhanden sind.
+		Im Grunde ist der Interrupt Transfer nichts anderes als der Bulk nur das die Interrupt Endpunkte eine höhere Priorität 
+		und mehr Bandbreite bekommen, so dass der Master immer zu dem gewünschten Zeitpunkt tatsächlich auf das Gerät zugreifen kann.
+		
+		Das zyklische Pollingintervall muss dann als Parameter für einen Endpunkt definiert werden. Hier gibt man den Wert in Millisekunden
+		an. 
+
+	\item[Isochron]
+		Mit dem Isochronen Modus kann man Daten übertragen die eine konstante Bandbreite erfordern. Typische Anwendungsbeipsiele
+		sind die Übertragung von Audio oder Videosignalen. Wenn hier man ein Bit oder Byte verloren geht ist die nur ein Knacken
+		oder Rauschen. Würden die Daten aber verzögert ankommen, wäre die Sprache oder das Bild völlig verzehrt und daher unbrauchbar.
+
+		Somit muss man wie beim Interrupttransfer das Pollingintervall definieren, wie oft der Master Daten abholen oder versenden soll.
+	\end{description}
+
+
+	Pro Endpunkt muss jetzt definiert werden:
+	\begin{enumerate}
+		\item Richtung
+		\item Adresse
+		\item FIFO Speicher Grösse
+		\item Übertragungsart
+		\item Pollingzyklus
+	\end{enumerate}
+
+
+	Jeder eigene Endpunkt kann mit diesen Parameter frei definiert werden. Die Daten die man dann später über die
+	Endpunkte sendet oder empfängt sind selbstdefinierte Byte Packete. In der USB Konfiguation wird auf von Steam Pipes
+	geredet. 
+
+	Es gibt nur einen Endpunkt der anders arbeitet und dies auch immer so machen muss, der Endpunkt 0. Der Endpunkt 0
+	wird vom Betriebssystem benötigt um das USB Gerät zu konfigurieren. 
+	Über diesen werden von der USB Spezifikation definierte Nachrichten gesendet. Dieser Endpunkt ist auch der einzige
+	der in zwei Richtungen betrieben werden kann. Auserdem gibt es für diesen eine eigene Übertragungsart den Controll Transfer
+	der auch nur vom Endpunkt 0 unterstützt werden.
+	
 
 		\subsection{Interface}
 	
 	Ein Interface ist ein Bündel an Endpunkten. Ein Gerät kann mehrere Interfaces anbieten. So könnte unsere
-	Soundkarte ein Interface für den Mono- und eines für den Stereobetrieb haben. Das Interface für den Monobetrieb hat einen Endpunkt für die Steuerkommandos und einen weiteren für die Daten die über einen Lautsprecher ausgegeben werden. Das Interface für den Stereobetrieb hat ebenfalls einen für Steuerkommandos, aber zwei für die Signalausgabe (linker und rechter Kanal). Es kann jederzeit von der Software auf dem PC zwischen den Interfaces hin und hergeschaltet werden. Oft liest man den Begriff Alternate Interface. Dieses Interface kann man parallel zu einem Interface definieren. Wenn man ein normales Interface definiert, gibt man dort die Endpunkte zu diesem an. Entsprechend der FIFO grösse eines Endpunktes wird entsprechend Bandbreite auf den USB Bus reserviert.
+	Soundkarte ein Interface für den Mono- und eines für den Stereobetrieb haben. Das Interface für den Monobetrieb hat einen Endpunkt für die Steuerkommandos und einen weiteren für die Daten die über einen Lautsprecher ausgegeben werden. Das Interface für den Stereobetrieb hat ebenfalls einen für Steuerkommandos, aber zwei für die Signalausgabe (linker und rechter Kanal). Es kann jederzeit von der Software auf dem PC zwischen den Interfaces hin und hergeschaltet werden. Oft liest man den Begriff Alternate Interface. Dieses Interface kann man parallel zu einem Interface definieren. Wenn man ein normales Interface definiert, gibt man dort die Endpunkte zu diesem an. Entsprechend der FIFO Grösse eines Endpunktes wird entsprechend Bandbreite auf den USB Bus reserviert.
 
-daher waere schnell die bandbreite aufgebraucht. wenn man es aber so macht, dass immer nur kurz vor der kommunikation die bandbreite reserviert und danach sofort wieder freigegeben wird, ist eine viel laengere zeit der bus frei fuer andere kommunikationen.
-
-gibt es ein alternate interface zu einem interface so wird beim starten von diesem immer erst das altenate gestartet. das hat den vorteil, dass man schon die richtige schnittstelle (die menge der Endpunkte) vor sich hat, aber nicht den ganzen bus fuer sich reserviert hat. will man jetzt datenaustauschen, so kann man schnell vom alternate interface auf das tatsaechliche wechseln, die daten uebertragen und danach sofort wieder zurueckwechseln. damit ist danach der bus sofort nicht mehr reserviert.
-
+Die Bandbreite wäre so schnell aufgebraucht auch ohne das irgendeine Kommunikation auf dem Bus stattfindet.
+Würde man aber die benötige Bandbreite immer nur kurz vor dem Senden oder Empfangen reservieren könnte man viel mehr Geräte über einen Bus bedienen.
+Daher wurde das Alternate Interface erfunden. Es kann zu jedem Interface ein Alternatives geben. Das sollte genauso von der
+Enpunktstruktur aussehen wie das Eigentliche. Der einzige Unterschied ist der, dass überfall als FIFO Grösse 0 Byte angegeben ist. Gibt es jetzt ein Alternate Interface aktiviert das Betriebsystem beim einstecken erst dieses und nimmt so nicht voreilig anderen die Bandbreite weg. Kurz vor dem Senden und Empfangen wird dann auf das eigentliche Interface gewechselt.
+	
 		\subsection{Konfiguration}
 
-		genauso wie interfaces kann ein geraet mehrer konfigurationen haben. ein interface regelt nur die endpunkte sammlung. im gegensatz dazu reguliert eine konfiguration mehr physikalische sachen. 
+		
+		Genauso wie Interfaces kann ein Gerät mehrer Konfigurationen haben. Hier geht es mehr um die elektrischen Eigenschaften.
+		Ein weiterer riesen Vorteil von USB ist, dass es eine Stromversorgung für die Geräte direkt über das USB Kabel gibt.
+		So kann man von einem Bus max 5V und und 500 mA über beziehen. Bevor ein Gerät aber den Strom nuzt muss es den Master fragen
+		ob noch genügend freie Kapazitäten vorhanden sind.
 
-strom, ..
+		In einer Konfiguration muss man folgende Parameter definieren:
 
-kamera mit akku betrieb, oder als webcam
+		\begin{enumerate}
+			\item Stromaufnahme in 2 mA Einheiten
+			\item Attribute (z.B. Bus-powered, Remote-Wakup-Support)
+			\item Anzahl der Interfaces unter dieser Konfiguration
+		\end{enumerate}
 
-		\subsection{Descriptoren}
+		\subsection{Deskriptoren}
 
-		\subsection{Plug and Play - Gerätekennung}
+		Jetzt wissen wir, wie man Endpunkte definiert und diese in Interfaces anordnet. Ebenfalls können
+		wir verschiedene Interfaces zu einer Konfiguration zuweisen. In der Konfiguration werden dazu
+		noch Parameter für den Stromverbrauch und Anschluss definiert. Alle diese Informationen
+		sind immer in Datenstrukturen verpackt die von der USB Spezifikation Deskriptoren genannte werden.
+		Ein Deskriptor ist nichts anderes als ein Speicherarray an dem jede Stelle für einen
+		bestimmen Parameter steht. Ein Gerät muss intern irgendwo einen Speicher haben, in dem 
+		diese Strukturen liegen denn das Betriebssystem kann jederzeit nach diesen Informationen fragen.
+
+
+		So gibt es ein Endpunkt-Deskriptor, Interface-Deskriptor, Konfiguartions-Deskriptor
+		und einen Geräte-Deskriptor.
+
+		Die Parameter der ersten Drei kennen wir bereits. Kommen wir nun zum Geräte-Deskriptor.
+
+		Der Geräte-Deskriptor muss in jedem Gerät vorhanden sein. Hier ist definiert:
+
+		\begin{description}
+			\item [USB Version]
+				USB Version die das Gerät unterstützte (z.B. 1.1)
+			\item [Klassen- / Subklassen- / Protokoll-Code]
+				Das USB Konsortium hat nicht nur den USB Bus definiert, sondern gibt auf Beschreibungen von
+				Endpunkt Bündeln für Geräte heraus. So können Betriebssysteme Standardtreiber anbieten.
+				Mehr zu dieser Technik im Bereich \textit{USB Klassen} dieses Dokuments.
+
+			\item [FIFO Tiefe von EP0]
+				Tiefe des FIFOs der für den Endpunkt 0 zuständig ist. Dieser ist bei USB 1.1 meist 8 Byte Tief.	
+
+			\item [Hersteller Nummer]
+				Jeder Hersteller von USB Geräten muss sich bei www.usb.org registrieren. Dafür bekommt
+				man dann eine eindeutige Nummer die für die Treibersuche vom Betriebssystem von Bedeutung ist.
+
+			\item [Produkt Nummer]
+				Die Produktnummer wird ebenfalls wenn sie definiert ist vom Treiberverwendet um das Gerät eindeutig
+				zu identifizieren. Mehr zu diesen Nummern im Bereich \textit{Plug and Play - Geräteerkennung}.
+
+			\item [Versions Nummer]
+				Versionsnummer für das Gerät
+
+			\item [String Index für Hersteller]
+				Hier kann ein Namen für den Hersteller angegeben werden, der vom Betriebssystem angezeigt werden kann.
+			\item [String Index für Produkt]
+				Hier kann ein Namen für das Produkt angegeben werden.
+			\item [String Index für Seriennummer]
+				Und Hier eine Seriennummer.
+
+				In dem Gerätedeskriptor wird nicht direkt der Name für Hersteller, Produkt oder Seriennummer gespeichert,
+				sondern nur eine Nummer eines sogenannten String-Deskriptors. Die ist wieder nur eine einfache Datenstruktur
+				im USB Gerät in dem dann tatsächlich die einzelnen ASCII Buchstaben stehen.
+
+			\item [Anzahl der Konfigurationen]
+
+				Die Anzahl der vorhandenen Konfigurationen für das Gerät. Eine Kamera könnter hier zwei haben.
+				Eine Konfiguration in der die Kamera den Strom vom USB Bus bezieht. Und eine von der es
+				den Strom aus den eigenen Batterien bezieht.
+	
+		\end{description}
+
+		\subsection{Plug and Play - Geräteerkennung und -zugriff}
+			
+			Dadurch das alle Eigenschaften in dem USB Gerät mit den Deskriptoren gespeichert sind kann
+			kennt das Betriebssystem direkt nach dem anstecken viele Details von dem Gerät.
+			Es kann z.B. dem Nutzer anzeigen das es das Gerät X vom Hesterller Y gefunden hat.
+
+			Wie genau sieht der Ablauf dahinter aus?
+
+			Kommen wir auf den Endpunkt 0 zurück. Über den EP0 werden definierte Nachrichten
+			gesendet. Mit diesen Nachrichten kann das Betriebssystem alle definierten Deskriptoren
+			abfragen. So gibt es z.B. eine Nachricht Get Descriptor um einen beliebigen
+			Deskriptor abfragen zu können, oder Get Configuration um das Gerät nach der aktuelle
+			Gerätekonfigutration zu fragen. Wenn man auf einen Endpunkt Zugreifen muss
+			habe ich immer davon gesprochen, dass man dies über die Geräte- und Endpunktadresse macht.
+
+			Wie kommt ein Gerät jetzt zu einer Geräteadresse?
+
+			Direkt nach dem anstecken reagiert das USB Gerät auf alle Pakete auf dem USB Bus die an
+			Adresse 0 adressiert sind. Der Master fragt um sicher zu sein, das es sich um echtes USB Gerät handelt
+			die ersten 8 Byte des Geräte-Deskriptors ab. Bekommt er eine sinnvolle Antwort
+			weisst er mit einer Standard Nachricht über den EP0 dem Gerät eine gültige Adresse zu.
+			Ab diesem Zeitpunkt ist das Gerät über dieser Adresse erreichbar.
+
+			Nur woher soll der Programmierer genau wissen welche Adresse das USB Gerät später 
+			auf einem Computer hat, da diese einfach nach der Anzahl der angesteckten Geräte
+			erhöht wird.
+
+			Wenn man eine Verbindung zu einem USB Gerät aufbaut, kann man dies nicht über einen eindeutigen
+			Punkt (wie z.B. c:/ oder /dev/hda0 bei einer Festlatte) machen. Die Prozedur ist immer folgende.
+			Das Betriebssystem legt in einer eigenen internen Struktur alle abgefragten Deskriptoren
+			von den angesteckten USB Geräten ab. Sucht man jetzt eine Adresse für ein Gerät muss
+			man in den Datenstrukturen nach dem passenden Gerät suchen. Dies kann man entweder
+			über die Hersteller- und Produkt-Nummer machen. Oder über einen Klasse- / Sub- / oder Protokoll-Code machen.
+			Falls ein Gerät nur über einen Stringdeskriptor beschrieben wird, kann man die Adresse
+			auch über diesen ermitteln.
 
 		\subsection{USB Klassen}
+			
+			Das USB Klassenmodell soll die Entwicklung von Treibern erheblich vereinfachen. Die Idee dahinter
+			ist ganz einfach. Mit den Deskriptoren beschreibt man das aussehen der Schnittstelle.
+			Welche Controller und Techniken dahinter stehen ist aus der USB Sicht unerheblich.
+			Wenn wir unseren Sounkarte anschauen, so haben wir nur gesagt das ein bestimmter Endpunkt
+			für die Ausgabe des Soundsignale für den rechten Stereokanal da ist.
+			Was genau dahinter mit dem Byte Strom hinter der USB Schnittstelle passiert ist dem USB Treiber egal. Er schickt nur
+			die definierte Bytes die das Audiosignal wiederspiegeln.
+			Und das ist die wesentliche Idee hinter den USB Klassen. Es sollen für Geräte mit gleichen Merkmalen und Eigen
+			schaften Gruppen von Interfaces und Endpunkten definiert werden. Betriebssysteme können
+			für diese Geräte Treiber anbieten, da diese kein einziges spezielles Register, oder Zeitverhalten von irgendeinem Controller
+			kennen müssen. Der Treiber muss nur so geschrieben werden das er die Daten richtig formatiert an die Endpunkte verteilt
+			und abholt. Dies entlastet Hersteller typischer PC Komponenten (Tastatur, Maus, Soundkarte, Scanner, Drucker, ...) von der
+			Bereitsstellung spezieller Treiber.
 
-		\subsection{Ein Gerät mit vielen Gesichtern}
+			Leider klappt diese Idee nur selten. Das einzige bei dem jeder Hersteller an diesem Konzept teilnimmt
+			sind Tastaturen und Mäuse. Irgendwas hält die Hersteller davon, dass sie sich nicht an diesen Standard halten 
+			wollen, sondern lieber eigene proriotäre Treiber entwicklen wollen.
 
+			Es gibt Klassenspezifikationen für:
+
+			\begin{enumerate}
+				\item Tastaturen, Mäuse, ... (Human Interace Device Class)
+				\item Soundkarten (Audio Device Class)
+				\item Kommunikationssschnittstellen z.B. RS232, Ethernet (Communication Device Classs)
+				\item Content Security Class
+				\item Chip-/Smart Card Device Class
+				\item IrDA Bridge Device Class
+				\item Imaging Device Class
+				\item Printer Device Class
+			\end{enumerate}
+
+			Für die meisten Klassen gibt es in allen bekannten Betriebssystemen Standardtreiber.
+			Speziell für die Communication Device Class gibt es ein Projekt hier auf der Seite (Netzwerkstack in USB Gerät).
+
+			Wenn man so einen Standardtreiber verwenden will muss man im Geräte-Deskriptor die richten Klassen- und Protokoll-Codes angeben.
+			Man kann sogar einem Interface eine Klasse zuweisen. In der Praxis bedeutet dies z.B. bei einem dieser bekannten
+			Multifunktions Fax/Kopierer/Scanner/Drucker Geräte, das es für jedes virtuelle Gerät ein Interface mit
+			dem entsprechenden Klassencode gibt. Im Idealfall muss man sich so nur um die Firmware in dem Gerät kümmern,
+			da man keinen einzigen Treiber selber schreiben muss.
+
+\chapter{USB entwickeln}
 
 	\section{Geräte-Stack}
 		
@@ -102,12 +295,3 @@ kamera mit akku betrieb, oder als webcam
 
 
 
-
-
-Und hier stehen wie an einem Punkt, an dem sich die arbeit mit verschiedenen Controller stark unterscheidet. Aber in dem meisten Fällen ist es so, dass die USB Baustein immer einige FIFO Speicher für Endpunkte bereit halten. Das heisst es muss im USB Baustein definiert werden, dass es einen Endpunkt X mit der Adresse Y gibt, und wenn Daten an diesen Endpunkt gesendet werden, sollen diese bitte in den FIFO Nr. Z im USB Baustein abgelegt werden und mir mit einem Interrupt ein Signal gegeben werden. Beim senden arbeitet man meist auch mit internen FIFOs. Hier muss ebenfalls vor der Kommunikation ein FIFO mit einer Endpunktadresse verbunden werden. Dann kann man einfach Daten in den FIFO legen, und der USB Baustein versendet diese entsprechend verpackt mit der richtigen Adresse.
-
-
-Wenn wir jetzt USB das letzte mal mit RS232 vergleichen will ich den wesentlichen Unterschied nochmal betonen. USB ist ein Bus auf dem Datenpakete hin und her gesendet werden. Bei RS232 hat man direkte Datenleitungen zwischen den Datenkommunikationsstellen. Die RS232 Signale kann man relativ einfach selbständig generieren, da man ja nur die entprechenen Pins des RS232 Port ansteuern muss. Bei USB braucht man in der Regel immer einen USB Controller, der einem einiges an arbeit abnimmt.
-
-
-	
