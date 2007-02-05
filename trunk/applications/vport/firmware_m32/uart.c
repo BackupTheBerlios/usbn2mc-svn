@@ -34,7 +34,7 @@ void UARTInit(void)
 }
 
 
-void UARTInitDynamic(uint8_t baud, char flags)
+void UARTInitDynamic(char baud, char flags)
 {
 	// baud
 	switch(baud)
@@ -66,7 +66,6 @@ void UARTInitDynamic(uint8_t baud, char flags)
 		case SERIAL_BAUD230400:
 		break;
 
-		default:
 	}
 
 	// parity
