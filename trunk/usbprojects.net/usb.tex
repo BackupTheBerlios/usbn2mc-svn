@@ -108,8 +108,12 @@ Speicher für ein- und ausgehende Daten u. v. m.
 
 
 	Die meisten Controller weisen intern eine verschiedene Anzahl von kleinen 
-FIFO Speichern (meist bis zu 64 Byte) auf. Diese FIFO Speicher
-	kann man direkt einem Endpunkt zuweisen (für ein- und ausgehene Daten). 
+FIFO Speichern auf (meist bis zu 64 Byte). Diese FIFO Speicher
+	kann man direkt einem Endpunkt zuweisen (für ein- und ausgehende Daten). 
+	In der Endpunktdefinition muss die FIFO Tiefe als Parameter angegeben werden.
+
+\newline
+\newline
 Besprochen wurden bisher die Parameter Tiefe des FIFOs, die Adresse des Endpunktes 
 und dessen Richtung.
 Zusätzlich gibt es einen weiteren Parameter, die Transferart.
@@ -127,16 +131,15 @@ Datenmengen übertragen werden. Zusätzlich überprüft dieser Transfer stets die
 Diese Übertragungsart darf man nicht falsch verstehen. USB ist und bleibt ein Single 
 Master Bus. Das heisst, dass
 		nur der Master jegliche Kommunikation initiieren kann. Kein Gerät 
-kann sich beim Master selbst anmelden und mitteilen, dass es Daten übertragen will. 
+kann sich beim Master selbst anmelden und ihm mitteilen, dass es Daten übertragen will. 
 Der Master muss zyklisch alle Geräte nach neuen Daten abfragen.
 		Im Grunde ist der Interrupt Transfer nichts anderes als der 
 Bulk-Transfer mit dem Unterschied, dass die Interrupt Endpunkte eine höhere Priorität 
 		und mehr Bandbreite bekommen. Auf diese Weise kann der Master immer 
-zu dem gewünschten Zeitpunkt auf das Gerät zugreifen.
-		
-		Das zyklische Pollingintervall muss hier als Parameter für einen 
-Endpunkt definiert werden. Hier gibt man den Wert in Millisekunden
-		an. 
+zu dem gewünschten Zeitpunkt auf das Gerät zugreifen,
+selbst wenn gerade viel Datenverkehr auf dem Bus ist.
+
+	Diesen zyklischen Zugriff stellt man über ein Pollingintervall in Millisekunden ein.
 
 	\item[Isochron-Transfer]
 		Mit dem Isochronen Modus kann man Daten übertragen, die eine 
@@ -156,7 +159,7 @@ versenden soll.
 	\begin{enumerate}
 		\item Richtung
 		\item Adresse
-		\item FIFO Speichergrösse
+		\item FIFO Tiefer 
 		\item Übertragungsart
 		\item Pollingzyklus
 	\end{enumerate}
@@ -164,9 +167,7 @@ versenden soll.
 
 	Jeder eigene Endpunkt kann mit diesen Parametern frei definiert werden. Die 
 Daten, die man später über die
-	Endpunkte sendet oder empfängt, sind selbst definierte Byte Pakete. In der 
-USB Konfiguration wird auch von Steam Pipes
-	gesprochen. 
+	Endpunkte sendet oder empfängt, sind selbst definierte Datenpakete. 
 
 	Es gibt nur einen einzigen Endpunkt, der anders arbeitet, der Endpunkt 0.
 	Er wird vom Betriebssystem benötigt, um das USB Gerät zu konfigurieren. 
@@ -187,7 +188,7 @@ Stereobetrieb haben. Das Interface für den Monobetrieb hat einen Endpunkt für di
 Steuerkommandos und einen weiteren für die Daten, die über einen Lautsprecher 
 ausgegeben werden. Das Interface für den Stereobetrieb hat ebenfalls einen Endpunkt 
 für Steuerkommandos, aber zwei für die Signalausgabe (linker und rechter Kanal). Die 
-Software auf dem PC kann jederzeit zwischen den Interfaces hin- und herschlten. 
+Software auf dem PC kann jederzeit zwischen den Interfaces hin- und herschalten. 
 Oft liest man auch vom Begriff Alternate Interface. Dieses Interface kann man 
 parallel zu einem anderen Interface definieren. Definiert man ein normales Interface, 
 so gibt man dort die Endpunkte, die zu ihm gehören, an. Entsprechend der FIFO Grösse 
@@ -209,8 +210,8 @@ Interface gewechselt.
 
 		
 		Genauso wie Interfaces kann ein Gerät mehre Konfigurationen haben. 
-Hier geht es  die elektrischen Eigenschaften.
-		Ein anderer großer Vorteil von USB ist, dass die Geräte direkt über 
+Hier geht es um die elektrischen Eigenschaften.
+		Bei USB kann können die Geräte direkt über 
 das USB Kabel mit Strom versorgt werden.
 		So kann man von einem Bus max 5V und 500mA beziehen. Bevor ein Gerät 
 den Strom nuzen kann, muss es beim Master erfragen,
@@ -293,9 +294,9 @@ werden, der vom Betriebssystem angezeigt werden kann.
 				In dem Gerätedeskriptor wird nicht direkt der Name 
 für Hersteller, Produkt oder Seriennummer gespeichert,
 				sondern nur eine Nummer eines sogenannten 
-String-Deskriptors. Sie ist wiederum eine einfache Datenstruktur
-				im USB Gerät, in dem dann die einzelnen ASCII 
-Buchstaben stehen.
+String-Deskriptors. Er ist wiederum eine einfache Datenstruktur
+				im USB Gerät, in dem dann die einzelnen ASCII-Buchstaben stehen.
+
 
 			\item [Anzahl der Konfigurationen]
 
@@ -331,14 +332,14 @@ zugreifen muss,
 
 			Wie kommt aber ein Gerät zu einer Geräteadresse?
 
-			Direkt nach dem Anstecken reagiert das USB Gerät auf alle 
-Pakete auf dem USB Bus, die an die
-			Adresse 0 adressiert sind. Der Master fragt die ersten 8 Byte 
-des Geräte-Deskriptors ab, um sicher zu sein, dass es sich um echtes USB Gerät 
-handelt. Bekommt er eine sinnvolle Antwort, weist er dem Gerät mit einer Standard 
-Nachricht über den EP0 eine gültige Adresse zu.
-			Ab diesem Zeitpunkt ist das Gerät über diese Adresse 
-erreichbar.
+			Direkt nach dem Anstecken hat das Gerät die Adresse 0.
+			Der Master erkennt, dass ein neues Gerät eingesteckt worden ist,
+			und sendet an dieses Gerät die Anfrage GetDescriptor (Gerätedeskriptor).	Daraufhin antwortet das Gerät
+			mit dem entsprechenden Deskriptor. Jetzt weiss der Master,
+			dass es sich um ein echtes USB Gerät handelt, und
+			ordnet ihm eine neue endgültige Adresse zu.
+			Ab diesem Zeitpunkt ist das Gerät über die neue Adresse 
+			erreichbar.
 
 			Nur woher soll der Programmierer wissen, welche Adresse das 
 USB Gerät später 
