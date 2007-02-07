@@ -1,0 +1,28 @@
+digraph G {
+	/* bla */
+
+	ep10 [label="Endpunkt 0 (Pflicht)"];
+	ep11 [label="Endpunkt 1"];
+	ep12 [label="Endpunkt 2"];
+	
+	ep20 [label="Endpunkt 0 (Pflicht)"];
+	ep21 [label="Endpunkt 1"];
+
+	interface [label="Interface 1"];
+	interface2 [label="Interface 2"];
+
+	configuration [label="Konfiguration 1"];
+
+	/* ab hier struktur */
+
+	configuration -> interface;
+	configuration -> interface2;
+
+	interface -> ep10;
+	interface -> ep11;
+	interface -> ep12;
+
+	interface2 -> ep20;
+	interface2 -> ep21;
+
+}
