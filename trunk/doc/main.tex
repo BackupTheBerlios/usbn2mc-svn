@@ -6,8 +6,8 @@
 
 % CV and Expertise
 
-%\usepackage{a4}
-%\usepackage{lscape}
+\usepackage{a4}
+\usepackage{lscape}
 \usepackage{fancybox,graphicx,url,german}
 
 \evensidemargin=0cm
@@ -20,8 +20,8 @@
 \pagestyle{empty}
 \parindent=0pt
 
-%\pdfpageheight=\textheight
-%\pdfpagewidth=\textwidth
+\pdfpageheight=\textheight
+\pdfpagewidth=\textwidth
 
 \begin{document}
 
@@ -34,14 +34,10 @@
 
 \bigskip
 
-Aktuelle Computer ("`PC"') sind oft 
-
 \begin{itemize}
-\item zu teuer (etwa 1000 Euro)
-\item zu laut 
-\item zu leistungsf"ahig f"ur allt"agliche Anwendungen
-\item zu hohe Stromverbraucher (200 Watt und mehr)
-\item zu gross, schwer und sperrig
+\item USB scheint f"ur viele Entwickler sehr kompliziert zu sein 
+\item Oft werden deshalb nur einfache Schnittstellenwandler eingesetzt
+\item Die Funktinalität von USB kann aufgrund desssen nur in einem sehr kleinem Umfang genutzt werden 
 \end{itemize}
 
 \medskip
@@ -49,18 +45,21 @@ Aktuelle Computer ("`PC"') sind oft
 \shadowbox{{\sf Die L"osung}}
 
 \begin{center}
-  {\large Einen passenden Rechner selberbauen!}
+  {\large USB Controller mit freien Stacks verwenden!}
 \end{center}
 
-Vorteile 
+Vorteile:
 
 \begin{itemize}
-\item macht Spass
-\item man lernt was
-\item man kann verschiedene preiswerte Teile kombinieren
-\item man kann den Rechner nach eigenem Geschmack bauen
+\item Unabh"angigkeit von USB Bausteinen
+\item Nutzung fertiger Treiber
+\item Flexibel Reaktionen auf verschiedenste Anforderungen
+\item Verf"ugbarkeitn vieler USB Funktionalit"ten (Übertragungsarten, Standbye-Verhalten,...) 
 \end{itemize}
 
+Um sich schnell und einfach in USB einarbeiten zu können,
+steht auf http://www.usb-projects.net ein
+Grundkurs zur Vermittlung der wesentlichen Eigenschaften.
 
 % \fbox{Just an fbox test}
 
@@ -73,54 +72,28 @@ Vorteile
 \hfill {\Large\sf 3}\\
 \hrule
 
-\shadowbox{{\sf Beispiel}}
-
+\shadowbox{{\sf USB Stacks}}
+\newline
+USB Device Stack (usbn2mc):
 \begin{itemize}
-\item Rechnerplatine ({\em "`Mainboard"'}).
-      Via EPIA Mini-ITX {\bf ME-6000} oder "ahnlich (600 MHz, 25 Watt).
-      \url{http://www.mini-itx.de}, \url{http://www.mini-itx.com},
-      120 EUR 
-
-\item Arbeitsspeicher ({\em "`RAM"'}),
-      30 bis 50 EUR  (512 MByte)
-
-\item Festplatte, z.B. Samsung SP1614N (160 GByte),
-      80 EUR 
-
-\item CDROM/DVD Laufwerk, 20 EUR
-
-\item Tastatur, 20 EUR
-
-\item Maus, 20 EUR
-
-\item Geh"ause (mit Netzteil), 50 bis 80 EUR,
-  \url{http://www.mini-itx.de} und \url{http://www.mini-itx.com}
-
+\item Einfache API
+\item Zahlreiche Beispielprojekte
+\item Flexible Schnittstelle f"ur Mikrocontroller (ARM7,R8C,AVR) 
+\item USB Baustein USBN9404/03 (National Semiconductor)
+\item Treiber in der Entwicklung für PDIUSBD12D (NXP) und AT90USB (Atmel)
+\item http://usbn2mc.berlios.org
 \end{itemize}
 
-% Die Eigenschaften
-
-% \begin{itemize}
-
-% \item Mit 600 MHz Taktfrequenz ausreichend schnell (h"angt vom
-%   Hauptspeicher ab)
-
-% \item Kleine Abmessungen XXX
-
-% \item Geringe Leistungsaufnahme (ca. 20 bis 40 Watt)
-
-% \end{itemize}
-
-Alle Teile kann man bei \url{http://www.mini-itx.de} bestellen. Auch
-einige Augsburger Gesch"afte wie Arlt (\url{http://www.arlt.com}) und 
-K\&M (\url{http://www.kmshop.de}) haben die meisten Teile.
-
-Insgesamt kommt man auf ca. 300 bis 350 Euro Materialkosten (ohne
-Bildschirm).
-
+USB Host Stack:
+\begin{itemize}
+\item Einfache API
+\item Eigene Host Controller Treiber (aktuell SL811HS (Cypress))
+\item Fertige Ger"atetreiber (Massenspeichern,HID,HUB)
+\item Debug Monitor unterst"utzt die Entwicklung
+\item http://www.embedded-projects.net/usbhost
+\end{itemize}
 
 \vskip 5mm
-
 
 \end{minipage}
 \hskip 12mm
@@ -132,35 +105,14 @@ Bildschirm).
 \hrule
 \shadowbox{{\sf Projekte}}
 
-Hier ist das Handbuch zum Mainboard hilfreich.
-
-\begin{itemize}
-\item Speicherriegel mit Gef"uhl in die Rechnerplatine stecken.
-
-\item Festplatte an das "`breite Kabel"' (IDE Flachbandkabel) und an die
-  Stromversorgung stecken. Jumper auf {\em Master}.
-
-\item CDROM-Laufwerk wie die Festplatte anschliessen. Auf dem breiten
-  Kabel sind dazu zwei Anschl"usse vorgesehen. Jumper auf {\em Slave}.
-
-\item Die Bedienelemente der Frontplatte anschliessen, mindestens den
-  Ein-/Ausschalter. 
-
-\item Den weissen Netzteilstecker in die Rechnerplatine stecken (die vielen bunten Kabel).
-
-\end{itemize}
-
-\shadowbox{{\sf Einschalten}}
-
-\begin{itemize}
-  
-\item Direkt nach dem Einschalten die {\tt Entfernen}-Taste dr"ucken
-  und damit in das BIOS wechseln.
-
-\item Im BIOS unter dem Eintrag {\tt Advanced Settings} das CDROM Laufwerk als 
-  erste Boot-Quelle ausw"ahlen.
-
-\end{itemize}
+\begin{description}
+\item [usbprog] bla bla
+\item [vPort] bla bla
+\item [Netzwerkkarte mit TCP/IP Stack] bla bla
+\item [PS2 zu USB Wandler (HID)] bla bla
+\item [Logik Analysator] bla bla
+\item [AVR Online Update] bla bla
+\end{description}
 
 \end{minipage}
 
@@ -174,36 +126,42 @@ Hier ist das Handbuch zum Mainboard hilfreich.
 
 \medskip
 
-\shadowbox{{\sf GNU/Linux: Das Betriebssystem}}
+\shadowbox{{\sf USB Debug-Techniken}}
 
-\begin{itemize}
+\begin{description}
   
-\item Freiheit zum Teilen durch freie Nutzungserlaubnis, d.h. das
-  Kopieren der GNU/Linux CDs ist legal. Das ist bei Microsoft Windows verboten!
+\item [Linux, usbmon]:
+	\newline
+	Es gibt in Linux ein Kernelmodul, das beim Debuggen sehr
+	hilfreich ist. Zu finden ist es unter Device Driver - USB Support - USB Monitor.
+	Mit usbmon kann man sich den Traffic auf dem USB Bus live ansehen.
+	\newline
+	Vorgehensweise:
+		\begin{enumerate}
+			\item modprobe usbmon 
+			\item mount -t debugfs none\_debugs /sys/kernel/debug
+			\item  cat /sys/kernel/debug/usbmon/Xt X = Ger"atenummer (1,2,3..)
+		\end{enumerate}
+	Beispielausgabe:
+		d5ea89a0 3575914555 S Ci:001:00 s a3 00 0000 0003 0004 4 <
+	\newline
+	Ci: (Control IN Transfer "uber Endpunkt 0 mit Adresse 1), 
+	anschliessend folgen die tats"achlichen Daten.
+	
+\item [Windows, usbsnoopy]:
+	\newline
+	Mit usbsnoopy kann man "ahnlich wie mit usbmon Traffic aufzeichnen.
+	
+	Usbsnoopy funktioniert "ahnlich wie usbmon. Jedoch muss man hier
+	zuerst aufzeichnen um die Daten analysieren zu k"onnen und kann
+	nicht \textit{live} auf den Bus sehen.
 
-\item Riesige Sammlung an freien Programmen auf einer DVD oder einem Satz
-  CDROMs.
-
-\item Kostenlos bzw. sehr niedriger Preis 
-\end{itemize}
-
-Zum Ausprobieren empfehle ich {\bf Ubuntu Linux}
-
-\begin{center}
-      \url{http://www.ubuntulinux.org}
+	\begin{center}
+      \url{http://www.wingmanteam.com/usbsnoopy/}
 \end{center}
 
-\begin{itemize}
-\item {\bf Live CD}: Linux ausprobieren ohne zu installieren (empfohlen!)
-\item {\bf Install CD}: Zur Installation auf der Festplatte
-\end{itemize}
 
-CDs mit Ubuntu Linux kann man kostenlos anfordern unter
-
-\bigskip
-
-\centerline{\url{http://www.ubuntulinux.org/shipit}}
-
+\end{description}
 
 % \Ovalbox{
 %     See my homepage for more information.
@@ -220,69 +178,42 @@ CDs mit Ubuntu Linux kann man kostenlos anfordern unter
 
 \medskip
 
-\shadowbox{{\sf Falls man doch Windows braucht}}
+\shadowbox{{\sf libusb - Systemunabh"angig}}
 
-Dann empfehle ich, Microsoft Windows unter Linux zu installieren. Dazu
-braucht man spezielle Software ("`virtuelle Maschine"'), z.B.
+F"ur den, der auf dem PC betriebssystemunabh"angig entwicklen m"ochte,
+ist die Bibliothek libusb eine echte Alternative.
+	
+\begin{center}
+      \url{http://libusb.sourceforge.net/}
+\end{center}
 
+Mit libusb kann mit folgenden Betriebssystemen
+auf den USB Bus zugreifen:
 \begin{itemize}
-
-\item {\bf Win4Lin}, \url{http://www.win4lin.com}. Kostet 30 Euro bei 
-   \url{http://www.ixsoft.de}
-
-\item {\bf VmWare}, \url{http://www.vmware.com}. Kostet etwa 120 Euro f"ur
-  Sch"uler und Lehrer bei \url{http://www.ixsoft.de} 
-
+	\item Linux
+	\item Windows (alle aktuellen Versionen)
+	\item FreeBSD
+	\item NetBSD
+	\item OpenBSD
+	\item Darwin
+	\item MacOS X
 \end{itemize}
 
-Damit kann man Linux und Windows {\em gleichzeitig} verwenden.
-
-\medskip
-
-\shadowbox{{\sf Mehr zum Thema}}
-
-\medskip
-
-Mein VIA EPIA Projekt an der FH:
-
-\centerline{{\tt http://www.fh-augsburg.de/\~{}hhoegl/}}
-\centerline{{\tt proj/epia/epia.html}}
-
-\bigskip
-
-F"ur alle:
-
-\smallskip
-
--- \url{http://www.linux-fuer-alle.de}
-
--- \url{http://www.linuxeinsteiger.info} 
-
--- \url{http://www.pro-linux.de} 
+Dadurch kann man kompatible Anwendungen und Schnittstellen
+entwickeln.
 
 
 \bigskip
-
-Mehr f"ur Lehrerinnen und Lehrer:
+\shadowbox{{\sf Konakt}}
 
 \medskip
 
--- Karl Sarnow, {\em Linux in der Schule}, Millin Verlag 2005
+http://www.usb-projects.net
 
--- {\em Edu Knoppix} - Freie Software und Bildung e.V.
-\url{http://www.fsub.org}
+Benedikt Sauter
 
--- {\em Skolelinux} -- freie Software f"ur Schulen, 
-   \url{http://www.skolelinux.de}
+sauter@ixbat.de
 
-% \vskip 14cm
-
-% \vfill
-
-% {\footnotesize Dieser Text steht unter der {\em Creative Commons
-%    Attribution License},
-%    \url{http://www.creativecommons.org}. 
-% }
 
 \end{minipage}
 \hskip 12mm
@@ -307,7 +238,7 @@ Mehr f"ur Lehrerinnen und Lehrer:
 
 \smallskip
 
-	freien USB Stacks
+	freien USB Stacks.
 
 \end{center} 
 }
