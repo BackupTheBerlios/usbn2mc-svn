@@ -37,7 +37,7 @@
 \begin{itemize}
 \item USB scheint f"ur viele Entwickler sehr kompliziert zu sein 
 \item Oft werden deshalb nur einfache Schnittstellenwandler eingesetzt
-\item Die Funktinalität von USB kann aufgrund desssen nur in einem sehr kleinem Umfang genutzt werden 
+\item Die Funktionalit"at von USB kann aufgrund dessen nur in einem sehr kleinen Umfang genutzt werden 
 \end{itemize}
 
 \medskip
@@ -53,12 +53,12 @@ Vorteile:
 \begin{itemize}
 \item Unabh"angigkeit von USB Bausteinen
 \item Nutzung fertiger Treiber
-\item Flexibel Reaktionen auf verschiedenste Anforderungen
-\item Verf"ugbarkeitn vieler USB Funktionalit"ten (Übertragungsarten, Standbye-Verhalten,...) 
+\item Flexibl Reaktionen auf verschiedenste Anforderungen
+\item Verf"ugbarkeit vieler USB Funktionalit"aten ("Ubertragungsarten, Standbye-Verhalten, ...) 
 \end{itemize}
 
-Um sich schnell und einfach in USB einarbeiten zu können,
-steht auf http://www.usb-projects.net ein
+Um sich schnell und einfach in USB einarbeiten zu k"onnen,
+gibt es auf http://www.usb-projects.net ein
 Grundkurs zur Vermittlung der wesentlichen Eigenschaften.
 
 % \fbox{Just an fbox test}
@@ -80,7 +80,7 @@ Grundkurs zur Vermittlung der wesentlichen Eigenschaften.
 \item Zahlreiche Beispielprojekte
 \item Flexible Schnittstelle f"ur Mikrocontroller (ARM7,R8C,AVR) 
 \item USB Baustein USBN9404/03 (National Semiconductor)
-\item Treiber in der Entwicklung für PDIUSBD12D (NXP) und AT90USB (Atmel)
+\item Treiber in der Entwicklung f"ur PDIUSBD12D (NXP) und AT90USB (Atmel)
 \item http://usbn2mc.berlios.org
 \end{itemize}
 
@@ -88,8 +88,8 @@ Grundkurs zur Vermittlung der wesentlichen Eigenschaften.
 \begin{itemize}
 \item Einfache API
 \item Eigene Host Controller Treiber (aktuell SL811HS (Cypress))
-\item Fertige Ger"atetreiber (Massenspeichern,HID,HUB)
-\item Debug Monitor unterst"utzt die Entwicklung
+\item Fertige Ger"atetreiber (Massenspeichern, HID, HUB)
+\item Der Debug Monitor unterst"utzt die Entwicklung
 \item http://www.embedded-projects.net/usbhost
 \end{itemize}
 
@@ -157,7 +157,7 @@ Grundkurs zur Vermittlung der wesentlichen Eigenschaften.
 	\newline
 	Es gibt in Linux ein Kernelmodul, das beim Debuggen sehr
 	hilfreich ist. Zu finden ist es unter Device Driver - USB Support - USB Monitor.
-	Mit usbmon kann man sich den Traffic auf dem USB Bus live ansehen.
+	Mit usbmon kann man sich den Traffic auf dem USB Bus \textit{live} ansehen.
 	\newline
 	Vorgehensweise:
 		\begin{enumerate}
@@ -174,10 +174,8 @@ Grundkurs zur Vermittlung der wesentlichen Eigenschaften.
 	\newline
 \textbf{Windows, usbsnoopy}
 	\newline
-	Mit usbsnoopy kann man "ahnlich wie mit usbmon Traffic aufzeichnen.
-	
 	Usbsnoopy funktioniert "ahnlich wie usbmon. Jedoch muss man hier
-	zuerst aufzeichnen um die Daten analysieren zu k"onnen und kann
+	zuerst aufzeichnen, um die Daten analysieren zu k"onnen, und kann
 	nicht \textit{live} auf den Bus sehen.
 
 	\begin{center}
@@ -209,8 +207,9 @@ ist die Bibliothek libusb eine echte Alternative.
       \url{http://libusb.sourceforge.net/}
 \end{center}
 
-Mit libusb kann mit folgenden Betriebssystemen
-auf den USB Bus zugreifen:
+Mit Hilfe von libusb kann man mit folgenden
+Betriebssystemen auf den USB Bus zugreifen:
+
 \begin{itemize}
 	\item Linux
 	\item Windows (alle aktuellen Versionen)
