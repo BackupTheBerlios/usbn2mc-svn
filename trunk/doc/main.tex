@@ -74,7 +74,7 @@ Grundkurs zur Vermittlung der wesentlichen Eigenschaften.
 
 \shadowbox{{\sf USB Stacks}}
 \newline
-USB Device Stack (usbn2mc):
+\textbf{USB Device Stack (usbn2mc):}
 \begin{itemize}
 \item Einfache API
 \item Zahlreiche Beispielprojekte
@@ -84,7 +84,7 @@ USB Device Stack (usbn2mc):
 \item http://usbn2mc.berlios.org
 \end{itemize}
 
-USB Host Stack:
+\textbf{USB Host Stack:}
 \begin{itemize}
 \item Einfache API
 \item Eigene Host Controller Treiber (aktuell SL811HS (Cypress))
@@ -104,49 +104,40 @@ USB Host Stack:
 \hfill {\Large\sf 4}\\
 \hrule
 \shadowbox{{\sf Projekte}}
-
-\begin{description}
-\item [usbprog]
+\newline
+\textbf{usbprog, programmierbarer Adapter:}
 	\begin{itemize}
-	\item Frei programmierbarer USB Adapter (AVRISP mkII Klon, ISP, RS232, JTAG,...)
+	\item Frimware: AVRISP mkII Klon, ISP, RS232, JTAG,...
 	\item http://www.embedded-projects.net/usbprog
 	\end{itemize}
-\item [vPort]
+
+\textbf{vPort uC Schnittstellen f"ur den PC:}
 	\begin{itemize}
-	\item vPort Schnittstellen Wandler und I/O Erweiterung für den PC 
 	\item Linux Treiber / libusb basierte Bibliothek
 	\item Ansteuerbar "uber das Netzwerk mit http://easyconnect.berlios.de
 	\item http://www.embedded-projects.net/vport
 	\end{itemize}
 
-\item [Netzwerkkarte mit TCP/IP Stack] 
+\textbf{Netzwerkkarte mit TCP/IP Stack:}
   \begin{itemize}
 	\item Kommunikation mit einem USB Ger"at "uber Sockets
-	\item http://www.ixbat.de/index.php?page_id=97
-	\item Realsierung als Communication Device Class
-	\item Integrierter uIP TCP/IP Stack
+	\item http://www.ixbat.de/tcp
 	\end{itemize}
 
-\item [PS2 zu USB Wandler (HID)]
+\textbf{PS2 zu USB Wandler (HID):}
 	\begin{itemize}
-	\item Ein PS/2 (Tastatur) zu USB Wandler mit usbn2mc
-	\item http://www.ixbat.de/index.php?page_id=98
+	\item http://www.ixbat.de/ps2
 	\end{itemize}
 
-\item [Logik Analysator]
+\textbf{Logik Analysator unter 15 EUR:}
 	\begin{itemize}
-	\item USB Logik Analysator für unter 15 EUR 
-	\item http://www.ixbat.de/index.php?page_id=92 
+	\item http://www.ixbat.de/la
 	\end{itemize}
 
-\item [AVR USB Bootloader]
+\textbf{AVR USB Bootloader:}
 	\begin{itemize}
-	\item http://www.ixbat.de/index.php?page_id=81 
+	\item http://www.ixbat.de/boot
 	\end{itemize}
-
-
-
-\end{description}
 
 \end{minipage}
 
@@ -162,9 +153,7 @@ USB Host Stack:
 
 \shadowbox{{\sf USB Debug-Techniken}}
 
-\begin{description}
-  
-\item [Linux, usbmon]:
+\textbf{Linux, usbmon}
 	\newline
 	Es gibt in Linux ein Kernelmodul, das beim Debuggen sehr
 	hilfreich ist. Zu finden ist es unter Device Driver - USB Support - USB Monitor.
@@ -181,8 +170,9 @@ USB Host Stack:
 	\newline
 	Ci: (Control IN Transfer "uber Endpunkt 0 mit Adresse 1), 
 	anschliessend folgen die tats"achlichen Daten.
-	
-\item [Windows, usbsnoopy]:
+	\newline
+	\newline
+\textbf{Windows, usbsnoopy}
 	\newline
 	Mit usbsnoopy kann man "ahnlich wie mit usbmon Traffic aufzeichnen.
 	
@@ -194,8 +184,6 @@ USB Host Stack:
       \url{http://www.wingmanteam.com/usbsnoopy/}
 \end{center}
 
-
-\end{description}
 
 % \Ovalbox{
 %     See my homepage for more information.
