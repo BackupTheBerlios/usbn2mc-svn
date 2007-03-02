@@ -42,7 +42,7 @@ MCU = atmega32
 
 # Main Oscillator Frequency
 # This is only used to define F_OSC in all assembler and c-sources.
-F_OSC = 3686400
+F_OSC = 16000000 
 
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
@@ -52,7 +52,7 @@ TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c uart.c ../../firmware/usbn960x/usbn960x.c usbn2mc.c ../../firmware/usbn960x/fifo.c ../../firmware/usbn960x/usbnapi.c
+SRC = $(TARGET).c uart.c usbnterm.c ../../firmware/usbn960xtiny/usbn960x.c usbn2mc.c ../../firmware/usbn960xtiny/usbnapi.c atkeyb.c
 
 
 # List Assembler source files here.
@@ -69,12 +69,12 @@ ASRC =
 # Optimization level, can be [0, 1, 2, 3, s]. 
 # 0 = turn off optimization. s = optimize for size.
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
-OPT = s
+OPT = s 
 
 # Debugging format.
 # Native formats for AVR-GCC's -g are stabs [default], or dwarf-2.
 # AVR (extended) COFF requires stabs, plus an avr-objcopy run.
-DEBUG = stabs
+#DEBUG = stabs
 #DEBUG = dwarf-2
 
 # List any extra directories to look for include files here.
@@ -276,14 +276,15 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 # Default target.
 all: begin gccversion sizebefore build sizeafter finished end
 
-build: elf hex eep lss sym
+build: elf hex eep lss sym hex2bin
 
 elf: $(TARGET).elf
 hex: $(TARGET).hex
 eep: $(TARGET).eep
 lss: $(TARGET).lss 
 sym: $(TARGET).sym
-
+hex2bin:
+	hex2bin main.hex
 
 
 # Eye candy.
