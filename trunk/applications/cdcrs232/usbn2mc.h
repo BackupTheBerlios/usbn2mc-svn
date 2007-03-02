@@ -19,7 +19,7 @@
 #define _MCIFACE_H_
 
 
-#include "../../firmware/usbn960x/usbnapi.h"
+#include "usbn2mc/tiny/usbnapi.h"
 
 unsigned char USBNRead(unsigned char Adr);
 unsigned char USBNBurstRead(void);
@@ -30,6 +30,8 @@ void USBNInitMC(void);
 
 // print debug messages
 void USBNDebug(char *msg);
+
+void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep);
 
 void USBNDecodeVendorRequest(DeviceRequest *req);
 void USBNDecodeClassRequest(DeviceRequest *req);

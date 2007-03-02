@@ -7,11 +7,9 @@
 #include "uart.h"
 #include "usbn2mc.h"
 
-#include "atkeyb.h"
-
-void usbHIDWrite(char hex);
 
 volatile int tx1togl=0; 		// inital value of togl bit
+
 /* report descriptor keyboard */
 
 char ReportDescriptorKeyboard[] = 
@@ -132,16 +130,12 @@ SIGNAL(SIG_INTERRUPT0)
 }
 
 
-SIGNAL(SIG_INTERRUPT2)
-{
-		atkeyb_interrupt();
-}
-
 /*************** usb class HID requests  **************/
 
 // reponse for requests on interface
 void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
 {
+/*
   	// 81 06 22 get report descriptor
   	switch(req->bRequest)
   	{
@@ -154,6 +148,7 @@ void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
     		default:
       		UARTWrite("unkown interface request");
    	}
+*/
 }
 
 
@@ -184,7 +179,7 @@ void usbHIDWrite(char hex)
 
   	USBNWrite(TXD1,0x00);	// send chars 		bei shift = 02
   	USBNWrite(TXD1,0x00);	
-	USBNWrite(TXD1,hex);	
+		USBNWrite(TXD1,hex);	
   	USBNWrite(TXD1,0x00);	
 
   	USBNWrite(TXD1,0x00);	
@@ -222,7 +217,6 @@ int main(void)
   	USBNInitMC();		// start usb controller
   	USBNStart();		// start device stack
 
-	atkeyb_init();
 
 	
 	/* stupid wait loop */
@@ -232,8 +226,8 @@ int main(void)
   	while(1)
 	{
 		
-		key = atkeyb_getchar();
-		usbHIDWrite(key-93);
+		//key = atkeyb_getchar();
+		//usbHIDWrite(key-93);
 		//usbHIDWrite(key-93);
 		//SendHex(key);
 
