@@ -18,7 +18,7 @@ void UARTInit(void)
 	UCSRA = (1 << RXC) | (1 << TXC);
   UCSRB = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
   UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
-	//ATmega32 bei 16MHz und für 19200 Baud
+	//ATmega32 bei 16MHz und für 9600 Baud
   UBRRH  = 0;                                   // Highbyte ist 0
   UBRRL  = 51;                                  // Lowbyte ist 51 ( dezimal )
     // Flush Receive-Buffer
@@ -101,4 +101,30 @@ void SendHex(unsigned char hex)
     UARTPutChar(low+87);
 
 }
+
+/*
+void uartInit(ulong baudrate, uchar parity, uchar stopbits, uchar databits)
+{
+usbDWord_t   br;
+
+    br.dword = F_CPU / (8L * baudrate) - 1;
+	UCSR0A  |= (1<<U2X0);
+
+#if DEBUG_LEVEL < 1
+    //    USART configuration    
+    UCSR0B  = 0;
+    UCSR0C  = URSEL_MASK | ((parity==1? 3:parity)<<UPM00) | ((stopbits>>1)<<USBS0) | ((databits-5)<<UCSZ00);
+    UBRR0L  = br.bytes[0];
+    UBRR0H  = br.bytes[1];
+#else
+    DBG1(0xf0, br.bytes, 2);
+#endif // DEBUG_LEVEL 
+
+#ifdef USE_UART_RXD_INTERRUPT
+    UCSR0B  = (1<<RXEN0) | (1<<TXEN0) | (1<<RXCIE0);
+#else
+    UCSR0B  = (1<<RXEN0) | (1<<TXEN0);
+#endif
+}
+*/
 

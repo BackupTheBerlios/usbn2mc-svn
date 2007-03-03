@@ -4,11 +4,38 @@
 #include <avr/interrupt.h>
 #include <inttypes.h>
 
+#define  F_CPU   16000000
+
 #include "uart.h"
 #include "usbn2mc.h"
+#include "usbn2mc/fifo.h"
 
 
 volatile int tx1togl=0; 		// inital value of togl bit
+
+
+char toUSBBuf[100];
+char toRS232Buf[100];
+
+fifo_t* toRS232FIFO;
+fifo_t* toUSBFIFO;
+
+static unsigned char interrupt3Status; /* used to controll interrupt endpoint transmission */
+int togl3=0;
+int togl1=0;
+
+enum {
+	SEND_ENCAPSULATED_COMMAND = 0,
+	GET_ENCAPSULATED_RESPONSE,
+	SET_COMM_FEATURE,
+	GET_COMM_FEATURE,
+	CLEAR_COMM_FEATURE,
+	SET_LINE_CODING = 0x20,
+	GET_LINE_CODING,
+	SET_CONTROL_LINE_STATE,
+	SEND_BREAK
+};
+
 
 /* Device Descriptor */
 
@@ -21,8 +48,8 @@ const unsigned char usbrs232[] =
     	0x00,             // device subclass
     	0x00,       // protocol code
     	0x08,       // deep of ep0 fifo in byte (e.g. 8)
-    	0xc0,0x16,  // vendor id
-    	0xe1,0x05,  // product id
+    	0x81,0x17,  // vendor id
+    	0x64,0x0c,  // product id
     	0x00,0x01,  // revision id (e.g 1.02)
     	0x00,       // index of manuf. string
     	0x00,             // index of product string
@@ -123,13 +150,11 @@ const unsigned char usbrs232Conf[] =
 
 SIGNAL(SIG_UART_RECV)
 {
-	UARTGetChar();
-	
-	/*char test[]="Hallo";
-	int size = 4;
-	usbHIDWrite(test,size,0x05);
-	*/
-	
+	//UARTWrite("tipp");
+	//fifo_put (toUSBFIFO,UARTGetChar());
+	USBNWrite(TXC2,FLUSH);
+	USBNWrite(TXD2,UARTGetChar());
+	rs232_send();	
 }
 
 /* interrupt signael from usb controller */
@@ -145,116 +170,124 @@ SIGNAL(SIG_INTERRUPT0)
 // reponse for requests on interface
 void USBNInterfaceRequests(DeviceRequest *req,EPInfo* ep)
 {
-/*
-  	// 81 06 22 get report descriptor
-  	switch(req->bRequest)
-  	{
-    		case GET_DESCRIPTOR:
-        		ep->Index=0;
-			ep->DataPid=1;
-        		ep->Size=59;
-			ep->Buf=ReportDescriptorKeyboard;
-    		break;
-    		default:
-      		UARTWrite("unkown interface request");
-   	}
-*/
 }
 
 
 
 // vendor requests
-void USBNDecodeVendorRequest(DeviceRequest *req)
+void USBNDecodeVendorRequest(DeviceRequest *req,EPInfo* ep)
 {
 }
 
 
 // class requests
-void USBNDecodeClassRequest(DeviceRequest *req)
+void USBNDecodeClassRequest(DeviceRequest *req,EPInfo* ep)
 {
+	//UARTWrite("class");
+  static unsigned char serialNotification[10] = {0xa1,0x20,0,0,0,0,2,0,3,0};
+	int loop;
+	switch(req->bRequest)
+	{
+		case 0x21:	// GET_LINE_CODING:
+
+		break;
+		case 0x20:	//SET_LINE_CODING:
+
+		break;
+		case 0x22:	//SET_CONTROL_LINE_STATE:
+			//UARTWrite("set ctrl line state");
+			USBNWrite(TXC1,FLUSH);
+			// fill endpoint fifo
+			for(loop=0;loop<8;loop++)
+				USBNWrite(TXD1,serialNotification[loop]);
+
+			//send and control togl bit
+			interrupt_ep_send();
+			USBNWrite(TXC0,TX_TOGL+TX_EN);
+		break;
+			//default:
+			//UARTWrite("unkown interface request");
+	}
 }
 
 
-
-
-/* function for sending strings over usb hid device 
- * please use max size of 64 in this version
- */
-
-void usbHIDWrite(char hex)
+// usb zu rs232
+void USBtoRS232(char * buf)
 {
-  	int i;
 
-  	USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
+	//fifo_put(toRS232FIFO,0x33);
+	//fifo_put(toRS232FIFO,0x34);
+	//fifo_put(toRS232FIFO,0x35);
+	UARTPutChar(buf[0]);
 
-  	USBNWrite(TXD1,0x00);	// send chars 		bei shift = 02
-  	USBNWrite(TXD1,0x00);	
-		USBNWrite(TXD1,hex);	
-  	USBNWrite(TXD1,0x00);	
-
-  	USBNWrite(TXD1,0x00);	
-  	USBNWrite(TXD1,0x00);	
-  	USBNWrite(TXD1,0x00);	
-  	USBNWrite(TXD1,0x00);	
-
-  	/* control togl bit of EP1 */
-  	if(tx1togl)
-  	{
-  		USBNWrite(TXC1,TX_TOGL+TX_EN+TX_LAST);  //enable the TX (DATA1)
-		tx1togl=0;
-  	}
-  	else
-  	{
-  		USBNWrite(TXC1,TX_EN+TX_LAST);  //enable the TX (DATA1)
-		tx1togl=1;
-  	}
+	//USBNWrite(TXC2,FLUSH);
+	//USBNWrite(TXD2,0x44);
+	//rs232_send();	
+	//UARTWrite("usb to rs232");
+	
 }
 
+
+// togl pid for in endpoint
+void interrupt_ep_send()
+{
+	if(togl3==0) {
+		togl3=1;
+		USBNWrite(TXC1,TX_LAST+TX_EN);
+	} else {
+		togl3=0;
+		USBNWrite(TXC1,TX_LAST+TX_EN+TX_TOGL);
+	}
+}
+
+// togl pid for in endpoint
+void rs232_send()
+{
+	if(togl1==0) {
+		togl1=1;
+		USBNWrite(TXC2,TX_LAST+TX_EN);
+	} else {
+		togl1=0;
+		USBNWrite(TXC2,TX_LAST+TX_EN+TX_TOGL);
+	}
+}
 
 
 /*************** main function  **************/
 
 int main(void)
 {
-
-  	sei();			// activate global interrupts
-  	UARTInit();		// only for debugging
-
-  	// setup usbstack with your descriptors
-  	USBNInit(usbrs232,usbrs232Conf);
-
-
-  	USBNInitMC();		// start usb controller
-  	USBNStart();		// start device stack
-
-
+	int loop;	
+	// init fifos
+	fifo_init (toRS232FIFO, toRS232Buf, 100);
+	fifo_init (toUSBFIFO, toUSBBuf, 100);
 	
-	/* stupid wait loop */
-	int i,j;		 
-	char key;
-	char test[2];
-  	while(1)
-	{
+	USBNCallbackFIFORX1(&USBtoRS232);
+	//USBNCallbackFIFOTX2Ready(&USBtoRS232);
+
+  sei();			// activate global interrupts
+  UARTInit();		// only for debugging
+
+  // setup usbstack with your descriptors
+  USBNInit(usbrs232,usbrs232Conf);
+
+
+  USBNInitMC();		// start usb controller
+  USBNStart();		// start device stack
+
+  while(1){
 		
-		//key = atkeyb_getchar();
-		//usbHIDWrite(key-93);
-		//usbHIDWrite(key-93);
-		//SendHex(key);
+#if 0
+		// wenn cpu zeit vorhanden fifos weiterverteilen
+		// usb -> rs232
+	
+		// rs232 -> usb
+		USBNWrite(TXC1,FLUSH);
+		USBNWrite(TXD1,0x44);
+		send_toggle();	
 
-		//test[0]=key;
-		//test[1]=0x00;
-		//UARTWrite(test);
-		
+#endif
 
-
-
-	    for(j=0;j<0xFFFF;j++){}
-		usbHIDWrite(0x00);
-/*	
-	  int size = 4;
-	  
-	  usbHIDWrite(test,size,0x04);
-	  */
 	}
 }
 

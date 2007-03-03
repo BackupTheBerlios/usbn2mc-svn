@@ -270,15 +270,17 @@ void _USBNReceiveFIFO0(void)
 				#if DEBUG
 				USBNDebug("Class request\n\r");
 				#endif
-				USBNDecodeClassRequest(req);
-				USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+				USBNDecodeClassRequest(req,&EP0tx);
+				_USBNTransmit(&EP0tx);
+				//USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
 			break;
 			case DO_VENDOR:				// vendor request        
 				#if DEBUG
 				USBNDebug("Vendor request\n\r");
 				#endif
-				USBNDecodeVendorRequest(req);
-				USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
+				USBNDecodeVendorRequest(req,&EP0tx);
+				_USBNTransmit(&EP0tx);
+				//USBNWrite(TXC0,TX_TOGL+TX_EN);  //enable the TX (DATA1)
 			break;              
 			default:					// unsupported req type    
 				#if DEBUG
@@ -470,7 +472,7 @@ void _USBNClearFeature(void)
 
 void _USBNGetDescriptor(DeviceRequest *req)
 {
-  unsigned char index =  req->wValue;
+  //unsigned char index =  req->wValue;
   unsigned char type = req->wValue >> 8;
 
   EP0tx.Index = 0;
@@ -537,16 +539,16 @@ void _USBNSetConfiguration(DeviceRequest *req)
   // load fct pointer list for out eps
   //
 
-USBNWrite(TXC1,FLUSH);
-USBNWrite(EPC1,EP_EN+0x01);      // enable EP1 at adr 1
+	// interrupt ddresse 83 raus
+	USBNWrite(TXC1,FLUSH);
+	USBNWrite(EPC1,EP_EN+0x03); 
 
-USBNWrite(RXC1,FLUSH);
-USBNWrite(EPC2,EP_EN+0x02); 
-USBNWrite(RXC1,RX_EN);
+	USBNWrite(RXC1,FLUSH);					// EP1 rein	mit callback function rein
+	USBNWrite(EPC2,EP_EN+0x01); 
+	USBNWrite(RXC1,RX_EN);
 
-//USBNWrite(TXC3,FLUSH);
-//USBNWrite(EPC5,EP_EN+0x05); 
-
+	USBNWrite(TXC2,FLUSH);					// interrupt ddresse 83 raus
+	USBNWrite(EPC3,EP_EN+0x01); 
 
 	
 /* 

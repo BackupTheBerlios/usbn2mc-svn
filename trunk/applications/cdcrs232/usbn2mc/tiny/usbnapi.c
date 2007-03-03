@@ -29,7 +29,7 @@ void USBNInit(unsigned char* _DeviceDescriptor,unsigned char* _ConfigurationDesc
   ConfigurationDescriptor=_ConfigurationDescriptor;
 }
 
-USBNCallbackFIFORX1(void *fct)
+void USBNCallbackFIFORX1(void *fct)
 {
   RX1Callback = fct;
 }

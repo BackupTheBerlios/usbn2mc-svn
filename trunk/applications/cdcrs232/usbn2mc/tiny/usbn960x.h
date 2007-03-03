@@ -19,7 +19,7 @@
 #ifndef _USBN960X_H
 #define _USBN960X_H
 
-#define DEBUG 0 
+#define DEBUG 0
 
 #include "../usbn960xreg.h"
 #include "../usb11spec.h"
@@ -96,8 +96,8 @@ void _USBNInitEP0(void);
 void USBNDebug(char *msg);
 
 //only for compiler
-void USBNDecodeVendorRequest(DeviceRequest *req);
-void USBNDecodeClassRequest(DeviceRequest *req);
+void USBNDecodeVendorRequest(DeviceRequest *req,EPInfo* ep);
+void USBNDecodeClassRequest(DeviceRequest *req,EPInfo* ep);
 
 
 

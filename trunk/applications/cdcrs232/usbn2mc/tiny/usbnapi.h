@@ -25,7 +25,7 @@
 /// initial global data structures
 void USBNInit(unsigned char *_DeviceDescriptor,unsigned char *_ConfigurationDescriptor);
 
-USBNCallbackFIFORX1(void *fct);
+void USBNCallbackFIFORX1(void *fct);
 
 /// start usb system after configuration
 void USBNStart(void);
