@@ -178,7 +178,7 @@ void USBNDecodeClassRequest(DeviceRequest *req)
 
 void usbHIDWrite(char hex)
 {
-  	int i;
+  	//int i;
 
   	USBNWrite(TXC1,FLUSH);  //enable the TX (DATA1)
 
@@ -226,10 +226,9 @@ int main(void)
 
 	
 	/* stupid wait loop */
-	int i,j;		 
+	int j;		 
 	char key;
-	char test[2];
-  	while(1)
+  while(1)
 	{
 		
 		key = atkeyb_getchar();

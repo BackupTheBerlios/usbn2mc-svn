@@ -11,7 +11,7 @@
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <avr/signal.h>
+#include <avr/interrupt.h>
 #include "atkeyb.h"
 
 #include "uart.h"
@@ -100,7 +100,7 @@ void decode(unsigned char sc)
 {
 	static unsigned char is_up=0, shift = 0, mode = 0;
 	unsigned char i;
-	unsigned char a, b;
+	unsigned char a;
 	if (!is_up)// Last data received was the up-key identifier
 	{
 		switch (sc)
