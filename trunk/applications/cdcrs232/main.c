@@ -11,6 +11,9 @@
 #include "usbn2mc/fifo.h"
 
 
+void interrupt_ep_send();
+void rs232_send();
+
 volatile int tx1togl=0; 		// inital value of togl bit
 
 
@@ -20,9 +23,17 @@ char toRS232Buf[100];
 fifo_t* toRS232FIFO;
 fifo_t* toUSBFIFO;
 
-static unsigned char interrupt3Status; /* used to controll interrupt endpoint transmission */
 int togl3=0;
 int togl1=0;
+
+
+
+struct {
+	char		dwDTERrate[4];   //data terminal rate, in bits per second
+	char    bCharFormat;  //num of stop bits (0=1, 1=1.5, 2=2)
+	char    bParityType;  //parity (0=none, 1=odd, 2=even, 3=mark, 4=space)
+	char    bDataBits;    //data bits (5,6,7,8 or 16)
+} usb_cdc_line_coding;
 
 enum {
 	SEND_ENCAPSULATED_COMMAND = 0,
@@ -189,10 +200,43 @@ void USBNDecodeClassRequest(DeviceRequest *req,EPInfo* ep)
 	switch(req->bRequest)
 	{
 		case 0x21:	// GET_LINE_CODING:
+			//UARTWrite("get line coding");
+			USBNWrite(TXC0,FLUSH);
 
+
+			// baud rate
+			USBNWrite(TXD0,0x80);
+			USBNWrite(TXD0,0x25);
+			USBNWrite(TXD0,0);
+			USBNWrite(TXD0,0);
+
+			USBNWrite(TXD0,0); //stopbit
+			USBNWrite(TXD0,0); // parity
+			USBNWrite(TXD0,8); // databits
+
+			interrupt_ep_send();
+
+			USBNWrite(TXC0,TX_TOGL+TX_EN);
+
+			
 		break;
 		case 0x20:	//SET_LINE_CODING:
+			USBNWrite(TXC0,FLUSH);
+		 	USBNRead(TXD0);
+		 	USBNRead(TXD0);
+		 	USBNRead(TXD0);
 
+		 	USBNRead(TXD0);
+		 	USBNRead(TXD0);
+		 	USBNRead(TXD0);
+		 	USBNRead(TXD0);
+			USBNWrite(TXC0,FLUSH);
+
+			//UARTWrite("set lin");
+			//USBNWrite(TXC0,FLUSH);
+			//USBNWrite(TXD0,0);
+			//USBNWrite(TXC0,TX_EN);
+			//USBNWrite(TXC0,TX_TOGL+TX_EN);
 		break;
 		case 0x22:	//SET_CONTROL_LINE_STATE:
 			//UARTWrite("set ctrl line state");
@@ -205,8 +249,6 @@ void USBNDecodeClassRequest(DeviceRequest *req,EPInfo* ep)
 			interrupt_ep_send();
 			USBNWrite(TXC0,TX_TOGL+TX_EN);
 		break;
-			//default:
-			//UARTWrite("unkown interface request");
 	}
 }
 
@@ -257,7 +299,6 @@ void rs232_send()
 
 int main(void)
 {
-	int loop;	
 	// init fifos
 	fifo_init (toRS232FIFO, toRS232Buf, 100);
 	fifo_init (toUSBFIFO, toUSBBuf, 100);
