@@ -38,12 +38,12 @@
 
 
 # MCU name
-MCU = atmega8
+MCU = atmega32
 
 # Main Oscillator Frequency
 # This is only used to define F_OSC in all assembler and c-sources.
 #F_OSC = 3686400
-F_OSC = 4000000 
+F_OSC = 16000000 
 
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
@@ -437,4 +437,4 @@ build elf hex eep lss sym coff extcoff \
 clean clean_list program
 
 download:
-	avrdude -p m8 -c bsd -U flash:w:main.hex -E noreset
+	avrdude -p m32 -c avrisp2 -P usb -U flash:w:main.hex -E noreset

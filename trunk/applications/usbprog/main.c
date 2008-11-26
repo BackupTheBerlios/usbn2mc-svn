@@ -5,7 +5,7 @@
 //#include <avr/signal.h>
 #include <inttypes.h>
 
-#define F_CPU 4000000
+#define F_CPU 16000000
 #include <util/delay.h>
 
 #include "uart.h"

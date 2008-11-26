@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include <inttypes.h>
 
 #include "uart.h"
@@ -226,11 +227,18 @@ int main(void)
 
 	
 	/* stupid wait loop */
-	int j;		 
+	int j,i;		 
 	char key;
   while(1)
-	{
-		
+    {
+      _delay_ms(1000);
+        
+      char test[]="Hallo";
+      int size = 4;
+      /* send string */
+      //usbHIDWrite(test,size,0x04);
+      usbHIDWrite(0x04);
+#if 0	
 		key = atkeyb_getchar();
 		usbHIDWrite(key-93);
 		//usbHIDWrite(key-93);
@@ -250,6 +258,7 @@ int main(void)
 	  
 	  usbHIDWrite(test,size,0x04);
 	  */
+#endif
 	}
 }
 
