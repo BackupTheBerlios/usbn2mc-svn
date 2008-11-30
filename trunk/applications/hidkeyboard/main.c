@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
+#define F_CPU 16000000UL  // 16 MHz
 #include <util/delay.h>
 #include <inttypes.h>
 
@@ -231,7 +232,10 @@ int main(void)
 	char key;
   while(1)
     {
-      _delay_ms(1000);
+      _delay_ms(200);
+      _delay_ms(200);
+      _delay_ms(200);
+      _delay_ms(200);
         
       char test[]="Hallo";
       int size = 4;
